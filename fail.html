@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оплата не прошла — Академия Финансов</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="adaptive.css">
+    <script>
+    // Обработка параметров URL для отслеживания неудачного платежа
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorCode = urlParams.get('ErrorCode');
+        const message = urlParams.get('Message');
+        const orderId = urlParams.get('OrderId');
+        
+        if (errorCode) {
+            console.log('Ошибка платежа. ErrorCode:', errorCode, 'Message:', message, 'OrderId:', orderId);
+            
+            // Отображаем ошибку, если она есть
+            const errorMessageElement = document.getElementById('error-message');
+            if (errorMessageElement && message) {
+                errorMessageElement.textContent = `Ошибка: ${message}`;
+                errorMessageElement.classList.remove('hidden');
+            }
+        }
+        
+        // Очищаем данные о текущем продукте из sessionStorage
+        sessionStorage.removeItem('currentProduct');
+    });
+    </script>
+</head>
+<body class="bg-slate-50 flex flex-col min-h-screen justify-center items-center">
+    <div class="max-w-lg bg-white rounded-xl shadow-md p-8 mt-12">
+        <h1 class="text-2xl font-bold mb-4 text-center text-red-600">Оплата не прошла</h1>
+        <p class="mb-4 text-center">К сожалению, платёж не был завершён. Попробуйте ещё раз или свяжитесь с нашей поддержкой: <a href="mailto:info@academfin.ru" class="text-orange-500 underline">info@academfin.ru</a></p>
+        <p id="error-message" class="mb-4 text-center text-red-500 hidden"></p>
+        <a href="index.html" class="cta-button cta-button-full block text-center">Вернуться на главную</a>
+    </div>
+</body>
+</html>

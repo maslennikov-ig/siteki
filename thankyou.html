@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Спасибо за оплату — Академия Финансов</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="adaptive.css">
+    <script>
+    // Обработка параметров URL для отслеживания успешного платежа
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentId = urlParams.get('PaymentId');
+        const orderId = urlParams.get('OrderId');
+        
+        if (paymentId) {
+            console.log('Успешный платеж. PaymentId:', paymentId, 'OrderId:', orderId);
+            // Здесь можно отправить информацию о платеже на сервер для сохранения
+        }
+        
+        // Очищаем данные о текущем продукте из sessionStorage
+        sessionStorage.removeItem('currentProduct');
+    });
+    </script>
+</head>
+<body class="bg-slate-50 flex flex-col min-h-screen justify-center items-center">
+    <div class="max-w-lg bg-white rounded-xl shadow-md p-8 mt-12">
+        <h1 class="text-2xl font-bold mb-4 text-center text-green-600">Спасибо за оплату!</h1>
+        <p class="mb-4 text-center">Ваша оплата успешно прошла. Мы отправили подробные инструкции и ссылки на скачивание на ваш email.</p>
+        <p class="mb-6 text-center">Если письмо не пришло в течение 10 минут — проверьте папку "Спам" или свяжитесь с нашей поддержкой: <a href="mailto:info@academfin.ru" class="text-orange-500 underline">info@academfin.ru</a></p>
+        <a href="index.html" class="cta-button cta-button-full block text-center">Вернуться на главную</a>
+    </div>
+</body>
+</html>
