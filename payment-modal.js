@@ -84,12 +84,11 @@ function openPaymentModal(productId) {
     const submitButton = document.getElementById('submit-payment');
     if (submitButton) {
         submitButton.innerHTML = `
-            <div class="payment-submit-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M9 12l2 2 4-4"/>
-                    <circle cx="12" cy="12" r="9"/>
+            <span class="payment-submit-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
                 </svg>
-            </div>
+            </span>
             Оплатить ${product.price.toLocaleString()} ₽
         `;
     }
@@ -306,30 +305,27 @@ function setFormLoading(loading) {
     
     if (loading) {
         submitButton.disabled = true;
-        submitButton.classList.add('loading');
         submitButton.innerHTML = `
-            <div class="payment-submit-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M21 12a9 9 0 11-6.219-8.56"/>
+            <span class="payment-submit-icon">
+                <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
-            </div>
-            Создаем платеж...
+            </span>
+            Обработка...
         `;
         cancelButton.disabled = true;
     } else {
         submitButton.disabled = false;
-        submitButton.classList.remove('loading');
         cancelButton.disabled = false;
         // Восстанавливаем оригинальный текст кнопки
         const product = productInfo[currentProductId];
         if (product) {
             submitButton.innerHTML = `
-                <div class="payment-submit-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M9 12l2 2 4-4"/>
-                        <circle cx="12" cy="12" r="9"/>
+                <span class="payment-submit-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
                     </svg>
-                </div>
+                </span>
                 Оплатить ${product.price.toLocaleString()} ₽
             `;
         }
