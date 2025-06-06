@@ -712,4 +712,420 @@
     .animate-spin {
         animation: none;
     }
+}
+
+/* Стили для Т-банк интерфейса оплаты */
+.tbank-payment-widget {
+    background: #2c2c2e;
+    border-radius: 16px;
+    padding: 24px;
+    color: white;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.tbank-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tbank-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.tbank-logo-icon {
+    width: 32px;
+    height: 32px;
+    background: #f5d116;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.tbank-flag {
+    width: 24px;
+    height: 16px;
+    background: linear-gradient(to bottom, #ffffff 33%, #0039a6 33%, #0039a6 66%, #d52b1e 66%);
+    border-radius: 2px;
+}
+
+.tbank-amount-section {
+    margin-bottom: 32px;
+}
+
+.tbank-amount-label {
+    background: #48484a;
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.tbank-amount-display {
+    background: #48484a;
+    color: #ffffff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tbank-amount-display:hover {
+    background: #56565a;
+}
+
+.tbank-amount-dropdown {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s ease;
+}
+
+.tbank-card-section {
+    flex: 1;
+    margin-bottom: 24px;
+}
+
+.tbank-card-title {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.tbank-card-input {
+    background: #48484a;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: #ffffff;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+}
+
+.tbank-card-input:focus {
+    outline: none;
+    background: #56565a;
+    box-shadow: 0 0 0 2px rgba(245, 209, 22, 0.3);
+}
+
+.tbank-card-input::placeholder {
+    color: #8e8e93;
+}
+
+.tbank-receipt-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.tbank-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #8e8e93;
+    border-radius: 4px;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tbank-checkbox.checked {
+    background: #f5d116;
+    border-color: #f5d116;
+}
+
+.tbank-checkbox.checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tbank-receipt-label {
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tbank-pay-button {
+    background: #f5d116;
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tbank-pay-button:hover {
+    background: #e6c015;
+    transform: translateY(-1px);
+}
+
+.tbank-pay-button:active {
+    transform: translateY(0);
+}
+
+.tbank-security-footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tbank-security-items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.tbank-security-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8e8e93;
+    font-size: 12px;
+}
+
+.tbank-security-item svg {
+    width: 16px;
+    height: 16px;
+    color: #34c759;
+}
+
+.tbank-security-title {
+    color: #8e8e93;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+/* Responsive для мобильных устройств */
+@media (max-width: 640px) {
+    .tbank-payment-widget {
+        padding: 20px;
+        min-height: 350px;
+    }
+    
+    .tbank-amount-display {
+        font-size: 20px;
+        padding: 14px 16px;
+    }
+    
+    .tbank-card-input {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+    
+    .tbank-security-items {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Стили для типов карт и валидации */
+.tbank-card-input {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.tbank-card-input.card-visa {
+    background: linear-gradient(135deg, #1a1f71 0%, #003087 100%);
+    border: 2px solid #1a1f71;
+}
+
+.tbank-card-input.card-mastercard {
+    background: linear-gradient(135deg, #eb001b 0%, #f79e1b 50%, #ff5f00 100%);
+    border: 2px solid #eb001b;
+}
+
+.tbank-card-input.card-mir {
+    background: linear-gradient(135deg, #4db45e 0%, #398b4c 100%);
+    border: 2px solid #4db45e;
+}
+
+.tbank-card-input.card-amex {
+    background: linear-gradient(135deg, #006fcf 0%, #0048a3 100%);
+    border: 2px solid #006fcf;
+}
+
+.tbank-card-input.card-valid {
+    background: #48484a !important;
+    border: 2px solid #34c759 !important;
+    box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.2);
+}
+
+.tbank-card-input.card-invalid {
+    background: #48484a !important;
+    border: 2px solid #ff453a !important;
+    box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.2);
+}
+
+/* Анимация успешной валидации */
+@keyframes cardValidPulse {
+    0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(52, 199, 89, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+}
+
+.tbank-card-input.card-valid {
+    animation: cardValidPulse 0.6s ease-out;
+}
+
+/* Улучшенные стили для секции карты */
+.tbank-card-section {
+    position: relative;
+}
+
+.tbank-card-input-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.tbank-card-type-indicator {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.tbank-card-input.card-visa ~ .tbank-card-type-indicator {
+    opacity: 1;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24"><rect fill="%23ffffff" width="40" height="24" rx="4"/><text x="20" y="15" text-anchor="middle" fill="%231a1f71" font-family="Arial" font-size="8" font-weight="bold">VISA</text></svg>');
+}
+
+.tbank-card-input.card-mastercard ~ .tbank-card-type-indicator {
+    opacity: 1;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24"><rect fill="%23ffffff" width="40" height="24" rx="4"/><circle cx="15" cy="12" r="6" fill="%23eb001b"/><circle cx="25" cy="12" r="6" fill="%23f79e1b"/></svg>');
+}
+
+.tbank-card-input.card-mir ~ .tbank-card-type-indicator {
+    opacity: 1;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24"><rect fill="%23ffffff" width="40" height="24" rx="4"/><text x="20" y="15" text-anchor="middle" fill="%234db45e" font-family="Arial" font-size="6" font-weight="bold">МИР</text></svg>');
+}
+
+.tbank-card-input.card-amex ~ .tbank-card-type-indicator {
+    opacity: 1;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24"><rect fill="%23006fcf" width="40" height="24" rx="4"/><text x="20" y="15" text-anchor="middle" fill="%23ffffff" font-family="Arial" font-size="5" font-weight="bold">AMEX</text></svg>');
+}
+
+/* Улучшенные анимации для кнопки оплаты */
+.tbank-pay-button {
+    position: relative;
+    overflow: hidden;
+}
+
+.tbank-pay-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.tbank-pay-button:hover::before {
+    left: 100%;
+}
+
+.tbank-pay-button:disabled {
+    background: #8e8e93;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.tbank-pay-button:disabled:hover {
+    background: #8e8e93;
+    transform: none;
+}
+
+/* Добавляем loader для кнопки оплаты */
+.tbank-pay-button.loading {
+    pointer-events: none;
+    background: #d4b617;
+}
+
+.tbank-pay-button.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #000;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Плавные переходы для всех элементов */
+.tbank-payment-widget * {
+    transition: all 0.2s ease;
+}
+
+/* Улучшения для чекбокса квитанции */
+.tbank-receipt-section {
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.tbank-receipt-section:hover {
+    background: rgba(255, 255, 255, 0.12);
 } 
