@@ -8,7 +8,7 @@ import crypto from 'crypto';
 
 // Конфигурация терминала
 const TERMINAL_KEY = '1749023114115DEMO';
-const TERMINAL_PASSWORD = 'TinkoffBankTest'; // Стандартный DEMO пароль
+const TERMINAL_PASSWORD = '*TS^0fvYzv$s_fu$'; // Реальный пароль из ЛК Т-банка
 
 /**
  * Генерация Token (SHA-256 подписи) на backend
