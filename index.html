@@ -12,9 +12,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="adaptive.css">
+    <link rel="stylesheet" href="payment-modal.css">
     <script src="faq.js" defer></script>
     <script src="image-optimization.js" defer></script>
     <script src="tbank-payment.js" defer></script>
+    <script src="payment-modal.js" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -404,7 +406,7 @@
     <li><svg class="feature-check" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" /></svg>Влияние Старых Просрочек</li>
     <li><svg class="feature-check" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75v16.5m-9-16.5v16.5m-2.25-2.25h13.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25h-13.5A2.25 2.25 0 0 0 3.75 6.75v9a2.25 2.25 0 0 0 2.25 2.25z" /></svg>Зачем Нужны Все 3 Отчета БКИ?</li>
 </ul>
-                    <a href="#" class="cta-button cta-button-full mt-auto" data-tinkoff-pay="guide-1399">Купить гайд за 1399 ₽</a>
+                    <button class="cta-button cta-button-full mt-auto" onclick="openPaymentModal('guide-1399')">Купить гайд за 1399 ₽</button>
                 </div>
 
                 <div class="product-card border-2 border-orange-500 relative">
@@ -417,7 +419,7 @@
                         <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="feature-check"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12.75a.375.375 0 1 0 0-.75.375.375 0 0 0 0 .75zM12 12.75a.375.375 0 1 0 0-.75.375.375 0 0 0 0 .75zM15.375 12.75a.375.375 0 1 0 0-.75.375.375 0 0 0 0 .75z" /><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" /></svg>Ответы на все ваши вопросы от специалиста.</li>
                         <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="feature-check"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg>Стратегия для будущего получения кредита.</li>
                     </ul>
-                    <a href="#" class="cta-button cta-button-full mt-auto" data-tinkoff-pay="consult-5000">Заказать консультацию за 5000 ₽</a>
+                    <button class="cta-button cta-button-full mt-auto" onclick="openPaymentModal('consult-5000')">Заказать консультацию за 5000 ₽</button>
                 </div>
 
                 <div class="product-card">
@@ -429,7 +431,7 @@
                         <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="feature-check"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25z" /></svg>Помощь в коммуникации с БКИ и банками.</li>
                         <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="feature-check"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9V7.5A2.25 2.25 0 0 1 6 5.25h12A2.25 2.25 0 0 1 20.25 7.5V9m-16.5 0v7.5A2.25 2.25 0 0 0 6 18.75h12a2.25 2.25 0 0 0 2.25-2.25V9m-16.5 0h16.5" /></svg>Подготовка и сопровождение при подаче заявок на кредит после улучшения КИ.</li>
                     </ul>
-                    <a href="#" class="cta-button cta-button-full mt-auto" data-tinkoff-pay="fullsupport-5000">Заказать полное сопровождение</a>
+                    <button class="cta-button cta-button-full mt-auto" onclick="openPaymentModal('fullsupport-5000')">Заказать полное сопровождение</button>
                 </div>
             </div>
         </div>
@@ -663,5 +665,106 @@
             </div>
         </div>
     </section>
+
+    <!-- Модальное окно для ввода данных покупателя -->
+    <div id="payment-modal" class="payment-modal hidden">
+        <div class="payment-modal-overlay" onclick="closePaymentModal()"></div>
+        <div class="payment-modal-content">
+            <div class="payment-modal-header">
+                <h3 class="payment-modal-title">Оформление заказа</h3>
+                <button class="payment-modal-close" onclick="closePaymentModal()" aria-label="Закрыть">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="payment-modal-product">
+                <div class="payment-modal-product-info">
+                    <h4 id="modal-product-name" class="payment-modal-product-name">Название продукта</h4>
+                    <p id="modal-product-price" class="payment-modal-product-price">0 ₽</p>
+                    <p id="modal-product-description" class="payment-modal-product-description">Описание продукта</p>
+                </div>
+            </div>
+
+            <form id="payment-form" class="payment-form">
+                <div class="payment-form-group">
+                    <label for="customer-email" class="payment-form-label">Ваш email <span class="required">*</span></label>
+                    <input 
+                        type="email" 
+                        id="customer-email" 
+                        name="email" 
+                        class="payment-form-input" 
+                        placeholder="example@email.com"
+                        required
+                        autocomplete="email"
+                    >
+                    <div class="payment-form-hint">На этот email придут инструкции после оплаты</div>
+                </div>
+
+                <div class="payment-form-group">
+                    <label for="customer-phone" class="payment-form-label">Ваш телефон <span class="required">*</span></label>
+                    <input 
+                        type="tel" 
+                        id="customer-phone" 
+                        name="phone" 
+                        class="payment-form-input" 
+                        placeholder="+7 (999) 123-45-67"
+                        required
+                        autocomplete="tel"
+                    >
+                    <div class="payment-form-hint">Для связи по вопросам заказа</div>
+                </div>
+
+                <div class="payment-form-group">
+                    <label for="customer-name" class="payment-form-label">Ваше имя</label>
+                    <input 
+                        type="text" 
+                        id="customer-name" 
+                        name="name" 
+                        class="payment-form-input" 
+                        placeholder="Иван Иванов"
+                        autocomplete="name"
+                    >
+                    <div class="payment-form-hint">Необязательно, для персонализации общения</div>
+                </div>
+
+                <div class="payment-form-actions">
+                    <button type="button" class="payment-form-cancel" onclick="closePaymentModal()">
+                        Отменить
+                    </button>
+                    <button type="submit" class="payment-form-submit" id="submit-payment">
+                        <span class="payment-submit-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                            </svg>
+                        </span>
+                        Перейти к оплате
+                    </button>
+                </div>
+            </form>
+
+            <div class="payment-security-info">
+                <div class="payment-security-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    </svg>
+                    <span>Безопасная оплата через Т-банк</span>
+                </div>
+                <div class="payment-security-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                    <span>Защищенное SSL соединение</span>
+                </div>
+                <div class="payment-security-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Мгновенная доставка на email</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
