@@ -149,6 +149,22 @@ function resetPaymentForm() {
             input.classList.remove('error');
         });
     }
+    
+    // Сбрасываем состояние двухэтапного процесса
+    const customerSection = document.getElementById('customer-data-section');
+    const iframeSection = document.getElementById('payment-iframe-section');
+    const iframe = document.getElementById('payment-iframe');
+    
+    if (customerSection && iframeSection) {
+        customerSection.classList.remove('hidden');
+        iframeSection.classList.add('hidden');
+        
+        // Очищаем iframe
+        if (iframe) {
+            iframe.src = '';
+            iframe.classList.add('hidden');
+        }
+    }
 }
 
 /**
@@ -314,7 +330,7 @@ function setFormLoading(loading) {
 }
 
 /**
- * Создание тестового платежа
+ * Создание тестового платежа и показ iframe
  */
 async function createTestPayment(productId, customerData) {
     console.log('💰 Создаем тестовый платеж:', productId, customerData);
@@ -358,16 +374,8 @@ async function createTestPayment(productId, customerData) {
         if (result.Success && result.PaymentURL) {
             console.log('✅ Платеж создан успешно:', result.PaymentURL);
             
-            // Закрываем модальное окно
-            closePaymentModal();
-            
-            // Показываем уведомление
-            showPaymentRedirectNotification();
-            
-            // Перенаправляем на страницу оплаты
-            setTimeout(() => {
-                window.location.href = result.PaymentURL;
-            }, 2000);
+            // Переходим к этапу оплаты в модальном окне
+            showPaymentIframe(result.PaymentURL);
             
         } else {
             throw new Error(result.Message || result.Details || result.error || 'Неизвестная ошибка при создании платежа');
@@ -380,41 +388,115 @@ async function createTestPayment(productId, customerData) {
 }
 
 /**
- * Показать уведомление о перенаправлении на оплату
+ * Показать этап оплаты с iframe
  */
-function showPaymentRedirectNotification() {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #10b981;
-        color: white;
-        padding: 16px 20px;
-        border-radius: 8px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        z-index: 1001;
-        font-size: 14px;
-        font-weight: 500;
-        max-width: 300px;
-    `;
-    notification.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Заказ оформлен! Перенаправляем на оплату...</span>
-        </div>
-    `;
+function showPaymentIframe(paymentURL) {
+    console.log('💳 Показываем iframe оплаты:', paymentURL);
     
-    document.body.appendChild(notification);
+    // Обновляем заголовок модального окна
+    const modalTitle = document.querySelector('.payment-modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = 'Оплата заказа';
+    }
     
-    // Удаляем уведомление через 3 секунды
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
+    // Скрываем форму данных клиента
+    const customerSection = document.getElementById('customer-data-section');
+    const iframeSection = document.getElementById('payment-iframe-section');
+    
+    if (customerSection && iframeSection) {
+        customerSection.classList.add('hidden');
+        iframeSection.classList.remove('hidden');
+        
+        // Показываем индикатор загрузки
+        const loadingElement = document.getElementById('payment-iframe-loading');
+        const iframe = document.getElementById('payment-iframe');
+        
+        if (loadingElement) {
+            loadingElement.classList.remove('hidden');
         }
-    }, 3000);
+        
+        if (iframe) {
+            iframe.classList.add('hidden');
+            
+            // Настраиваем iframe
+            iframe.src = paymentURL;
+            
+            // Обработчик загрузки iframe
+            iframe.onload = function() {
+                console.log('✅ Iframe загружен');
+                if (loadingElement) {
+                    loadingElement.classList.add('hidden');
+                }
+                iframe.classList.remove('hidden');
+            };
+            
+            // Обработчик ошибки загрузки
+            iframe.onerror = function() {
+                console.error('❌ Ошибка загрузки iframe');
+                if (loadingElement) {
+                    loadingElement.innerHTML = `
+                        <div class="payment-error-message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 32px; height: 32px; color: #ef4444;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                            </svg>
+                            <span style="font-size: 16px; color: #ef4444; font-weight: 500;">Ошибка загрузки формы оплаты</span>
+                            <button onclick="goBackToCustomerData()" style="margin-top: 12px; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">Попробовать снова</button>
+                        </div>
+                    `;
+                }
+            };
+        }
+        
+        console.log('✅ Переключились на этап оплаты');
+    }
+}
+
+/**
+ * Вернуться к форме ввода данных
+ */
+function goBackToCustomerData() {
+    console.log('⬅️ Возвращаемся к форме данных');
+    
+    // Восстанавливаем заголовок модального окна
+    const modalTitle = document.querySelector('.payment-modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = 'Оформление заказа';
+    }
+    
+    const customerSection = document.getElementById('customer-data-section');
+    const iframeSection = document.getElementById('payment-iframe-section');
+    const iframe = document.getElementById('payment-iframe');
+    
+    if (customerSection && iframeSection) {
+        // Показываем форму данных
+        iframeSection.classList.add('hidden');
+        customerSection.classList.remove('hidden');
+        
+        // Очищаем iframe
+        if (iframe) {
+            iframe.src = '';
+            iframe.classList.add('hidden');
+        }
+        
+        // Сбрасываем состояние загрузки
+        const loadingElement = document.getElementById('payment-iframe-loading');
+        if (loadingElement) {
+            loadingElement.classList.remove('hidden');
+            loadingElement.innerHTML = `
+                <div class="payment-loading-spinner">
+                    <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                </div>
+                <div class="payment-loading-text">Подготавливаем форму оплаты...</div>
+            `;
+        }
+        
+        // Убираем состояние загрузки с кнопки
+        setFormLoading(false);
+        
+        console.log('✅ Вернулись к форме данных');
+    }
 }
 
 /**

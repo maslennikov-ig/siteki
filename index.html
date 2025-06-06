@@ -687,62 +687,112 @@
                 </div>
             </div>
 
-            <form id="payment-form" class="payment-form">
-                <div class="payment-form-group">
-                    <label for="customer-email" class="payment-form-label">Ваш email <span class="required">*</span></label>
-                    <input 
-                        type="email" 
-                        id="customer-email" 
-                        name="email" 
-                        class="payment-form-input" 
-                        placeholder="example@email.com"
-                        required
-                        autocomplete="email"
-                    >
-                    <div class="payment-form-hint">На этот email придут инструкции после оплаты</div>
-                </div>
+            <!-- Форма ввода данных клиента -->
+            <div id="customer-data-section" class="payment-step-section">
+                <form id="payment-form" class="payment-form">
+                    <div class="payment-form-group">
+                        <label for="customer-email" class="payment-form-label">Ваш email <span class="required">*</span></label>
+                        <input 
+                            type="email" 
+                            id="customer-email" 
+                            name="email" 
+                            class="payment-form-input" 
+                            placeholder="example@email.com"
+                            required
+                            autocomplete="email"
+                        >
+                        <div class="payment-form-hint">На этот email придут инструкции после оплаты</div>
+                    </div>
 
-                <div class="payment-form-group">
-                    <label for="customer-phone" class="payment-form-label">Ваш телефон <span class="required">*</span></label>
-                    <input 
-                        type="tel" 
-                        id="customer-phone" 
-                        name="phone" 
-                        class="payment-form-input" 
-                        placeholder="+7 (999) 123-45-67"
-                        required
-                        autocomplete="tel"
-                    >
-                    <div class="payment-form-hint">Для связи по вопросам заказа</div>
-                </div>
+                    <div class="payment-form-group">
+                        <label for="customer-phone" class="payment-form-label">Ваш телефон <span class="required">*</span></label>
+                        <input 
+                            type="tel" 
+                            id="customer-phone" 
+                            name="phone" 
+                            class="payment-form-input" 
+                            placeholder="+7 (999) 123-45-67"
+                            required
+                            autocomplete="tel"
+                        >
+                        <div class="payment-form-hint">Для связи по вопросам заказа</div>
+                    </div>
 
-                <div class="payment-form-group">
-                    <label for="customer-name" class="payment-form-label">Ваше имя</label>
-                    <input 
-                        type="text" 
-                        id="customer-name" 
-                        name="name" 
-                        class="payment-form-input" 
-                        placeholder="Иван Иванов"
-                        autocomplete="name"
-                    >
-                    <div class="payment-form-hint">Необязательно, для персонализации общения</div>
-                </div>
+                    <div class="payment-form-group">
+                        <label for="customer-name" class="payment-form-label">Ваше имя</label>
+                        <input 
+                            type="text" 
+                            id="customer-name" 
+                            name="name" 
+                            class="payment-form-input" 
+                            placeholder="Иван Иванов"
+                            autocomplete="name"
+                        >
+                        <div class="payment-form-hint">Необязательно, для персонализации общения</div>
+                    </div>
 
-                <div class="payment-form-actions">
-                    <button type="button" class="payment-form-cancel" onclick="closePaymentModal()">
-                        Отменить
+                    <div class="payment-form-actions">
+                        <button type="button" class="payment-form-cancel" onclick="closePaymentModal()">
+                            Отменить
+                        </button>
+                        <button type="submit" class="payment-form-submit" id="submit-payment">
+                            <span class="payment-submit-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                                </svg>
+                            </span>
+                            Перейти к оплате
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Секция оплаты с iframe -->
+            <div id="payment-iframe-section" class="payment-step-section hidden">
+                <div class="payment-step-header">
+                    <button type="button" class="payment-back-button" onclick="goBackToCustomerData()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                        Назад к данным
                     </button>
-                    <button type="submit" class="payment-form-submit" id="submit-payment">
-                        <span class="payment-submit-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                    <div class="payment-step-title">Оплата</div>
+                </div>
+                
+                <div class="payment-iframe-container">
+                    <div id="payment-iframe-loading" class="payment-iframe-loading">
+                        <div class="payment-loading-spinner">
+                            <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
-                        </span>
-                        Перейти к оплате
-                    </button>
+                        </div>
+                        <div class="payment-loading-text">Подготавливаем форму оплаты...</div>
+                    </div>
+                    <iframe 
+                        id="payment-iframe" 
+                        class="payment-iframe hidden"
+                        frameborder="0"
+                        allowtransparency="true"
+                        allowfullscreen="true"
+                        title="Форма оплаты Т-банк"
+                    ></iframe>
                 </div>
-            </form>
+                
+                <div class="payment-iframe-info">
+                    <div class="payment-info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                        </svg>
+                        <span>Безопасная оплата через Т-банк</span>
+                    </div>
+                    <div class="payment-info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                        </svg>
+                        <span>Поддерживаются все основные карты</span>
+                    </div>
+                </div>
+            </div>
 
             <div class="payment-security-info">
                 <div class="payment-security-item">

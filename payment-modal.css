@@ -279,4 +279,151 @@
 
 .animate-spin {
     animation: spin 1s linear infinite;
+}
+
+/* Стили для двухэтапного процесса оплаты */
+.payment-step-section {
+    transition: all 0.3s ease-in-out;
+}
+
+.payment-step-section.hidden {
+    display: none;
+}
+
+.payment-step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.payment-back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-back-button:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.payment-back-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.payment-step-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Контейнер для iframe */
+.payment-iframe-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+}
+
+.payment-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+}
+
+.payment-iframe.hidden {
+    display: none;
+}
+
+/* Индикатор загрузки iframe */
+.payment-iframe-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    z-index: 10;
+}
+
+.payment-iframe-loading.hidden {
+    display: none;
+}
+
+.payment-loading-spinner {
+    margin-bottom: 16px;
+}
+
+.payment-loading-spinner svg {
+    width: 32px;
+    height: 32px;
+    color: #3b82f6;
+}
+
+.payment-loading-text {
+    font-size: 16px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Информация о платеже под iframe */
+.payment-iframe-info {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.payment-info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.payment-info-item svg {
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 640px) {
+    .payment-iframe-container {
+        height: 450px;
+    }
+    
+    .payment-step-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .payment-back-button {
+        align-self: flex-start;
+    }
+    
+    .payment-iframe-info {
+        font-size: 13px;
+    }
 } 
