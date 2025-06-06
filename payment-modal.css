@@ -1,715 +1,907 @@
-/* Стили для модального окна оплаты - стилизация в духе Т-банка */
+/* =====================================================================
+   МОДАЛЬНОЕ ОКНО ОПЛАТЫ - СОВРЕМЕННЫЙ ДИЗАЙН 2024-2025
+   ===================================================================== */
+
+/* CSS Custom Properties для централизованного управления дизайном */
+:root {
+  /* Цвета бренда Т-банк */
+  --primary-brand: #FFDD2D;           /* Основной желтый Т-банк */
+  --primary-brand-hover: #E6C826;     /* Hover состояние */
+  --primary-brand-light: #FFF7CC;     /* Светлый вариант */
+  
+  /* Нейтральные цвета */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  --color-text-primary: #1A1A1A;      /* Основной текст */
+  --color-text-secondary: #6B7280;    /* Вторичный текст */
+  --color-text-muted: #9CA3AF;        /* Приглушенный текст */
+  
+  /* Серые тона для интерфейса */
+  --color-gray-50: #F9FAFB;
+  --color-gray-100: #F3F4F6;
+  --color-gray-200: #E5E7EB;
+  --color-gray-300: #D1D5DB;
+  --color-gray-400: #9CA3AF;
+  --color-gray-500: #6B7280;
+  --color-gray-600: #4B5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937;
+  --color-gray-900: #111827;
+  
+  /* Статусные цвета */
+  --color-success: #10B981;
+  --color-success-light: #D1FAE5;
+  --color-error: #EF4444;
+  --color-error-light: #FEE2E2;
+  --color-warning: #F59E0B;
+  --color-warning-light: #FEF3C7;
+  --color-info: #3B82F6;
+  --color-info-light: #DBEAFE;
+  
+  /* Радиусы скругления */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Отступы */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  
+  /* Тени */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* Переходы */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Типографика */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  
+  /* Z-index */
+  --z-modal: 1000;
+  --z-modal-backdrop: 999;
+}
+
+/* =====================================================================
+   СБРОС И БАЗОВЫЕ СТИЛИ
+   ===================================================================== */
+
+/* Убираем стандартные стили для кнопок и inputs внутри модального окна */
+.payment-modal *,
+.payment-modal *::before,
+.payment-modal *::after {
+  box-sizing: border-box;
+}
+
+.payment-modal button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.payment-modal input,
+.payment-modal textarea,
+.payment-modal select {
+  font: inherit;
+  background: none;
+  border: none;
+  outline: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* =====================================================================
+   МОДАЛЬНЫЙ КОНТЕЙНЕР И ФОН
+   ===================================================================== */
+
 .payment-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    opacity: 1;
-    visibility: visible;
-    transition: all 0.3s cubic-bezier(0.2, 0, 0.2, 1);
-    padding: 1rem;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  
+  /* Анимация появления */
+  opacity: 1;
+  visibility: visible;
+  transition: 
+    opacity var(--transition-normal),
+    visibility var(--transition-normal),
+    backdrop-filter var(--transition-normal);
 }
 
 .payment-modal.hidden {
-    opacity: 0;
-    visibility: hidden;
+  opacity: 0;
+  visibility: hidden;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
 }
 
+/* Кликабельная область для закрытия */
 .payment-modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-modal-backdrop);
+  cursor: pointer;
 }
+
+/* =====================================================================
+   ОСНОВНОЙ КОНТЕНТ МОДАЛЬНОГО ОКНА
+   ===================================================================== */
 
 .payment-modal-content {
-    position: relative;
-    width: 100%;
-    max-width: 520px;
-    max-height: 90vh;
-    overflow: hidden;
-    background: #ffffff;
-    border-radius: 24px;
-    box-shadow: 
-        0 32px 64px -12px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
-    transform: scale(1) translateY(0);
-    transition: all 0.3s cubic-bezier(0.2, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
+  position: relative;
+  z-index: calc(var(--z-modal) + 1);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  background: var(--color-white);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-2xl);
+  
+  /* Современная структура */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+  /* Анимация появления */
+  transform: scale(1) translateY(0);
+  transition: transform var(--transition-normal);
 }
 
 .payment-modal.hidden .payment-modal-content {
-    transform: scale(0.96) translateY(16px);
+  transform: scale(0.95) translateY(var(--spacing-4));
 }
 
-/* Заголовок модального окна */
+/* =====================================================================
+   ЗАГОЛОВОК МОДАЛЬНОГО ОКНА
+   ===================================================================== */
+
 .payment-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 24px 16px;
-    border-bottom: 1px solid #f0f0f0;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-6) var(--spacing-6) var(--spacing-4);
+  border-bottom: 1px solid var(--color-gray-100);
+  flex-shrink: 0;
 }
 
 .payment-modal-title {
-    font-size: 1.375rem;
-    font-weight: 600;
-    color: #333333;
-    margin: 0;
-    letter-spacing: -0.02em;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
 }
 
 .payment-modal-close {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: #f8f9fa;
-    color: #6c757d;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-10);
+  height: var(--spacing-10);
+  border-radius: var(--radius-lg);
+  background: var(--color-gray-50);
+  color: var(--color-gray-500);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .payment-modal-close:hover {
-    background: #e9ecef;
-    color: #495057;
-    transform: scale(1.05);
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+  transform: scale(1.05);
 }
 
 .payment-modal-close:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
-/* Информация о продукте */
+.payment-modal-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* =====================================================================
+   ИНФОРМАЦИЯ О ПРОДУКТЕ
+   ===================================================================== */
+
 .payment-modal-product {
-    padding: 20px 24px;
-    border-bottom: 1px solid #f0f0f0;
-    background: linear-gradient(135deg, #fdf8f3 0%, #fff9f5 100%);
-    flex-shrink: 0;
+  padding: var(--spacing-5) var(--spacing-6);
+  background: linear-gradient(135deg, #FFFBF0 0%, #FFF8E1 100%);
+  border-bottom: 1px solid var(--color-gray-100);
+  flex-shrink: 0;
 }
 
 .payment-modal-product-name {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #333333;
-    margin: 0 0 8px 0;
-    line-height: 1.4;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-2) 0;
+  line-height: 1.4;
 }
 
 .payment-modal-product-price {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #f97316;
-    margin: 0 0 12px 0;
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-black);
+  margin: 0 0 var(--spacing-3) 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-1);
 }
 
 .payment-modal-product-description {
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin: 0;
-    line-height: 1.5;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
 }
 
-/* Контейнер для скроллинга */
+/* =====================================================================
+   КОНТЕЙНЕР ДЛЯ СКРОЛЛИНГА
+   ===================================================================== */
+
 .payment-modal-scroll-container {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* Кастомный скроллбар */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-300) transparent;
 }
 
 .payment-modal-scroll-container::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .payment-modal-scroll-container::-webkit-scrollbar-track {
-    background: #f8f9fa;
+  background: transparent;
 }
 
 .payment-modal-scroll-container::-webkit-scrollbar-thumb {
-    background: #dee2e6;
-    border-radius: 3px;
+  background: var(--color-gray-300);
+  border-radius: var(--radius-full);
 }
 
 .payment-modal-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: #adb5bd;
+  background: var(--color-gray-400);
 }
 
-/* Форма оплаты */
+/* =====================================================================
+   ФОРМА ОПЛАТЫ
+   ===================================================================== */
+
 .payment-form {
-    padding: 24px;
+  padding: var(--spacing-6);
 }
 
 .payment-form-group {
-    margin-bottom: 20px;
+  margin-bottom: var(--spacing-5);
+}
+
+.payment-form-group:last-child {
+  margin-bottom: 0;
 }
 
 .payment-form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #495057;
-    margin-bottom: 8px;
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+  line-height: 1.4;
 }
 
 .payment-form-label .required {
-    color: #dc3545;
-    margin-left: 2px;
+  color: var(--color-error);
+  margin-left: var(--spacing-1);
 }
 
+/* Стили для полей ввода */
 .payment-form-input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    background: #ffffff;
-    box-sizing: border-box;
-    font-family: inherit;
+  width: 100%;
+  padding: var(--spacing-4);
+  border: 2px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
+  
+  /* Улучшенная типографика */
+  line-height: 1.5;
+  font-family: inherit;
 }
 
 .payment-form-input:focus {
-    outline: none;
-    border-color: #f97316;
-    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
-    background: #ffffff;
+  border-color: var(--primary-brand);
+  box-shadow: 0 0 0 3px var(--primary-brand-light);
+  background: var(--color-white);
 }
 
 .payment-form-input::placeholder {
-    color: #adb5bd;
+  color: var(--color-text-muted);
 }
 
+/* Состояние ошибки */
 .payment-form-input.error {
-    border-color: #dc3545;
+  border-color: var(--color-error);
+  background: var(--color-error-light);
 }
 
 .payment-form-input.error:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
+/* Подсказки и ошибки */
 .payment-form-hint {
-    font-size: 0.75rem;
-    color: #6c757d;
-    margin-top: 6px;
-    line-height: 1.4;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-1);
+  line-height: 1.4;
 }
 
 .payment-form-error {
-    font-size: 0.75rem;
-    color: #dc3545;
-    margin-top: 6px;
-    display: none;
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  margin-top: var(--spacing-1);
+  line-height: 1.4;
+  display: none;
 }
 
 .payment-form-input.error + .payment-form-error {
-    display: block;
+  display: block;
 }
 
-/* Действия формы */
+/* =====================================================================
+   КНОПКИ ДЕЙСТВИЙ
+   ===================================================================== */
+
 .payment-form-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid #f0f0f0;
+  display: flex;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-8);
+  flex-direction: column;
 }
 
+/* Кнопка отмены */
 .payment-form-cancel {
-    flex: 1;
-    padding: 14px 20px;
-    border: 2px solid #e9ecef;
-    background: #ffffff;
-    color: #6c757d;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
+  padding: var(--spacing-4) var(--spacing-6);
+  border: 2px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-white);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  order: 2;
 }
 
 .payment-form-cancel:hover {
-    background: #f8f9fa;
-    border-color: #dee2e6;
-    color: #495057;
+  border-color: var(--color-gray-300);
+  color: var(--color-text-primary);
+  background: var(--color-gray-50);
 }
 
 .payment-form-cancel:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
+/* Основная кнопка оплаты */
 .payment-form-submit {
-    flex: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 20px;
-    border: none;
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-    color: white;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-    position: relative;
-    overflow: hidden;
-}
-
-.payment-form-submit::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-}
-
-.payment-form-submit:hover::before {
-    left: 100%;
+  position: relative;
+  padding: var(--spacing-4) var(--spacing-6);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  background: var(--primary-brand);
+  color: var(--color-black);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
+  /* Flexbox для иконки и текста */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  
+  /* Современный внешний вид */
+  box-shadow: var(--shadow-sm);
+  order: 1;
+  
+  /* Минимальная высота для touch-friendly */
+  min-height: 48px;
 }
 
 .payment-form-submit:hover {
-    background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+  background: var(--primary-brand-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .payment-form-submit:active {
-    transform: translateY(-1px);
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--shadow-sm);
 }
 
 .payment-form-submit:disabled {
-    background: #dee2e6;
-    color: #adb5bd;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.payment-form-submit:disabled::before {
-    display: none;
+  background: var(--color-gray-200);
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .payment-submit-icon {
-    display: flex;
-    align-items: center;
-    width: 18px;
-    height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
 }
 
 .payment-submit-icon svg {
-    width: 100%;
-    height: 100%;
+  width: 20px;
+  height: 20px;
 }
 
-/* Информация о безопасности */
-.payment-security-info {
-    padding: 20px 24px;
-    background: #f8f9fa;
-    border-top: 1px solid #f0f0f0;
-    flex-shrink: 0;
+/* Состояние загрузки */
+.payment-form-submit.loading .payment-submit-icon {
+  animation: spin 1s linear infinite;
 }
 
-.payment-security-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    font-size: 0.75rem;
-    color: #6c757d;
-}
+/* =====================================================================
+   СЕКЦИИ И ЭТАПЫ
+   ===================================================================== */
 
-.payment-security-item:last-child {
-    margin-bottom: 0;
-}
-
-.payment-security-item svg {
-    width: 16px;
-    height: 16px;
-    color: #28a745;
-    flex-shrink: 0;
-}
-
-/* Двухэтапный процесс */
 .payment-step-section {
-    transition: all 0.3s ease;
+  display: block;
 }
 
 .payment-step-section.hidden {
-    display: none;
+  display: none;
 }
 
 .payment-step-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 24px;
-    border-bottom: 1px solid #f0f0f0;
-    background: #ffffff;
-    position: relative;
-}
-
-.payment-step-header::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-6);
+  border-bottom: 1px solid var(--color-gray-100);
+  background: var(--color-gray-50);
 }
 
 .payment-back-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: 2px solid #e9ecef;
-    background: #ffffff;
-    color: #6c757d;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--color-gray-200);
 }
 
 .payment-back-button:hover {
-    background: #f8f9fa;
-    border-color: #dee2e6;
-    color: #495057;
-    transform: translateX(-2px);
+  background: var(--color-gray-50);
+  color: var(--color-text-primary);
+  border-color: var(--color-gray-300);
 }
 
 .payment-back-button:active {
-    transform: translateX(-1px) scale(0.98);
+  transform: scale(0.98);
 }
 
 .payment-back-button svg {
-    width: 18px;
-    height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .payment-step-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #333333;
-    margin: 0;
-    letter-spacing: -0.02em;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
 }
 
-/* Контейнер iframe */
+/* =====================================================================
+   IFRAME КОНТЕЙНЕР
+   ===================================================================== */
+
 .payment-iframe-container {
-    position: relative;
-    padding: 24px;
-    min-height: 400px;
-    background: #ffffff;
+  position: relative;
+  min-height: 400px;
+  background: var(--color-white);
 }
 
 .payment-iframe {
-    width: 100%;
-    height: 500px;
-    border: none;
-    border-radius: 12px;
-    background: #ffffff;
-    transition: opacity 0.3s ease;
+  width: 100%;
+  height: 500px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  opacity: 1;
+  transition: opacity var(--transition-normal);
 }
 
 .payment-iframe.hidden {
-    opacity: 0;
-    pointer-events: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* Загрузка iframe */
+/* Состояние загрузки iframe */
 .payment-iframe-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    z-index: 2;
-    transition: opacity 0.3s ease;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-white);
+  z-index: 10;
+  opacity: 1;
+  transition: opacity var(--transition-normal);
 }
 
 .payment-iframe-loading.hidden {
-    opacity: 0;
-    pointer-events: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .payment-loading-spinner {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-4);
 }
 
 .payment-loading-spinner svg {
-    width: 100%;
-    height: 100%;
-    color: #f97316;
+  width: 32px;
+  height: 32px;
+  color: var(--primary-brand);
+  animation: spin 1s linear infinite;
 }
 
 .payment-loading-text {
-    font-size: 0.875rem;
-    color: #6c757d;
-    text-align: center;
-    font-weight: 500;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  text-align: center;
 }
 
-/* Информация о iframe */
+/* =====================================================================
+   ИНФОРМАЦИЯ О БЕЗОПАСНОСТИ
+   ===================================================================== */
+
+.payment-security-info {
+  padding: var(--spacing-6);
+  background: var(--color-gray-50);
+  border-top: 1px solid var(--color-gray-100);
+  flex-shrink: 0;
+}
+
+.payment-security-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.payment-security-item:last-child {
+  margin-bottom: 0;
+}
+
+.payment-security-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+/* =====================================================================
+   ИНФОРМАЦИЯ ОБ IFRAME
+   ===================================================================== */
+
 .payment-iframe-info {
-    padding: 20px 24px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-top: 1px solid #f0f0f0;
+  padding: var(--spacing-4) var(--spacing-6);
+  background: var(--color-gray-50);
 }
 
 .payment-iframe-info-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-3);
 }
 
 .payment-iframe-info-title svg {
-    width: 18px;
-    height: 18px;
-    color: #28a745;
+  width: 16px;
+  height: 16px;
+  color: var(--color-success);
 }
 
 .payment-info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-3);
 }
 
 .payment-info-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.75rem;
-    color: #6c757d;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  padding: var(--spacing-2);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
 }
 
 .payment-info-item svg {
-    width: 14px;
-    height: 14px;
-    color: #28a745;
-    flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--color-success);
+  flex-shrink: 0;
 }
 
-/* Адаптивность для мобильных устройств */
-@media (max-width: 640px) {
-    .payment-modal {
-        padding: 0.5rem;
-        align-items: flex-end;
-    }
-    
-    .payment-modal-content {
-        max-width: 100%;
-        max-height: 95vh;
-        border-radius: 20px 20px 0 0;
-        margin-bottom: 0;
-    }
-    
-    .payment-modal-header {
-        padding: 20px 20px 16px;
-    }
-    
-    .payment-modal-title {
-        font-size: 1.25rem;
-    }
-    
-    .payment-modal-product,
-    .payment-form,
-    .payment-iframe-container {
-        padding: 20px;
-    }
-    
-    .payment-form-actions {
-        flex-direction: column-reverse;
-        gap: 12px;
-    }
-    
-    .payment-form-cancel,
-    .payment-form-submit {
-        flex: none;
-        width: 100%;
-    }
-    
-    .payment-step-header {
-        padding: 16px 20px;
-    }
-    
-    .payment-back-button {
-        width: 36px;
-        height: 36px;
-    }
-    
-    .payment-step-title {
-        font-size: 1.125rem;
-    }
-    
-    .payment-iframe-container {
-        min-height: 350px;
-    }
-    
-    .payment-iframe {
-        height: 450px;
-    }
-    
-    .payment-iframe-info {
-        padding: 16px 20px;
-    }
-    
-    .payment-info-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-    
-    .payment-info-item {
-        font-size: 0.75rem;
-        padding: 10px 12px;
-    }
-    
-    .payment-loading-spinner {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .payment-loading-text {
-        font-size: 0.8rem;
-    }
+/* =====================================================================
+   АДАПТИВНОСТЬ - ПЛАНШЕТЫ
+   ===================================================================== */
+
+@media (max-width: 768px) {
+  .payment-modal {
+    padding: var(--spacing-3);
+  }
+  
+  .payment-modal-content {
+    max-width: 100%;
+    max-height: 95vh;
+  }
+  
+  .payment-modal-header {
+    padding: var(--spacing-5) var(--spacing-5) var(--spacing-3);
+  }
+  
+  .payment-modal-title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .payment-modal-product,
+  .payment-form {
+    padding: var(--spacing-5);
+  }
+  
+  .payment-step-header {
+    padding: var(--spacing-3) var(--spacing-5);
+  }
 }
+
+/* =====================================================================
+   АДАПТИВНОСТЬ - МОБИЛЬНЫЕ УСТРОЙСТВА
+   ===================================================================== */
+
+@media (max-width: 640px) {
+  .payment-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+  
+  .payment-modal-content {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    transform: translateY(0);
+  }
+  
+  .payment-modal.hidden .payment-modal-content {
+    transform: translateY(100%);
+  }
+  
+  .payment-modal-header {
+    padding: var(--spacing-4) var(--spacing-4) var(--spacing-3);
+  }
+  
+  .payment-modal-title {
+    font-size: var(--font-size-base);
+  }
+  
+  .payment-modal-product,
+  .payment-form {
+    padding: var(--spacing-4);
+  }
+  
+  .payment-form-actions {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+  
+  .payment-form-cancel,
+  .payment-form-submit {
+    order: unset;
+    min-height: 48px;
+  }
+  
+  .payment-step-header {
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+  
+  .payment-step-title {
+    font-size: var(--font-size-base);
+  }
+  
+  .payment-iframe-container {
+    min-height: 350px;
+  }
+  
+  .payment-iframe {
+    height: 400px;
+  }
+  
+  .payment-info-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-2);
+  }
+  
+  .payment-security-info {
+    padding: var(--spacing-4);
+  }
+  
+  .payment-iframe-info {
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+}
+
+/* =====================================================================
+   АДАПТИВНОСТЬ - МАЛЕНЬКИЕ МОБИЛЬНЫЕ
+   ===================================================================== */
 
 @media (max-width: 480px) {
-    .payment-modal {
-        padding: 0;
-    }
-    
-    .payment-modal-content {
-        border-radius: 16px 16px 0 0;
-        max-height: 100vh;
-    }
-    
-    .payment-modal-header {
-        padding: 16px 16px 12px;
-    }
-    
-    .payment-modal-product,
-    .payment-form,
-    .payment-iframe-container,
-    .payment-iframe-info {
-        padding: 16px;
-    }
-    
-    .payment-step-header {
-        padding: 14px 16px;
-    }
+  .payment-modal-content {
+    max-height: 95vh;
+  }
+  
+  .payment-modal-header {
+    padding: var(--spacing-3) var(--spacing-3) var(--spacing-2);
+  }
+  
+  .payment-modal-product,
+  .payment-form {
+    padding: var(--spacing-3);
+  }
+  
+  .payment-step-header {
+    padding: var(--spacing-2) var(--spacing-3);
+  }
 }
 
-/* Анимации */
+/* =====================================================================
+   АНИМАЦИИ
+   ===================================================================== */
+
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.animate-spin {
-    animation: spin 1s linear infinite;
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-4));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+/* Анимация появления контента */
 .payment-modal-content {
-    animation: fadeInUp 0.3s ease-out;
+  animation: fadeInUp var(--transition-normal) ease-out;
 }
 
-/* Улучшения для accessibility */
-.payment-modal-close:focus,
-.payment-back-button:focus,
-.payment-form-input:focus,
-.payment-form-cancel:focus,
-.payment-form-submit:focus {
-    outline: 2px solid #f97316;
-    outline-offset: 2px;
+/* =====================================================================
+   ФОКУС И ACCESSIBILITY
+   ===================================================================== */
+
+.payment-modal-close:focus-visible,
+.payment-form-input:focus-visible,
+.payment-form-cancel:focus-visible,
+.payment-form-submit:focus-visible,
+.payment-back-button:focus-visible {
+  outline: 2px solid var(--primary-brand);
+  outline-offset: 2px;
 }
 
-/* Статусы загрузки */
+/* =====================================================================
+   СОСТОЯНИЯ ЗАГРУЗКИ
+   ===================================================================== */
+
 .payment-form-submit.loading {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .payment-form-submit.loading .payment-submit-icon {
-    animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
-/* Темная тема для системных настроек */
+/* =====================================================================
+   ТЕМНАЯ ТЕМА (ОПЦИОНАЛЬНО)
+   ===================================================================== */
+
 @media (prefers-color-scheme: dark) {
-    .payment-modal {
-        background: rgba(0, 0, 0, 0.8);
-    }
+  .payment-modal {
+    background: rgba(0, 0, 0, 0.8);
+  }
 }
 
-/* Уменьшение анимаций для пользователей с ограниченными возможностями */
+/* =====================================================================
+   УМЕНЬШЕННАЯ АНИМАЦИЯ
+   ===================================================================== */
+
 @media (prefers-reduced-motion: reduce) {
-    .payment-modal,
-    .payment-modal-content,
-    .payment-form-input,
-    .payment-form-submit,
-    .payment-form-cancel,
-    .payment-back-button,
-    .payment-modal-close {
-        transition: none;
-    }
-    
-    .animate-spin {
-        animation: none;
-    }
+  .payment-modal,
+  .payment-modal-content,
+  .payment-form-submit,
+  .payment-form-cancel,
+  .payment-modal-close,
+  .payment-back-button,
+  .payment-form-input {
+    transition: none;
+    animation: none;
+  }
+  
+  .payment-loading-spinner svg,
+  .animate-spin {
+    animation: none;
+  }
 } 

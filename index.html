@@ -666,175 +666,214 @@
         </div>
     </section>
 
-    <!-- Модальное окно для ввода данных покупателя -->
+    <!-- Модальное окно оплаты -->
     <div id="payment-modal" class="payment-modal hidden">
         <div class="payment-modal-overlay" onclick="closePaymentModal()"></div>
         <div class="payment-modal-content">
+            <!-- Заголовок модального окна -->
             <div class="payment-modal-header">
-                <h3 class="payment-modal-title">Оформление заказа</h3>
-                <button class="payment-modal-close" onclick="closePaymentModal()" aria-label="Закрыть">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <h2 class="payment-modal-title">Безопасная оплата</h2>
+                <button class="payment-modal-close" onclick="closePaymentModal()" aria-label="Закрыть модальное окно">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
             </div>
-            
+
+            <!-- Информация о продукте -->
             <div class="payment-modal-product">
-                <div class="payment-modal-product-info">
-                    <h4 id="modal-product-name" class="payment-modal-product-name">Название продукта</h4>
-                    <p id="modal-product-price" class="payment-modal-product-price">0 ₽</p>
-                    <p id="modal-product-description" class="payment-modal-product-description">Описание продукта</p>
-                </div>
+                <h4 id="modal-product-name" class="payment-modal-product-name">Исправление кредитной истории</h4>
+                <p id="modal-product-price" class="payment-modal-product-price">9 990 ₽</p>
+                <p id="modal-product-description" class="payment-modal-product-description">Профессиональная консультация и сопровождение процесса исправления кредитной истории</p>
             </div>
 
-            <!-- Контейнер для скроллинга -->
             <div class="payment-modal-scroll-container">
                 <!-- Форма ввода данных клиента -->
                 <div id="customer-data-section" class="payment-step-section">
-                <form id="payment-form" class="payment-form">
-                    <div class="payment-form-group">
-                        <label for="customer-name" class="payment-form-label">Ваше имя</label>
-                        <input 
-                            type="text" 
-                            id="customer-name" 
-                            name="name" 
-                            class="payment-form-input" 
-                            placeholder="Иван Иванов"
-                            autocomplete="name"
-                        >
-                        <div class="payment-form-hint">Необязательно, для персонализации общения</div>
-                    </div>
+                    <form id="payment-form" class="payment-form">
+                        <div class="payment-form-group">
+                            <label for="customer-name" class="payment-form-label">
+                                Ваше имя <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="customer-name"
+                                name="name"
+                                class="payment-form-input"
+                                placeholder="Например: Александр Петров"
+                                required
+                                autocomplete="name"
+                                aria-describedby="name-hint"
+                            />
+                            <div id="name-hint" class="payment-form-hint">Укажите ваше полное имя для документооборота</div>
+                            <div class="payment-form-error" aria-live="polite">Пожалуйста, введите ваше имя</div>
+                        </div>
 
-                    <div class="payment-form-group">
-                        <label for="customer-phone" class="payment-form-label">Ваш телефон <span class="required">*</span></label>
-                        <input 
-                            type="tel" 
-                            id="customer-phone" 
-                            name="phone" 
-                            class="payment-form-input" 
-                            placeholder="+7 (999) 123-45-67"
-                            required
-                            autocomplete="tel"
-                        >
-                        <div class="payment-form-hint">Для связи по вопросам заказа</div>
-                    </div>
+                        <div class="payment-form-group">
+                            <label for="customer-email" class="payment-form-label">
+                                Email адрес <span class="required">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                id="customer-email"
+                                name="email"
+                                class="payment-form-input"
+                                placeholder="example@gmail.com"
+                                required
+                                autocomplete="email"
+                                aria-describedby="email-hint"
+                            />
+                            <div id="email-hint" class="payment-form-hint">На этот адрес отправим чек и документы</div>
+                            <div class="payment-form-error" aria-live="polite">Пожалуйста, введите корректный email</div>
+                        </div>
 
-                    <div class="payment-form-group">
-                        <label for="customer-email" class="payment-form-label">Ваш email <span class="required">*</span></label>
-                        <input 
-                            type="email" 
-                            id="customer-email" 
-                            name="email" 
-                            class="payment-form-input" 
-                            placeholder="example@email.com"
-                            required
-                            autocomplete="email"
-                        >
-                        <div class="payment-form-hint">На этот email придут инструкции после оплаты</div>
-                    </div>
+                        <div class="payment-form-group">
+                            <label for="customer-phone" class="payment-form-label">
+                                Номер телефона <span class="required">*</span>
+                            </label>
+                            <input
+                                type="tel"
+                                id="customer-phone"
+                                name="phone"
+                                class="payment-form-input"
+                                placeholder="+7 (999) 123-45-67"
+                                required
+                                autocomplete="tel"
+                                aria-describedby="phone-hint"
+                            />
+                            <div id="phone-hint" class="payment-form-hint">Для связи с нашими специалистами</div>
+                            <div class="payment-form-error" aria-live="polite">Пожалуйста, введите корректный номер телефона</div>
+                        </div>
 
-                    <div class="payment-form-actions">
-                        <button type="button" class="payment-form-cancel" onclick="closePaymentModal()">
-                            Отменить
+                        <div class="payment-form-actions">
+                            <button type="submit" class="payment-form-submit" id="submit-payment" aria-describedby="submit-description">
+                                <div class="payment-submit-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M9 12l2 2 4-4"/>
+                                        <circle cx="12" cy="12" r="9"/>
+                                    </svg>
+                                </div>
+                                Перейти к оплате
+                            </button>
+                            <button type="button" class="payment-form-cancel" onclick="closePaymentModal()">
+                                Отменить
+                            </button>
+                        </div>
+                        <div id="submit-description" class="payment-form-hint" style="text-align: center; margin-top: 12px;">
+                            Нажимая кнопку, вы соглашаетесь с условиями оказания услуг
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Секция iframe с платежной формой -->
+                <div id="payment-iframe-section" class="payment-step-section hidden">
+                    <div class="payment-step-header">
+                        <button class="payment-back-button" onclick="goBackToCustomerData()" aria-label="Вернуться к заполнению данных">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="m15 18-6-6 6-6"/>
+                            </svg>
+                            Назад
                         </button>
-                        <button type="submit" class="payment-form-submit" id="submit-payment">
-                            <span class="payment-submit-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                        <h3 class="payment-step-title">Завершение оплаты</h3>
+                    </div>
+
+                    <div class="payment-iframe-container">
+                        <div id="payment-iframe-loading" class="payment-iframe-loading" aria-live="polite">
+                            <div class="payment-loading-spinner">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M21 12a9 9 0 11-6.219-8.56"/>
                                 </svg>
-                            </span>
-                            Перейти к оплате
-                        </button>
+                            </div>
+                            <div class="payment-loading-text">Загружается безопасная форма оплаты Т-Банка...</div>
+                        </div>
+                        <iframe
+                            id="payment-iframe"
+                            class="payment-iframe hidden"
+                            src=""
+                            frameborder="0"
+                            allowtransparency="true"
+                            scrolling="yes"
+                            title="Форма оплаты Т-Банка"
+                        ></iframe>
                     </div>
-                </form>
+
+                    <div class="payment-iframe-info">
+                        <div class="payment-iframe-info-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M9 12l2 2 4-4"/>
+                                <circle cx="12" cy="12" r="9"/>
+                            </svg>
+                            Гарантии безопасности
+                        </div>
+                        <div class="payment-info-grid">
+                            <div class="payment-info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <circle cx="12" cy="16" r="1"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                                SSL-шифрование
+                            </div>
+                            <div class="payment-info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M9 12l2 2 4-4"/>
+                                    <circle cx="12" cy="12" r="9"/>
+                                </svg>
+                                Стандарт PCI DSS
+                            </div>
+                            <div class="payment-info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                    <line x1="9" y1="9" x2="9.01" y2="9"/>
+                                    <line x1="15" y1="9" x2="15.01" y2="9"/>
+                                </svg>
+                                Т-Банк processing
+                            </div>
+                            <div class="payment-info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M12 1v6"/>
+                                    <path d="M12 17v6"/>
+                                    <path d="M3.34 7l1.56.9"/>
+                                    <path d="M19.1 16.1l1.56.9"/>
+                                    <path d="M1 12h6"/>
+                                    <path d="M17 12h6"/>
+                                    <path d="M3.34 17l1.56-.9"/>
+                                    <path d="M19.1 7.9l1.56-.9"/>
+                                </svg>
+                                Мониторинг 24/7
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Секция оплаты с iframe -->
-            <div id="payment-iframe-section" class="payment-step-section hidden">
-                <div class="payment-step-header">
-                    <button type="button" class="payment-back-button" onclick="goBackToCustomerData()">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                        </svg>
-                        Назад к данным
-                    </button>
-                    <div class="payment-step-title">Оплата</div>
-                </div>
-                
-                <div class="payment-iframe-container">
-                    <div id="payment-iframe-loading" class="payment-iframe-loading">
-                        <div class="payment-loading-spinner">
-                            <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
-                        </div>
-                        <div class="payment-loading-text">Подготавливаем форму оплаты...</div>
-                    </div>
-                    <iframe 
-                        id="payment-iframe" 
-                        class="payment-iframe hidden"
-                        frameborder="0"
-                        allowtransparency="true"
-                        allowfullscreen="true"
-                        title="Форма оплаты Т-банк"
-                    ></iframe>
-                </div>
-                
-                <div class="payment-iframe-info">
-                    <div class="payment-iframe-info-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                        </svg>
-                        <span>Защищённая оплата</span>
-                    </div>
-                    <div class="payment-info-grid">
-                        <div class="payment-info-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                            </svg>
-                            <span>SSL шифрование</span>
-                        </div>
-                        <div class="payment-info-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-                            </svg>
-                            <span>Все виды карт</span>
-                        </div>
-                        <div class="payment-info-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Мгновенно</span>
-                        </div>
-                        <div class="payment-info-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                            </svg>
-                            <span>Банковская защита</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </div>
-
+            <!-- Информация о безопасности -->
             <div class="payment-security-info">
                 <div class="payment-security-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <circle cx="12" cy="16" r="1"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                     </svg>
-                    <span>Безопасная оплата через Т-банк</span>
+                    Данные передаются в зашифрованном виде по протоколу SSL
                 </div>
                 <div class="payment-security-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                        <line x1="9" y1="9" x2="9.01" y2="9"/>
+                        <line x1="15" y1="9" x2="15.01" y2="9"/>
                     </svg>
-                    <span>Защищенное SSL соединение</span>
+                    Платежная информация не сохраняется на наших серверах
                 </div>
                 <div class="payment-security-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M9 12l2 2 4-4"/>
+                        <circle cx="12" cy="12" r="9"/>
                     </svg>
-                    <span>Мгновенная доставка на email</span>
+                    Соответствие международным стандартам безопасности PCI DSS
                 </div>
             </div>
         </div>
