@@ -1,0 +1,21 @@
+{
+  "name": "siteki",
+  "version": "2.2.3",
+  "description": "Академия Финансов - лендинг с интеграцией платежной системы Т-банка",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "keywords": [
+    "финансы",
+    "кредитная история",
+    "т-банк",
+    "платежи",
+    "netlify"
+  ],
+  "author": "Академия Финансов",
+  "license": "MIT",
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+} 
