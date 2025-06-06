@@ -101,9 +101,9 @@ function openPaymentModal(productId) {
     
     // Фокус на первое поле
     setTimeout(() => {
-        const emailInput = document.getElementById('customer-email');
-        if (emailInput) {
-            emailInput.focus();
+        const nameInput = document.getElementById('customer-name');
+        if (nameInput) {
+            nameInput.focus();
         }
     }, 300);
     
@@ -128,6 +128,9 @@ function closePaymentModal() {
     
     // Восстанавливаем скролл страницы
     document.body.style.overflow = '';
+    
+    // Сбрасываем состояние загрузки
+    setFormLoading(false);
     
     // Очищаем текущий продукт
     currentProductId = null;
@@ -208,9 +211,9 @@ async function handlePaymentFormSubmit(event) {
  */
 function getFormData() {
     return {
-        email: document.getElementById('customer-email')?.value?.trim() || '',
+        name: document.getElementById('customer-name')?.value?.trim() || '',
         phone: document.getElementById('customer-phone')?.value?.trim() || '',
-        name: document.getElementById('customer-name')?.value?.trim() || ''
+        email: document.getElementById('customer-email')?.value?.trim() || ''
     };
 }
 
