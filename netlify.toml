@@ -3,7 +3,7 @@
   
 [functions]
   node_bundler = "esbuild"
-  
+ 
 # Настройки для serverless functions
 [functions.create-payment]
   methods = ["POST", "OPTIONS"] 

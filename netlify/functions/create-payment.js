@@ -7,8 +7,8 @@
 import crypto from 'crypto';
 
 // Конфигурация терминала
-const TERMINAL_KEY = '1749023114115DEMO';
-const TERMINAL_PASSWORD = '*TS^0fvYzv$s_fu$'; // Пароль из ЛК Т-банка
+const TERMINAL_KEY = 'TinkoffBankTest';
+const TERMINAL_PASSWORD = 'TinkoffBankTest'; // DEMO пароль для тестового терминала
 
 /**
  * Генерация Token (SHA-256 подписи) на backend
@@ -23,7 +23,7 @@ function generateToken(params) {
     // Сортируем по алфавиту
     const sortedKeys = Object.keys(allParams).sort();
     
-    // Конкатенируем только значения
+    // Конкатенируем только значения согласно документации
     let concatenated = '';
     sortedKeys.forEach(key => {
         const value = allParams[key];
@@ -38,7 +38,7 @@ function generateToken(params) {
         }
     });
     
-    console.log('🔐 Строка для подписи (backend):', concatenated);
+    console.log('🔐 Строка для подписи (DEMO):', concatenated);
     
     // Генерируем SHA-256 хеш
     return crypto.createHash('sha256').update(concatenated).digest('hex');

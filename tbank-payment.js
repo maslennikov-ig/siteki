@@ -7,7 +7,7 @@
  */
 
 // Конфигурация терминала
-const TERMINAL_KEY = '1749023114115DEMO'; // Ключ терминала из личного кабинета
+const TERMINAL_KEY = 'TinkoffBankTest'; // DEMO ключ для тестирования
 
 // Карта продуктов: id, название, сумма
 const products = [
@@ -190,7 +190,7 @@ function loadTbankScript() {
     };
     
     try {
-        document.body.appendChild(script);
+    document.body.appendChild(script);
         console.log('📄 Скрипт интеграции Т-банка добавлен на страницу');
     } catch (error) {
         clearTimeout(loadTimeout);
@@ -216,13 +216,12 @@ function onPaymentIntegrationLoad() {
     
     try {
         // Простая конфигурация для backend интеграции
-        const initConfig = {
-            terminalKey: TERMINAL_KEY,
-            product: 'eacq',
-            features: {
-                payment: {
-                    paymentStartCallback: paymentStartCallback,
-                    config: {
+    const initConfig = {
+        terminalKey: TERMINAL_KEY,
+        product: 'eacq',
+        features: {
+            payment: {
+                config: {
                         status: {
                             changedCallback: async (status) => {
                                 console.log('💳 Статус платежа изменен:', status);
@@ -231,27 +230,32 @@ function onPaymentIntegrationLoad() {
                         dialog: {
                             closedCallback: async () => {
                                 console.log('🚪 Диалог оплаты закрыт');
-                            }
-                        }
                     }
+                        }
                 }
             }
-        };
+        }
+    };
         
         console.log('⚙️ Конфигурация PaymentIntegration (backend mode):', initConfig);
         console.log('🔄 Вызываем PaymentIntegration.init()...');
-        
-        // Инициализируем интеграцию
+    
+    // Инициализируем интеграцию
         const initPromise = PaymentIntegration.init(initConfig);
         
         initPromise
-            .then(integration => {
+        .then(async integration => {
                 console.log('✅ PaymentIntegration успешно инициализирован с backend!');
                 paymentIntegration = integration;
-                window.tbankIntegration = integration;
+            window.tbankIntegration = integration;
+                
+                // Устанавливаем глобальный callback согласно документации
+                await integration.payments.setPaymentStartCallback(paymentStartCallback);
+                console.log('✅ PaymentStartCallback установлен');
+                
                 console.log('🎉 Интеграция готова (приоритет: backend + виджеты)!');
-            })
-            .catch(error => {
+        })
+        .catch(error => {
                 console.warn('⚠️ PaymentIntegration не инициализирован:', error);
                 console.log('💻 Используем только backend режим');
                 paymentIntegration = null;
@@ -312,12 +316,12 @@ async function openPaymentForm(product) {
     if (paymentIntegration && paymentIntegration.payments) {
         try {
             console.log('🎯 Используем PaymentIntegration + backend...');
-            
+        
             // Создаем интеграцию
             const integration = await paymentIntegration.payments.create('main-integration', {
                 loadedCallback: () => {
                     console.log('✅ PaymentIntegration виджеты загружены');
-                }
+            }
             });
             
             // Создаем контейнер для виджетов
@@ -344,7 +348,7 @@ async function openPaymentForm(product) {
             
             // Добавляем доступные методы оплаты
             await integration.updateWidgetTypes(['tpay', 'mirpay', 'sberpay']); 
-            
+    
             // Добавляем информацию о заказе
             const titleDiv = document.createElement('div');
             titleDiv.innerHTML = `
@@ -390,8 +394,8 @@ async function openPaymentForm(product) {
         return;
     } catch (error) {
         console.error('❌ Backend не сработал:', error.message);
-    }
-    
+}
+
     // ПРИОРИТЕТ 3: Инструкции пользователю
     alert(`❌ Платежная система недоступна
 
@@ -430,5 +434,6 @@ window.TbankPayment = {
     openPaymentForm,
     checkPaymentStatus,
     paymentStartCallback,
-    createPaymentWithBackend
+    createPaymentWithBackend,
+    createSimplePayment: createPaymentWithBackend  // Алиас для тестов
 };
