@@ -93,12 +93,12 @@ export default async (request, context) => {
             Description: body.Description,
             Language: 'ru',
             PayType: 'O', // Одностадийная оплата
+            Email: body.Email || 'test@example.com', // В корне, обязательно для Receipt
+            Phone: body.Phone || '+79999999999', // В корне, обязательно для Receipt
             SuccessURL: body.SuccessURL || 'https://siteki.netlify.app/thankyou.html',
             FailURL: body.FailURL || 'https://siteki.netlify.app/fail.html',
             DATA: {
-                connection_type: 'Widget',
-                Email: body.Email || 'test@example.com',
-                Phone: body.Phone || '+79999999999'
+                connection_type: 'Widget'
             },
             Receipt: {
                 EmailCompany: 'info@siteki.netlify.app',
