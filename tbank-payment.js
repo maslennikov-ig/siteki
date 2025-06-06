@@ -7,7 +7,7 @@
  */
 
 // Конфигурация терминала
-const TERMINAL_KEY = 'TinkoffBankTest'; // DEMO ключ для тестирования
+const TERMINAL_KEY = '1749023114115DEMO'; // Стандартный DEMO ключ согласно документации
 
 // Карта продуктов: id, название, сумма
 const products = [
