@@ -51,6 +51,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Добавляем маскирование телефона
     initPhoneMask();
     
+    // Добавляем обработчик клавиши Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && paymentModal && !paymentModal.classList.contains('hidden')) {
+            closePaymentModal();
+        }
+    });
+    
     console.log('✅ Модальное окно оплаты готово к работе');
 });
 
