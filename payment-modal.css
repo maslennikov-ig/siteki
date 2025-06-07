@@ -914,6 +914,8 @@
 
 /* Футер безопасности T-Bank всегда видим */
 
+/* Управление видимостью заголовка и продукта через JavaScript */
+
 /* Скрываем блок безопасности первого экрана при показе T-Bank виджета */
 #payment-iframe-section:not(.hidden) ~ .customer-screen-security {
     display: none;

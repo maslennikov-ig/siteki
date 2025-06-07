@@ -82,7 +82,10 @@ function openPaymentModal(productId) {
     // Сохраняем текущий продукт
     currentProductId = productId;
     
-    // Информация о продукте убрана из интерфейса
+    // Заполняем информацию о продукте
+    document.getElementById('modal-product-name').textContent = product.name;
+    document.getElementById('modal-product-price').textContent = `${product.price.toLocaleString()} ₽`;
+    document.getElementById('modal-product-description').textContent = product.description;
     
     // Обновляем текст кнопки
     const submitButton = document.getElementById('submit-payment');
@@ -162,6 +165,8 @@ function resetPaymentForm() {
     const iframeSection = document.getElementById('payment-iframe-section');
     const iframe = document.getElementById('payment-iframe');
     const customerSecurity = document.querySelector('.customer-screen-security');
+    const modalHeader = document.querySelector('.payment-modal-header');
+    const modalProduct = document.querySelector('.payment-modal-product');
     
     if (customerSection && iframeSection) {
         customerSection.classList.remove('hidden');
@@ -170,6 +175,14 @@ function resetPaymentForm() {
         // Показываем блок безопасности первого экрана
         if (customerSecurity) {
             customerSecurity.classList.remove('hidden');
+        }
+        
+        // Показываем заголовок и информацию о продукте на первом экране
+        if (modalHeader) {
+            modalHeader.classList.remove('hidden');
+        }
+        if (modalProduct) {
+            modalProduct.classList.remove('hidden');
         }
         
         // Очищаем iframe
@@ -531,6 +544,8 @@ function showTBankPaymentScreen(productId, customerData) {
     const customerSection = document.getElementById('customer-data-section');
     const iframeSection = document.getElementById('payment-iframe-section');
     const customerSecurity = document.querySelector('.customer-screen-security');
+    const modalHeader = document.querySelector('.payment-modal-header');
+    const modalProduct = document.querySelector('.payment-modal-product');
     
     if (customerSection && iframeSection) {
         customerSection.classList.add('hidden');
@@ -539,6 +554,14 @@ function showTBankPaymentScreen(productId, customerData) {
         // Скрываем блок безопасности первого экрана
         if (customerSecurity) {
             customerSecurity.classList.add('hidden');
+        }
+        
+        // Скрываем заголовок и информацию о продукте на втором экране
+        if (modalHeader) {
+            modalHeader.classList.add('hidden');
+        }
+        if (modalProduct) {
+            modalProduct.classList.add('hidden');
         }
         
         // Устанавливаем сумму в виджете
