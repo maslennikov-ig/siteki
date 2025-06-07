@@ -625,6 +625,12 @@ function showTBankPaymentScreen(productId, customerData) {
             amountDisplay.textContent = `${product.price.toLocaleString()} ₽`;
         }
         
+        // Добавляем класс для оптимизации высоты модального окна
+        const modalContent = document.querySelector('.payment-modal-content');
+        if (modalContent) {
+            modalContent.classList.add('payment-screen-active');
+        }
+        
         // Фокус на поле номера карты
         setTimeout(() => {
             const cardInput = document.getElementById('tbank-card-number');
@@ -637,7 +643,7 @@ function showTBankPaymentScreen(productId, customerData) {
     // Сбрасываем состояние загрузки
     setFormLoading(false);
     
-    console.log('✅ Экран оплаты Т-банка показан');
+    console.log('✅ Экран оплаты Т-банка показан с компактной оптимизацией');
 }
 
 /**
@@ -1075,6 +1081,9 @@ function goBackToCustomerData() {
     const customerSection = document.getElementById('customer-data-section');
     const iframeSection = document.getElementById('payment-iframe-section');
     const customerSecurity = document.querySelector('.customer-screen-security');
+    const modalHeader = document.querySelector('.payment-modal-header');
+    const modalProduct = document.querySelector('.payment-modal-product');
+    const modalContent = document.querySelector('.payment-modal-content');
     
     if (customerSection && iframeSection) {
         customerSection.classList.remove('hidden');
@@ -1083,6 +1092,25 @@ function goBackToCustomerData() {
         // Показываем блок безопасности первого экрана
         if (customerSecurity) {
             customerSecurity.classList.remove('hidden');
+        }
+        
+        // Показываем заголовок и информацию о продукте
+        if (modalHeader) {
+            modalHeader.classList.remove('hidden');
+        }
+        if (modalProduct) {
+            modalProduct.classList.remove('hidden');
+        }
+        
+        // Убираем класс оптимизации экрана оплаты
+        if (modalContent) {
+            modalContent.classList.remove('payment-screen-active');
+        }
+        
+        // Восстанавливаем заголовок модального окна
+        const modalTitle = document.querySelector('.payment-modal-title');
+        if (modalTitle) {
+            modalTitle.textContent = 'Оформление заказа';
         }
     }
 } 

@@ -2951,3 +2951,272 @@ body.modal-open {
         flex: none;
     }
 }
+
+/* ===== ОПТИМИЗАЦИЯ Т-БАНК ВИДЖЕТА ДЛЯ КОМПАКТНОСТИ ===== */
+
+.tbank-payment-widget {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-radius: 16px;
+    padding: 1.25rem;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.tbank-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tbank-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.tbank-logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #000;
+}
+
+.tbank-flag {
+    width: 24px;
+    height: 16px;
+    background: linear-gradient(to bottom, #ffffff 0%, #ffffff 33%, #0052cc 33%, #0052cc 66%, #cc0000 66%, #cc0000 100%);
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.tbank-amount-section {
+    margin-bottom: 1rem;
+}
+
+.tbank-amount-display {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.tbank-amount-display:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.tbank-card-section {
+    margin-bottom: 1rem;
+}
+
+.tbank-card-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.tbank-card-input-container {
+    position: relative;
+    margin-bottom: 0.75rem;
+}
+
+.tbank-card-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.875rem 3rem 0.875rem 1rem;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    letter-spacing: 0.5px;
+}
+
+.tbank-card-input:focus {
+    outline: none;
+    border-color: #FFD700;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+}
+
+.tbank-card-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.tbank-card-type-indicator {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.tbank-receipt-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tbank-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.tbank-checkbox.checked {
+    background: #FFD700;
+    border-color: #FFD700;
+}
+
+.tbank-checkbox.checked::after {
+    content: '✓';
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.tbank-receipt-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    user-select: none;
+}
+
+.tbank-pay-button {
+    width: 100%;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    color: #000;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+}
+
+.tbank-pay-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+.tbank-pay-button:active {
+    transform: translateY(0);
+}
+
+.tbank-security-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.75rem;
+}
+
+.tbank-security-title {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+}
+
+.tbank-security-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.tbank-security-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    justify-content: center;
+}
+
+.tbank-security-item svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
+/* ===== ОПТИМИЗАЦИЯ ЭКРАНА ОПЛАТЫ ===== */
+
+/* Специальный класс для экрана оплаты - максимально компактный дизайн */
+.payment-modal-content.payment-screen-active {
+    max-height: 90vh;
+}
+
+.payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+    max-height: calc(90vh - 60px);
+    padding: 0.75rem 1.25rem 1.25rem;
+}
+
+/* Скрытие элементов на экране оплаты для экономии места */
+.payment-modal-header.hidden,
+.payment-modal-product.hidden,
+.customer-screen-security.hidden {
+    display: none !important;
+}
+
+/* Компактная кнопка "Назад" */
+.tbank-back-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.5rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.tbank-back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.tbank-back-button svg {
+    width: 20px;
+    height: 20px;
+}
