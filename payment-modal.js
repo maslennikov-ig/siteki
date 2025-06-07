@@ -157,10 +157,16 @@ function resetPaymentForm() {
     const customerSection = document.getElementById('customer-data-section');
     const iframeSection = document.getElementById('payment-iframe-section');
     const iframe = document.getElementById('payment-iframe');
+    const customerSecurity = document.querySelector('.customer-screen-security');
     
     if (customerSection && iframeSection) {
         customerSection.classList.remove('hidden');
         iframeSection.classList.add('hidden');
+        
+        // Показываем блок безопасности первого экрана
+        if (customerSecurity) {
+            customerSecurity.classList.remove('hidden');
+        }
         
         // Очищаем iframe
         if (iframe) {
@@ -520,10 +526,16 @@ function showTBankPaymentScreen(productId, customerData) {
     // Скрываем секцию данных клиента
     const customerSection = document.getElementById('customer-data-section');
     const iframeSection = document.getElementById('payment-iframe-section');
+    const customerSecurity = document.querySelector('.customer-screen-security');
     
     if (customerSection && iframeSection) {
         customerSection.classList.add('hidden');
         iframeSection.classList.remove('hidden');
+        
+        // Скрываем блок безопасности первого экрана
+        if (customerSecurity) {
+            customerSecurity.classList.add('hidden');
+        }
         
         // Устанавливаем сумму в виджете
         const amountDisplay = document.getElementById('tbank-selected-amount');
@@ -980,9 +992,15 @@ function goBackToCustomerData() {
     
     const customerSection = document.getElementById('customer-data-section');
     const iframeSection = document.getElementById('payment-iframe-section');
+    const customerSecurity = document.querySelector('.customer-screen-security');
     
     if (customerSection && iframeSection) {
         customerSection.classList.remove('hidden');
         iframeSection.classList.add('hidden');
+        
+        // Показываем блок безопасности первого экрана
+        if (customerSecurity) {
+            customerSecurity.classList.remove('hidden');
+        }
     }
 } 

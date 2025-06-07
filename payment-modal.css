@@ -912,6 +912,16 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Скрываем футер безопасности T-Bank при показе виджета */
+#payment-iframe-section:not(.hidden) .tbank-security-footer {
+    display: none;
+}
+
+/* Скрываем блок безопасности первого экрана при показе T-Bank виджета */
+#payment-iframe-section:not(.hidden) ~ .customer-screen-security {
+    display: none;
+}
+
 .tbank-security-items {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
