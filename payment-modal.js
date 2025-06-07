@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    // Инициализируем систему предотвращения layout shifts
+    initScrollbarCompensation();
+    
     // Добавляем обработчик формы
     const paymentForm = document.getElementById('payment-form');
     if (paymentForm) {
@@ -60,6 +63,60 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ Модальное окно оплаты готово к работе');
 });
+
+/**
+ * Инициализация системы компенсации скроллбара для предотвращения layout shifts
+ */
+function initScrollbarCompensation() {
+    // Вычисляем ширину скроллбара
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    
+    // Устанавливаем CSS переменную для ширины скроллбара
+    document.documentElement.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`);
+    
+    console.log('📏 Ширина скроллбара:', scrollbarWidth + 'px');
+}
+
+/**
+ * Блокировка скролла страницы с предотвращением layout shifts
+ */
+function lockBodyScroll() {
+    // Сохраняем текущую позицию скролла
+    const scrollY = window.scrollY;
+    
+    // Добавляем класс для блокировки скролла
+    document.body.classList.add('modal-open');
+    
+    // Устанавливаем позицию для предотвращения скачков
+    document.body.style.top = `-${scrollY}px`;
+    
+    // Сохраняем позицию для восстановления
+    document.body.setAttribute('data-scroll-y', scrollY.toString());
+    
+    console.log('🔒 Скролл заблокирован на позиции:', scrollY);
+}
+
+/**
+ * Разблокировка скролла страницы с восстановлением позиции
+ */
+function unlockBodyScroll() {
+    // Получаем сохраненную позицию скролла
+    const scrollY = document.body.getAttribute('data-scroll-y');
+    
+    // Убираем класс блокировки скролла
+    document.body.classList.remove('modal-open');
+    
+    // Очищаем стили
+    document.body.style.top = '';
+    document.body.removeAttribute('data-scroll-y');
+    
+    // Восстанавливаем позицию скролла
+    if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY, 10));
+    }
+    
+    console.log('🔓 Скролл разблокирован, позиция восстановлена:', scrollY || '0');
+}
 
 /**
  * Открытие модального окна с информацией о продукте
@@ -103,7 +160,8 @@ function openPaymentModal(productId) {
     // Очищаем форму
     resetPaymentForm();
     
-    // Показываем модальное окно
+    // Показываем модальное окно с предотвращением layout shifts
+    lockBodyScroll();
     paymentModal.classList.remove('hidden');
     
     // Фокус на первое поле
@@ -113,9 +171,6 @@ function openPaymentModal(productId) {
             nameInput.focus();
         }
     }, 300);
-    
-    // Блокируем скролл страницы
-    document.body.style.overflow = 'hidden';
     
     console.log('✅ Модальное окно открыто для продукта:', product.name);
 }
@@ -133,8 +188,8 @@ function closePaymentModal() {
     // Скрываем модальное окно
     paymentModal.classList.add('hidden');
     
-    // Восстанавливаем скролл страницы
-    document.body.style.overflow = '';
+    // Восстанавливаем скролл страницы с предотвращением layout shifts
+    unlockBodyScroll();
     
     // Сбрасываем состояние загрузки
     setFormLoading(false);

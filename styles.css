@@ -2602,27 +2602,179 @@ transform: translateY(-0.25rem);
     position: relative;
     width: 90%;
     max-width: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-height: 95vh; /* Увеличиваем с 90vh до 95vh для лучшего использования пространства */
+    overflow: hidden; /* Убираем прокрутку с контейнера */
     background: white;
     border-radius: 16px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     transform: scale(1);
     transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column; /* Делаем flex контейнером для правильного управления высотой */
 }
 
 .payment-modal.hidden .payment-modal-content {
     transform: scale(0.95);
 }
 
+/* Добавляем правильную структуру для прокрутки */
+.payment-modal-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+    scrollbar-width: thin; /* Тонкие скроллбары в Firefox */
+    scrollbar-color: #cbd5e1 #f1f5f9; /* Цвета скроллбара в Firefox */
+}
+
+/* Стилизация скроллбара для Webkit браузеров */
+.payment-modal-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.payment-modal-scroll-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.payment-modal-scroll-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.payment-modal-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Фиксируем заголовок */
 .payment-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px;
     border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0; /* Предотвращаем сжатие заголовка */
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
+/* Фиксируем информацию о продукте */
+.payment-modal-product {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0; /* Предотвращаем сжатие блока продукта */
+    background: white;
+    position: sticky;
+    top: 73px; /* Высота заголовка + border */
+    z-index: 9;
+}
+
+/* Оптимизируем форму для лучшего использования пространства */
+.payment-form {
+    padding: 24px;
+    min-height: 0; /* Позволяем форме сжиматься */
+}
+
+/* Оптимизируем Т-банк виджет для экономии места */
+.tbank-payment-widget {
+    padding: 20px 24px;
+    min-height: 0;
+}
+
+/* Уменьшаем отступы в виджете для экономии места */
+.tbank-header {
+    margin-bottom: 16px; /* Уменьшаем с 24px */
+}
+
+.tbank-amount-section {
+    margin-bottom: 16px; /* Уменьшаем с 24px */
+}
+
+.tbank-card-section {
+    margin-bottom: 16px; /* Уменьшаем с 24px */
+}
+
+.tbank-pay-button {
+    margin: 16px 0; /* Уменьшаем отступы */
+}
+
+.tbank-security-footer {
+    margin-top: 16px; /* Уменьшаем с 24px */
+    padding-top: 16px;
+}
+
+/* Оптимизируем блок безопасности */
+.payment-security-info {
+    padding: 16px 24px; /* Уменьшаем padding */
+    background: #f9fafb;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    flex-shrink: 0;
+}
+
+.payment-security-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 6px; /* Уменьшаем с 8px */
+}
+
+.payment-security-item:last-child {
+    margin-bottom: 0;
+}
+
+.payment-security-item svg {
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+/* Предотвращение layout shifts при открытии модального окна */
+body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    padding-right: var(--scrollbar-width, 0);
+}
+
+/* Добавляем специальные стили для десктопа */
+@media (min-width: 1024px) {
+    .payment-modal-content {
+        max-width: 520px; /* Немного увеличиваем ширину на больших экранах */
+        max-height: 90vh; /* Возвращаем 90vh для десктопа, но с лучшей структурой */
+    }
+    
+    /* Добавляем scrollbar-gutter для предотвращения layout shifts */
+    html {
+        scrollbar-gutter: stable;
+    }
+    
+    /* Оптимизируем отступы для десктопа */
+    .payment-form {
+        padding: 28px 32px;
+    }
+    
+    .tbank-payment-widget {
+        padding: 24px 32px;
+    }
+    
+    .payment-modal-header {
+        padding: 24px 32px;
+    }
+    
+    .payment-modal-product {
+        padding: 24px 32px;
+    }
+    
+    .payment-security-info {
+        padding: 20px 32px;
+    }
+}
+
+/* Добавляем недостающие стили для элементов модального окна */
 .payment-modal-title {
     font-size: 1.25rem;
     font-weight: 600;
@@ -2649,11 +2801,6 @@ transform: translateY(-0.25rem);
     color: #374151;
 }
 
-.payment-modal-product {
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
 .payment-modal-product-name {
     font-size: 1.125rem;
     font-weight: 600;
@@ -2673,10 +2820,6 @@ transform: translateY(-0.25rem);
     color: #6b7280;
     margin: 0;
     line-height: 1.5;
-}
-
-.payment-form {
-    padding: 24px;
 }
 
 .payment-form-group {
@@ -2782,31 +2925,6 @@ transform: translateY(-0.25rem);
 .payment-submit-icon {
     display: flex;
     align-items: center;
-}
-
-.payment-security-info {
-    padding: 20px 24px;
-    background: #f9fafb;
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
-}
-
-.payment-security-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.75rem;
-    color: #6b7280;
-    margin-bottom: 8px;
-}
-
-.payment-security-item:last-child {
-    margin-bottom: 0;
-}
-
-.payment-security-item svg {
-    color: #10b981;
-    flex-shrink: 0;
 }
 
 /* Мобильная адаптация модального окна */

@@ -325,6 +325,121 @@
     }
 }
 
+/* Оптимизация модальных окон для десктопа */
+@media (min-width: 1024px) {
+    /* Предотвращение layout shifts при открытии модального окна */
+    body.modal-open {
+        overflow: hidden;
+        padding-right: var(--scrollbar-width, 0);
+    }
+    
+    /* Улучшенная анимация для десктопа */
+    .payment-modal {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+    
+    .payment-modal-content {
+        max-height: 85vh; /* Оптимальная высота для десктопа */
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.25),
+            0 0 0 1px rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Улучшенная прокрутка для десктопа */
+    .payment-modal-scroll-container {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+    
+    .payment-modal-scroll-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .payment-modal-scroll-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .payment-modal-scroll-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
+    
+    .payment-modal-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+        background-clip: content-box;
+    }
+    
+    /* Оптимизация Т-банк виджета для десктопа */
+    .tbank-payment-widget {
+        padding: 24px 32px 20px;
+    }
+    
+    .tbank-header {
+        margin-bottom: 20px;
+    }
+    
+    .tbank-amount-section {
+        margin-bottom: 20px;
+    }
+    
+    .tbank-card-section {
+        margin-bottom: 20px;
+    }
+    
+    .tbank-pay-button {
+        margin: 20px 0 16px;
+        min-height: 48px;
+        font-size: 1rem;
+    }
+    
+    .tbank-security-footer {
+        margin-top: 16px;
+        padding-top: 16px;
+    }
+    
+    .tbank-security-items {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px 16px;
+    }
+    
+    .tbank-security-item {
+        font-size: 0.75rem;
+    }
+}
+
+/* Дополнительная оптимизация для очень больших экранов */
+@media (min-width: 1440px) {
+    .payment-modal-content {
+        max-width: 560px;
+        max-height: 80vh;
+    }
+    
+    .payment-form {
+        padding: 32px 40px;
+    }
+    
+    .tbank-payment-widget {
+        padding: 28px 40px 24px;
+    }
+    
+    .payment-modal-header {
+        padding: 28px 40px;
+    }
+    
+    .payment-modal-product {
+        padding: 28px 40px;
+    }
+    
+    .payment-security-info {
+        padding: 24px 40px;
+    }
+}
+
 /* ===== КОНТАКТЫ И ПОДВАЛ ===== */
 
 /* Адаптивные стили для сетки контактов */
