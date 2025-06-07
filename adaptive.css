@@ -1375,3 +1375,99 @@ picture img {
         border-radius: 10px;
     }
 }
+
+/* ===== АДАПТИВНАЯ ОПТИМИЗАЦИЯ ЭКРАНА ОПЛАТЫ ===== */
+
+/* Мобильные устройства (≤640px) - максимальная компактность */
+@media (max-width: 640px) {
+    .payment-modal-content.payment-screen-active {
+        max-height: 85vh; /* Больше места на мобильных */
+    }
+    
+    .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+        max-height: 85vh;
+        padding: 0.5rem 0.75rem 0.75rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-payment-widget {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-header,
+    .payment-modal-content.payment-screen-active .tbank-amount-section,
+    .payment-modal-content.payment-screen-active .tbank-card-section,
+    .payment-modal-content.payment-screen-active .tbank-receipt-section {
+        margin-bottom: 0.5rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-pay-button {
+        margin-bottom: 0.5rem;
+        padding: 0.625rem;
+        font-size: 1rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-security-footer {
+        padding-top: 0.375rem;
+        margin-top: 0.375rem;
+    }
+}
+
+/* Планшеты (641px - 1023px) - сбалансированные размеры */
+@media (min-width: 641px) and (max-width: 1023px) {
+    .payment-modal-content.payment-screen-active {
+        max-height: 80vh;
+    }
+    
+    .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+        max-height: 80vh;
+        padding: 0.625rem 1rem 1rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-payment-widget {
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Десктоп (≥1024px) - компактные отступы */
+@media (min-width: 1024px) {
+    .payment-modal-content.payment-screen-active {
+        max-height: 75vh;
+    }
+    
+    .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+        max-height: 75vh;
+        padding: 0.75rem 1.25rem 1.25rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-payment-widget {
+        padding: 1rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-header,
+    .payment-modal-content.payment-screen-active .tbank-amount-section,
+    .payment-modal-content.payment-screen-active .tbank-card-section {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Большие экраны (≥1440px) - еще более компактно */
+@media (min-width: 1440px) {
+    .payment-modal-content.payment-screen-active {
+        max-height: 70vh; /* Еще более компактно на больших экранах */
+    }
+    
+    .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+        max-height: 70vh;
+        padding: 1rem 1.5rem 1.5rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-payment-widget {
+        padding: 1.125rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-header,
+    .payment-modal-content.payment-screen-active .tbank-amount-section,
+    .payment-modal-content.payment-screen-active .tbank-card-section {
+        margin-bottom: 1.125rem;
+    }
+}

@@ -3181,12 +3181,45 @@ body.modal-open {
 
 /* Специальный класс для экрана оплаты - максимально компактный дизайн */
 .payment-modal-content.payment-screen-active {
-    max-height: 90vh;
+    max-height: 75vh; /* Уменьшаем с 90vh до 75vh */
+    height: auto;
 }
 
 .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
-    max-height: calc(90vh - 60px);
-    padding: 0.75rem 1.25rem 1.25rem;
+    max-height: 75vh; /* Убираем calc и делаем фиксированную высоту */
+    padding: 0.5rem 1rem 1rem; /* Уменьшаем отступы еще больше */
+    overflow-y: auto;
+}
+
+/* Дополнительная компактность для Т-банк виджета */
+.payment-modal-content.payment-screen-active .tbank-payment-widget {
+    padding: 0.75rem 1rem; /* Минимальные отступы */
+}
+
+.payment-modal-content.payment-screen-active .tbank-header {
+    margin-bottom: 0.75rem; /* Уменьшаем отступы */
+}
+
+.payment-modal-content.payment-screen-active .tbank-amount-section {
+    margin-bottom: 0.75rem;
+}
+
+.payment-modal-content.payment-screen-active .tbank-card-section {
+    margin-bottom: 0.75rem;
+}
+
+.payment-modal-content.payment-screen-active .tbank-receipt-section {
+    margin-bottom: 0.75rem;
+}
+
+.payment-modal-content.payment-screen-active .tbank-pay-button {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem; /* Уменьшаем padding кнопки */
+}
+
+.payment-modal-content.payment-screen-active .tbank-security-footer {
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 /* Скрытие элементов на экране оплаты для экономии места */
