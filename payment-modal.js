@@ -75,10 +75,7 @@ function openPaymentModal(productId) {
     // Сохраняем текущий продукт
     currentProductId = productId;
     
-    // Заполняем информацию о продукте
-    document.getElementById('modal-product-name').textContent = product.name;
-    document.getElementById('modal-product-price').textContent = `${product.price.toLocaleString()} ₽`;
-    document.getElementById('modal-product-description').textContent = product.description;
+    // Информация о продукте убрана из интерфейса
     
     // Обновляем текст кнопки
     const submitButton = document.getElementById('submit-payment');
