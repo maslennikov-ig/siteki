@@ -945,10 +945,11 @@ transform: translateY(-0.25rem);
 }
 .feature-check {
     flex-shrink: 0;
-    width: 1.25em;
-    height: 1.25em;
+    width: 1rem;
+    height: 1rem;
     color: #22c55e;
     margin-top: 0.15em;
+    margin-right: 0.5rem;
 }
 
 .benefit-icon {
