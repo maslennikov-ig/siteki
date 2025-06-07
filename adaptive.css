@@ -686,3 +686,417 @@ picture img {
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     }
 }
+
+/* ===== КРИТИЧЕСКИЕ УЛУЧШЕНИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ===== */
+
+/* Базовые настройки для всех мобильных устройств */
+@media (max-width: 767px) {
+    /* Увеличиваем базовый размер шрифта для лучшей читаемости */
+    html {
+        font-size: 16px;
+    }
+    
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+        padding: 0;
+        margin: 0;
+    }
+    
+    /* Контейнеры с увеличенными отступами */
+    .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        max-width: 100%;
+    }
+    
+    /* Секции с оптимизированными отступами */
+    .section-padding {
+        padding: 3rem 1.5rem;
+    }
+    
+    /* Заголовки с увеличенными размерами */
+    .section-title {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 700;
+    }
+    
+    .section-subtitle {
+        font-size: 1.125rem;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: #64748b;
+    }
+    
+    /* Hero секция оптимизация */
+    .hero-title {
+        font-size: 2.25rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 800;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        text-align: center;
+        opacity: 0.95;
+    }
+    
+    /* Кнопки с увеличенными размерами */
+    .cta-button {
+        min-height: 56px;
+        padding: 1.25rem 2rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .cta-button:hover,
+    .cta-button:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+    }
+    
+    /* Карточки продуктов */
+    .product-card {
+        padding: 2rem 1.5rem;
+        margin-bottom: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        background: white;
+        border: 1px solid #f1f5f9;
+    }
+    
+    .product-title {
+        font-size: 1.5rem;
+        line-height: 1.3;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .product-price {
+        font-size: 2rem;
+        margin: 1.5rem 0;
+        font-weight: 800;
+        color: #f97316;
+    }
+    
+    /* Списки функций */
+    .feature-list li {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+        line-height: 1.6;
+        position: relative;
+    }
+    
+    .feature-list li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #10b981;
+        font-weight: bold;
+        font-size: 1.125rem;
+    }
+    
+    /* Навигация */
+    .nav-link {
+        font-size: 1.125rem;
+        padding: 1rem 0.75rem;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    /* FAQ секция */
+    .faq-question {
+        font-size: 1.125rem;
+        min-height: 64px;
+        padding: 1.25rem 1rem 1.25rem 3rem;
+        border-radius: 16px;
+    }
+    
+    .faq-answer p {
+        font-size: 1rem;
+        line-height: 1.7;
+        margin: 1.5rem 0;
+    }
+    
+    /* Экспертное фото */
+    .expert-photo {
+        max-width: 240px;
+        max-height: 240px;
+        border-radius: 24px;
+        margin: 0 auto;
+        display: block;
+    }
+    
+    .expert-badge {
+        font-size: 0.95rem;
+        padding: 0.75rem 1.25rem;
+        min-width: 200px;
+        border-radius: 16px;
+        margin-top: 1rem;
+    }
+}
+
+/* ===== ОПТИМИЗАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ (480px и меньше) ===== */
+@media (max-width: 480px) {
+    /* Еще больше увеличиваем размеры для маленьких экранов */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .section-padding {
+        padding: 2.5rem 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.875rem;
+        line-height: 1.2;
+        margin-bottom: 1.25rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1.0625rem;
+        line-height: 1.6;
+        margin-bottom: 1.75rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+        line-height: 1.15;
+        margin-bottom: 1.25rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.0625rem;
+        line-height: 1.5;
+        margin-bottom: 1.75rem;
+    }
+    
+    /* Увеличенные кнопки для лучшего UX */
+    .cta-button {
+        min-height: 60px;
+        padding: 1.375rem 2rem;
+        font-size: 1.1875rem;
+        border-radius: 18px;
+        gap: 0.875rem;
+    }
+    
+    .product-card {
+        padding: 1.75rem 1.25rem;
+        margin-bottom: 1.75rem;
+        border-radius: 18px;
+    }
+    
+    .product-title {
+        font-size: 1.375rem;
+        line-height: 1.25;
+        margin-bottom: 0.875rem;
+    }
+    
+    .product-price {
+        font-size: 1.875rem;
+        margin: 1.25rem 0;
+    }
+    
+    .feature-list li {
+        font-size: 0.9375rem;
+        margin-bottom: 0.875rem;
+        padding-left: 1.75rem;
+    }
+    
+    .expert-photo {
+        max-width: 220px;
+        max-height: 220px;
+        border-radius: 20px;
+    }
+    
+    .expert-badge {
+        font-size: 0.875rem;
+        padding: 0.625rem 1rem;
+        min-width: 180px;
+        border-radius: 14px;
+    }
+    
+    /* Статистика */
+    .stat-number {
+        font-size: 2.25rem;
+        line-height: 1.1;
+        font-weight: 800;
+    }
+    
+    .stat-label {
+        font-size: 0.9375rem;
+        margin-top: 0.5rem;
+    }
+}
+
+/* ===== КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНОВ (375px и меньше) ===== */
+@media (max-width: 375px) {
+    .container {
+        padding-left: 0.875rem;
+        padding-right: 0.875rem;
+    }
+    
+    .section-padding {
+        padding: 2rem 0.875rem;
+    }
+    
+    .section-title {
+        font-size: 1.75rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-title {
+        font-size: 1.875rem;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .cta-button {
+        min-height: 56px;
+        padding: 1.25rem 1.75rem;
+        font-size: 1.125rem;
+        border-radius: 16px;
+    }
+    
+    .product-card {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 16px;
+    }
+    
+    .product-title {
+        font-size: 1.25rem;
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+    }
+    
+    .product-price {
+        font-size: 1.75rem;
+        margin: 1rem 0;
+    }
+    
+    .feature-list li {
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+        padding-left: 1.5rem;
+    }
+    
+    .expert-photo {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 18px;
+    }
+    
+    .expert-badge {
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.875rem;
+        min-width: 160px;
+        border-radius: 12px;
+    }
+}
+
+/* ===== ЭКСТРЕМАЛЬНАЯ ОПТИМИЗАЦИЯ ДЛЯ МИНИМАЛЬНЫХ ЭКРАНОВ (320px) ===== */
+@media (max-width: 320px) {
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    .section-padding {
+        padding: 1.75rem 0.75rem;
+    }
+    
+    .section-title {
+        font-size: 1.625rem;
+        line-height: 1.15;
+        margin-bottom: 0.875rem;
+    }
+    
+    .hero-title {
+        font-size: 1.75rem;
+        line-height: 1.1;
+        margin-bottom: 0.875rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.9375rem;
+        line-height: 1.4;
+        margin-bottom: 1.25rem;
+    }
+    
+    .cta-button {
+        min-height: 52px;
+        padding: 1.125rem 1.5rem;
+        font-size: 1.0625rem;
+        border-radius: 14px;
+    }
+    
+    .product-card {
+        padding: 1.25rem 0.875rem;
+        margin-bottom: 1.25rem;
+        border-radius: 14px;
+    }
+    
+    .product-title {
+        font-size: 1.125rem;
+        line-height: 1.2;
+        margin-bottom: 0.625rem;
+    }
+    
+    .product-price {
+        font-size: 1.625rem;
+        margin: 0.875rem 0;
+    }
+    
+    .feature-list li {
+        font-size: 0.8125rem;
+        margin-bottom: 0.625rem;
+        padding-left: 1.25rem;
+    }
+    
+    .expert-photo {
+        max-width: 180px;
+        max-height: 180px;
+        border-radius: 16px;
+    }
+    
+    .expert-badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        min-width: 140px;
+        border-radius: 10px;
+    }
+}

@@ -17,16 +17,172 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* ===== КРИТИЧЕСКИЕ МОБИЛЬНЫЕ УЛУЧШЕНИЯ ===== */
+
 /* Адаптивные базовые стили */
 @media (max-width: 767px) {
     body {
-        font-size: 15px;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    /* Улучшенное мобильное меню */
+    .mobile-menu {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 100%;
+        max-width: 100%;
+        background: white;
+        z-index: 9999;
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 2rem 1.5rem;
+        box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .mobile-menu-hidden {
+        transform: translateX(100%);
+        visibility: hidden;
+    }
+    
+    .mobile-menu:not(.mobile-menu-hidden) {
+        transform: translateX(0);
+        visibility: visible;
+    }
+    
+    /* Увеличенные ссылки в мобильном меню */
+    .mobile-menu .nav-link {
+        font-size: 1.25rem;
+        font-weight: 500;
+        padding: 1.25rem 1rem;
+        margin-bottom: 0.5rem;
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        border-radius: 16px;
+        color: #1e293b;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .mobile-menu .nav-link:hover,
+    .mobile-menu .nav-link:focus {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: white;
+        transform: translateX(4px);
+    }
+    
+    /* Кнопка в мобильном меню */
+    .mobile-menu .cta-button {
+        min-height: 64px;
+        padding: 1.5rem 2rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        border-radius: 18px;
+        margin-top: 1.5rem;
+        width: 100%;
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
+        transition: all 0.3s ease;
+        touch-action: manipulation;
+    }
+    
+    .mobile-menu .cta-button:hover,
+    .mobile-menu .cta-button:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(249, 115, 22, 0.4);
+    }
+    
+    /* Контактная информация в меню */
+    .mobile-menu .contact-link {
+        font-size: 1.125rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        border-radius: 14px;
+        color: #475569;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        touch-action: manipulation;
+    }
+    
+    .mobile-menu .contact-link:hover,
+    .mobile-menu .contact-link:focus {
+        background: #f8fafc;
+        color: #f97316;
+        transform: translateX(4px);
+    }
+    
+    .mobile-menu .contact-link svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
     }
 }
 
 @media (max-width: 480px) {
     body {
-        font-size: 14px;
+        font-size: 15px;
+    }
+    
+    .mobile-menu {
+        padding: 1.5rem 1rem;
+    }
+    
+    .mobile-menu .nav-link {
+        font-size: 1.1875rem;
+        padding: 1.125rem 0.875rem;
+        min-height: 60px;
+    }
+    
+    .mobile-menu .cta-button {
+        min-height: 60px;
+        padding: 1.375rem 1.75rem;
+        font-size: 1.1875rem;
+    }
+    
+    .mobile-menu .contact-link {
+        font-size: 1.0625rem;
+        padding: 0.875rem;
+        min-height: 52px;
+    }
+}
+
+@media (max-width: 374px) {
+    .mobile-menu {
+        padding: 1.25rem 0.875rem;
+    }
+    
+    .mobile-menu .nav-link {
+        font-size: 1.125rem;
+        padding: 1rem 0.75rem;
+        min-height: 56px;
+    }
+    
+    .mobile-menu .cta-button {
+        min-height: 56px;
+        padding: 1.25rem 1.5rem;
+        font-size: 1.125rem;
+    }
+    
+    .mobile-menu .contact-link {
+        font-size: 1rem;
+        padding: 0.75rem;
+        min-height: 48px;
     }
 }
 
@@ -39,17 +195,211 @@ body {
     textarea, 
     select,
     .clickable {
-        min-height: 44px;
-        min-width: 44px;
+        min-height: 48px;
+        min-width: 48px;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
     }
     
     /* Улучшенная обратная связь при касании */
     button:active,
-    .cta-button:active {
+    .cta-button:active,
+    .nav-link:active {
         transform: scale(0.98);
         transition: transform 0.1s ease;
+    }
+    
+    /* Увеличенные кнопки для touch */
+    .cta-button {
+        min-height: 56px;
+        padding: 1.25rem 2rem;
+        font-size: 1.125rem;
+    }
+    
+    .nav-link {
+        min-height: 56px;
+        padding: 1rem 0.75rem;
+    }
+    
+    .faq-question {
+        min-height: 64px;
+        padding: 1.25rem 1rem 1.25rem 3rem;
+    }
+}
+
+/* ===== ОСНОВНАЯ НАВИГАЦИЯ ===== */
+
+.main-nav {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    min-height: 80px;
+}
+
+.logo-img-header {
+    height: 48px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-img-header:hover {
+    transform: scale(1.05);
+}
+
+.header-nav-items {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-link {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #475569;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: #f97316;
+    background: rgba(249, 115, 22, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Кнопка мобильного меню */
+.sm-hidden button {
+    background: none;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 12px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sm-hidden button:hover,
+.sm-hidden button:focus {
+    background: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+    transform: scale(1.05);
+}
+
+.sm-hidden button svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* Мобильное меню overlay */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.mobile-menu-overlay.opacity-0 {
+    opacity: 0;
+}
+
+.mobile-menu-overlay.invisible {
+    visibility: hidden;
+}
+
+/* ===== АДАПТИВНЫЕ СТИЛИ ДЛЯ НАВИГАЦИИ ===== */
+
+@media (max-width: 1023px) {
+    .header-nav-items {
+        gap: 1.5rem;
+    }
+    
+    .nav-link {
+        font-size: 0.9375rem;
+        padding: 0.625rem 0.875rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .main-nav {
+        padding: 0 1.5rem;
+    }
+    
+    .header-nav {
+        padding: 0.875rem 0;
+        min-height: 72px;
+    }
+    
+    .logo-img-header {
+        height: 40px;
+    }
+    
+    .md-block {
+        display: none !important;
+    }
+    
+    .sm-hidden {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-nav {
+        padding: 0 1rem;
+    }
+    
+    .header-nav {
+        padding: 0.75rem 0;
+        min-height: 64px;
+    }
+    
+    .logo-img-header {
+        height: 36px;
+    }
+}
+
+@media (max-width: 374px) {
+    .main-nav {
+        padding: 0 0.875rem;
+    }
+    
+    .header-nav {
+        padding: 0.625rem 0;
+        min-height: 60px;
+    }
+    
+    .logo-img-header {
+        height: 32px;
     }
 }
 
@@ -2482,5 +2832,4 @@ transform: translateY(-0.25rem);
     .payment-form-submit {
         flex: none;
     }
-}
 }
