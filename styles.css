@@ -1985,6 +1985,12 @@ transform: translateY(-0.25rem);
     transform: translateX(5px);
 }
 
+.cta-button-icon {
+    display: flex;
+    align-items: center;
+    margin-right: 0.5rem;
+}
+
 .cta-button-icon svg {
     width: 1.5rem;
     height: 1.5rem;
