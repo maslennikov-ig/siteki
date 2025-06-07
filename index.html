@@ -277,28 +277,7 @@
         </svg>
     </button>
 
-    <!-- Корзина -->
-    <div id="cart-drawer" class="cart-drawer cart-drawer-hidden p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold">Ваша корзина</h3>
-            <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-800 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div id="cart-items" class="mb-6">
-            <!-- Здесь будут элементы корзины -->
-            <p class="text-gray-500 text-center py-8">Ваша корзина пуста</p>
-        </div>
-        <div class="border-t border-gray-200 pt-4 mb-4">
-            <div class="flex justify-between mb-2">
-                <span>Итого:</span>
-                <span id="cart-total" class="font-bold">0 ₽</span>
-            </div>
-        </div>
-        <button id="checkout-button" class="cta-button cta-button-full" disabled>Оформить заказ</button>
-    </div>
+
 
     <nav class="main-nav">
         <div class="container">
@@ -316,8 +295,10 @@
                 <!-- Мобильное меню -->
                 <div class="flex-center">
                     <!-- Кнопка мобильного меню -->
-                    <button class="sm-hidden" onclick="toggleMobileMenu()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="feature-check"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                    <button class="sm-hidden mobile-menu-button" onclick="toggleMobileMenu()" aria-label="Открыть меню">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -383,8 +364,8 @@
                 <!-- Карточка 1: Скрытые ошибки в КИ -->
                 <div class="info-card group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                     <div class="flex flex-col items-center p-6 md:p-8">
-                        <div class="w-16 h-16 mb-6 rounded-full bg-orange-100 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition-all duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="feature-check" style="width:2.5rem;height:2.5rem;">
+                        <div class="w-12 h-12 mb-4 rounded-full bg-orange-100 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
                                 <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
                             </svg>
                         </div>
@@ -404,11 +385,11 @@
                 <!-- Карточка 2: Влияние старых просрочек -->
                 <div class="info-card group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                     <div class="flex flex-col items-center p-6 md:p-8">
-                        <div class="w-16 h-16 mb-6 rounded-full bg-indigo-100 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition-all duration-300">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="feature-check" style="width:2.5rem;height:2.5rem;">
-        <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
-    </svg>
-</div>
+                        <div class="w-12 h-12 mb-4 rounded-full bg-indigo-100 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
                         <h3 class="text-xl font-bold mb-3 text-slate-800 group-hover:text-indigo-500 transition-colors duration-300 text-center">Влияние старых просрочек</h3>
                         <p class="text-slate-600 text-center">Давно погашенные просрочки все еще могут негативно влиять на ваш кредитный рейтинг и решения банков.</p>
                         <div class="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -425,11 +406,11 @@
                 <!-- Карточка 3: Зачем нужны все 3 отчета БКИ? -->
                 <div class="info-card group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                     <div class="flex flex-col items-center p-6 md:p-8">
-                        <div class="w-16 h-16 mb-6 rounded-full bg-teal-100 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition-all duration-300">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="feature-check" style="width:2.5rem;height:2.5rem;">
-        <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
-    </svg>
-</div>
+                        <div class="w-12 h-12 mb-4 rounded-full bg-teal-100 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
                         <h3 class="text-xl font-bold mb-3 text-slate-800 group-hover:text-teal-500 transition-colors duration-300 text-center">Зачем нужны все 3 отчета БКИ?</h3>
                         <p class="text-slate-600 text-center">Информация в ОКБ, НБКИ и Скорбюро может отличаться. Только полный анализ всех трех отчетов дает объективную картину.</p>
                         <div class="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

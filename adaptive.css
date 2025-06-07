@@ -1,811 +1,1593 @@
 /* 
- * СОВРЕМЕННЫЕ АДАПТИВНЫЕ СТИЛИ 2024
- * Mobile-First подход с Container Queries и современными CSS функциями
- * Оптимизировано для всех устройств от 320px до 2560px+
+ * АКАДЕМИЯ ФИНАНСОВ - ПОЛНОСТЬЮ ПЕРЕРАБОТАННЫЕ МОБИЛЬНЫЕ СТИЛИ
+ * Версия 4.0.0 - Современная мобильная оптимизация с лучшими практиками
+ * Удалена корзина, переработаны все компоненты для touch-устройств
  */
 
-/* =================================================================
-   ОСНОВА: БАЗОВЫЕ СТИЛИ И ПЕРЕМЕННЫЕ
-   ================================================================= */
+/* ===== БАЗОВЫЕ СОВРЕМЕННЫЕ СТИЛИ ===== */
 
+/* Переменные для консистентности дизайна */
 :root {
-  /* Адаптивная типографика */
-  --font-size-xs: clamp(0.75rem, 2vw, 0.875rem);
-  --font-size-sm: clamp(0.875rem, 2.5vw, 1rem);
-  --font-size-base: clamp(1rem, 3vw, 1.125rem);
-  --font-size-lg: clamp(1.125rem, 3.5vw, 1.25rem);
-  --font-size-xl: clamp(1.25rem, 4vw, 1.5rem);
-  --font-size-2xl: clamp(1.5rem, 5vw, 1.875rem);
-  --font-size-3xl: clamp(1.875rem, 6vw, 2.25rem);
-  --font-size-4xl: clamp(2.25rem, 7vw, 3rem);
-  --font-size-5xl: clamp(3rem, 8vw, 4rem);
-  
-  /* Адаптивные отступы */
-  --space-xs: clamp(0.25rem, 1vw, 0.5rem);
-  --space-sm: clamp(0.5rem, 2vw, 0.75rem);
-  --space-md: clamp(0.75rem, 3vw, 1rem);
-  --space-lg: clamp(1rem, 4vw, 1.5rem);
-  --space-xl: clamp(1.5rem, 5vw, 2rem);
-  --space-2xl: clamp(2rem, 6vw, 3rem);
-  --space-3xl: clamp(3rem, 8vw, 4rem);
-  --space-4xl: clamp(4rem, 10vw, 6rem);
-  
-  /* Адаптивные радиусы */
-  --radius-sm: clamp(0.375rem, 1vw, 0.5rem);
-  --radius-md: clamp(0.5rem, 2vw, 0.75rem);
-  --radius-lg: clamp(0.75rem, 3vw, 1rem);
-  --radius-xl: clamp(1rem, 4vw, 1.5rem);
-  --radius-2xl: clamp(1.5rem, 5vw, 2rem);
-  
-  /* Touch-friendly размеры */
-  --touch-target-min: 44px;
-  --touch-target-comfortable: 48px;
-  --touch-target-large: 56px;
-  
-  /* Брейкпоинты для container queries */
-  --breakpoint-xs: 20rem;   /* 320px */
-  --breakpoint-sm: 30rem;   /* 480px */
-  --breakpoint-md: 48rem;   /* 768px */
-  --breakpoint-lg: 64rem;   /* 1024px */
-  --breakpoint-xl: 80rem;   /* 1280px */
-  --breakpoint-2xl: 96rem;  /* 1536px */
+    --touch-target-size: 44px; /* iOS Human Interface Guidelines */
+    --touch-target-size-enhanced: 48px; /* Рекомендованный размер для Android */
+    --mobile-padding: 16px;
+    --mobile-gap: 12px;
+    --border-radius-mobile: 12px;
+    --shadow-mobile: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --animation-speed: 0.3s;
+    --max-width-mobile: 100%;
 }
 
-/* =================================================================
-   БАЗОВЫЕ АДАПТИВНЫЕ НАСТРОЙКИ
-   ================================================================= */
-
-html {
-  /* Улучшенный скроллинг на iOS */
-  -webkit-text-size-adjust: 100%;
-  -webkit-touch-callout: none;
+/* Улучшенная типографика с динамическим scaling */
+@media (max-width: 1023px) {
+    html {
+        font-size: 16px; /* Базовый размер для читаемости */
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
+    
+    .section-padding {
+        padding: clamp(2rem, 5vw, 3rem) var(--mobile-padding);
+    }
+    
+    .section-title {
+        font-size: clamp(1.5rem, 4vw, 1.875rem);
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .section-subtitle {
+        font-size: clamp(1rem, 2.5vw, 1.125rem);
+        line-height: 1.6;
+        max-width: 90%;
+        margin: 0 auto 2rem;
+        text-align: center;
+    }
+    
+    /* Улучшенные touch-friendly кнопки */
+    .cta-button {
+        min-height: var(--touch-target-size-enhanced);
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        border-radius: var(--border-radius-mobile);
+        touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
-  scroll-behavior: smooth;
-  
-  /* Базовый размер шрифта адаптируется к устройству */
-  font-size: clamp(14px, 2.5vw, 18px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-body {
-  /* Оптимизация для мобильных устройств */
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  
-  /* Предотвращение нежелательного зума на iOS */
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  
-  /* Убираем выделение при тапе */
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* Разрешаем выделение для текстового контента */
-p, h1, h2, h3, h4, h5, h6, span, li, blockquote {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
-}
-
-/* =================================================================
-   КОНТЕЙНЕР И СЕТКИ
-   ================================================================= */
-
-.container {
-        width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--space-md);
-  padding-right: var(--space-md);
-  
-  /* Адаптивная максимальная ширина */
-  max-width: min(100% - 2rem, 1200px);
-}
-
-/* Container queries для более точного контроля */
-@container (min-width: 30rem) {
-  .container {
-    padding-left: var(--space-lg);
-    padding-right: var(--space-lg);
-  }
-}
-
-@container (min-width: 48rem) {
-  .container {
-    padding-left: var(--space-xl);
-    padding-right: var(--space-xl);
-  }
-}
-
-/* Современная адаптивная сетка */
-.grid {
-    display: grid;
-  gap: var(--space-md);
-        grid-template-columns: 1fr;
-}
-
-.grid-auto-fit {
-  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-}
-
-.grid-auto-fill {
-  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
-}
-
-/* Брейкпоинт-специфичные сетки */
-@media (min-width: 30rem) {
-  .grid-sm-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 48rem) {
-  .grid-md-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .grid-md-3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 64rem) {
-  .grid-lg-3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .grid-lg-4 {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* =================================================================
-   ТИПОГРАФИКА
-   ================================================================= */
-
-/* Заголовки с адаптивными размерами */
-.hero-title {
-  font-size: var(--font-size-4xl);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  margin-bottom: var(--space-lg);
-}
-
-.section-title {
-  font-size: var(--font-size-3xl);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  margin-bottom: var(--space-lg);
-}
-
-.hero-subtitle,
-.section-subtitle {
-  font-size: var(--font-size-lg);
-  font-weight: 400;
-  line-height: 1.6;
-  margin-bottom: var(--space-xl);
-  color: #64748b;
-}
-
-.product-title {
-  font-size: var(--font-size-xl);
-  font-weight: 600;
-  line-height: 1.3;
-  margin-bottom: var(--space-md);
-}
-
-.product-price {
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
-  color: #f97316;
-  margin: var(--space-md) 0;
-}
-
-/* Адаптивные размеры текста */
-.text-xs { font-size: var(--font-size-xs); }
-.text-sm { font-size: var(--font-size-sm); }
-.text-base { font-size: var(--font-size-base); }
-.text-lg { font-size: var(--font-size-lg); }
-.text-xl { font-size: var(--font-size-xl); }
-
-/* =================================================================
-   ИНТЕРАКТИВНЫЕ ЭЛЕМЕНТЫ
-   ================================================================= */
-
-/* Кнопки оптимизированные для мобильных устройств */
-.cta-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-  
-  /* Touch-friendly размеры */
-  min-height: var(--touch-target-comfortable);
-  padding: var(--space-md) var(--space-lg);
-  
-  /* Адаптивная типографика */
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  line-height: 1;
-  text-decoration: none;
-  
-  /* Визуальные стили */
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  color: white;
-  border: none;
-  border-radius: var(--radius-lg);
-  
-  /* Анимации */
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0);
-  
-  /* Touch оптимизация */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  cursor: pointer;
-}
-
-/* Состояния кнопок */
-.cta-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
-}
-
-.cta-button:active {
-  transform: translateY(0);
-  transition-duration: 0.1s;
-}
-
-/* Размеры кнопок */
-.cta-button-sm {
-  min-height: var(--touch-target-min);
-  padding: var(--space-sm) var(--space-md);
-  font-size: var(--font-size-sm);
-}
-
-.cta-button-lg {
-  min-height: var(--touch-target-large);
-  padding: var(--space-lg) var(--space-xl);
-  font-size: var(--font-size-lg);
-}
-
-.cta-button-full {
-  width: 100%;
-}
-
-/* =================================================================
-   НАВИГАЦИЯ
-   ================================================================= */
-
-/* Основная навигация */
-.main-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.header-nav {
+        transition: all var(--animation-speed) ease;
+        will-change: transform;
+    }
+    
+    .cta-button:active {
+        transform: scale(0.98);
+    }
+    
+    /* Улучшенная кнопка мобильного меню */
+    .mobile-menu-button {
+        padding: 0.5rem;
+        border: none;
+        background: transparent;
+        color: #1f2937;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all var(--animation-speed) ease;
         display: flex;
         align-items: center;
-  justify-content: space-between;
-  padding: var(--space-md) 0;
-  min-height: 64px;
-}
-
-.logo-img-header {
-  height: clamp(32px, 5vw, 48px);
-  width: auto;
-}
-
-/* Десктоп навигация скрыта на мобильных */
-.header-nav-items {
-  display: none;
-}
-
-/* Мобильная кнопка меню */
-.mobile-menu-toggle {
-  display: flex;
-  align-items: center;
         justify-content: center;
-  width: var(--touch-target-comfortable);
-  height: var(--touch-target-comfortable);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.2s ease;
+        min-width: var(--touch-target-size);
+        min-height: var(--touch-target-size);
+    }
+    
+    .mobile-menu-button:hover {
+        background: #f3f4f6;
+        color: #f97316;
+    }
+    
+    .mobile-menu-button:active {
+        transform: scale(0.95);
+        background: #e5e7eb;
+    }
 }
 
-.mobile-menu-toggle:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-/* Мобильное меню */
-.mobile-menu {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100vh;
-  background: white;
-  transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 200;
-  
-  /* Скроллинг */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  
-  /* Отступы */
-  padding: var(--space-xl) var(--space-lg);
-  
-  /* Тень */
-  box-shadow: -10px 0 50px rgba(0, 0, 0, 0.15);
-}
-
-.mobile-menu.active {
-  transform: translateX(0);
-}
-
-.mobile-menu-close {
-  display: flex;
-  align-items: center;
+/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА (до 767px) ===== */
+@media (max-width: 767px) {
+    body {
+        overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
+    }
+    
+    .section-padding {
+        padding: clamp(2rem, 4vw, 2.5rem) var(--mobile-padding);
+    }
+    
+    .section-title {
+        font-size: clamp(1.375rem, 5vw, 1.625rem);
+        line-height: 1.25;
+        margin-bottom: 1.25rem;
+        text-align: center;
+        font-weight: 700;
+    }
+    
+    .section-subtitle {
+        font-size: clamp(0.9rem, 3vw, 1rem);
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: #64748b;
+    }
+    
+    /* Улучшенная типографика продуктов */
+    .product-title {
+        font-size: clamp(1.25rem, 4vw, 1.375rem);
+        line-height: 1.3;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+    
+    .product-price {
+        font-size: clamp(1.5rem, 5vw, 1.75rem);
+        margin: 1rem 0;
+        font-weight: 700;
+        color: #f97316;
+    }
+    
+    .feature-list li {
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+    
+    .feature-list li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #10b981;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    
+    /* Полностью переработанные кнопки для мобильных */
+    .cta-button {
+        min-height: 52px;
+        padding: 1rem 1.75rem;
+        font-size: clamp(1rem, 3vw, 1.125rem);
+        border-radius: 14px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
         justify-content: center;
-  width: var(--touch-target-comfortable);
-  height: var(--touch-target-comfortable);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-md);
-  margin-left: auto;
-  margin-bottom: var(--space-xl);
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.mobile-menu-nav {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-2xl);
-}
-
-.mobile-nav-link {
-  display: flex;
-  align-items: center;
-  min-height: var(--touch-target-large);
-  padding: var(--space-md) var(--space-lg);
-  font-size: var(--font-size-lg);
-  font-weight: 500;
-  color: #1e293b;
-  text-decoration: none;
-  border-radius: var(--radius-lg);
-  transition: all 0.2s ease;
+        gap: 0.5rem;
         touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        font-weight: 600;
+        box-shadow: var(--shadow-mobile);
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cta-button:active {
+        transform: scale(0.97);
+    }
+    
+    .cta-button:focus {
+        outline: 2px solid #f97316;
+        outline-offset: 2px;
+    }
+    
+    /* Современные карточки продуктов */
+    .product-card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow-mobile);
+        background: white;
+        border: 1px solid #f1f5f9;
+        transition: all var(--animation-speed) ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    }
 }
 
-.mobile-nav-link:hover,
-.mobile-nav-link:focus {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  color: white;
-  transform: translateX(4px);
+/* ===== МАЛЕНЬКИЕ МОБИЛЬНЫЕ УСТРОЙСТВА (до 480px) ===== */
+@media (max-width: 480px) {
+    .section-padding {
+        padding: clamp(1.5rem, 4vw, 2rem) var(--mobile-padding);
+    }
+    
+    .section-title {
+        font-size: clamp(1.25rem, 5vw, 1.5rem);
+        line-height: 1.3;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+    
+    .section-subtitle {
+        font-size: clamp(0.875rem, 3vw, 0.95rem);
+        line-height: 1.6;
+        max-width: 100%;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Оптимизация Hero секции для небольших экранов */
+    .hero-title {
+        font-size: clamp(1.5rem, 6vw, 1.75rem);
+        line-height: 1.25;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-weight: 800;
+    }
+    
+    .hero-subtitle {
+        font-size: clamp(0.9rem, 3vw, 1rem);
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .product-title {
+        font-size: clamp(1.125rem, 4vw, 1.25rem);
+        line-height: 1.3;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .feature-list li {
+        font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+        margin-bottom: 0.5rem;
+        padding-left: 1.5rem;
+        line-height: 1.4;
+    }
+    
+    .step-title {
+        font-size: clamp(1.125rem, 4vw, 1.25rem);
+        line-height: 1.3;
+        font-weight: 600;
+    }
+    
+    /* Максимально удобные кнопки для небольших экранов */
+    .cta-button {
+        min-height: 56px;
+        padding: 1.125rem 2rem;
+        font-size: clamp(1rem, 3.5vw, 1.125rem);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 100%;
+        font-weight: 600;
+    }
+    
+    .stat-number {
+        font-size: clamp(1.75rem, 6vw, 2rem);
+        line-height: 1.2;
+        font-weight: 700;
+    }
+    
+    /* Оптимизированные изображения экспертов */
+    .expert-photo {
+        max-width: 180px;
+        max-height: 180px;
+        border-radius: 20px;
+        object-fit: cover;
+    }
+    
+    .expert-badge {
+        font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+        padding: 0.5rem 1rem;
+        min-width: 160px;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    /* Улучшенная навигация */
+    .nav-link {
+        font-size: clamp(0.9rem, 3vw, 1rem);
+        padding: 1rem 0.5rem;
+        min-height: var(--touch-target-size);
+        display: flex;
+        align-items: center;
+    }
 }
 
-/* =================================================================
-   КАРТОЧКИ И КОМПОНЕНТЫ
-   ================================================================= */
+/* ===== СЕТКИ И АДАПТИВНЫЕ КОМПОНЕНТЫ ===== */
 
-.card {
-  background: white;
-  border-radius: var(--radius-xl);
-  padding: var(--space-lg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+/* Адаптивные стили для сетки отзывов */
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+@media (max-width: 768px) {
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    
+    .testimonial-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+    
+    .testimonial-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .testimonial-author {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+}
+
+/* ===== ФОРМЫ И ИНТЕРАКТИВНЫЕ ЭЛЕМЕНТЫ ===== */
+
+/* Адаптивные стили для контактной формы */
+.contact-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 767px) {
+    .contact-form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-input, .form-textarea {
+        padding: 1rem;
+        font-size: 1rem;
+        border-radius: 12px;
+        min-height: 48px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.2s ease;
+        touch-action: manipulation;
+    }
+    
+    .form-input:focus, .form-textarea:focus {
+        border-color: #f97316;
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        outline: none;
+    }
+    
+    .form-submit {
+        padding: 1rem 2rem;
+        min-height: 52px;
+        font-size: 1.125rem;
+        border-radius: 14px;
+        width: 100%;
+        touch-action: manipulation;
+    }
+}
+
+/* ===== НАВИГАЦИЯ И МЕНЮ ===== */
+
+/* Улучшенное мобильное меню */
+@media (max-width: 1023px) {
+    .mobile-menu {
+        padding: 2rem 1.5rem;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .nav-link {
+        padding: 1rem 0;
+        font-size: 1.125rem;
+        border-bottom: 1px solid #f3f4f6;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .nav-link:last-child {
+        border-bottom: none;
+    }
+}
+
+/* ===== МОДАЛЬНЫЕ ОКНА ===== */
+
+/* Оптимизация модальных окон для мобильных */
+@media (max-width: 640px) {
+    .payment-modal-content {
+        margin: 0;
+        max-height: 100vh;
+        border-radius: 0;
+        width: 100%;
+        height: 100vh;
+    }
+
+    .payment-modal-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+    }
+
+    .payment-modal-scroll-container {
+        max-height: calc(100vh - 120px);
+        padding: 0 1.25rem;
+    }
+
+    /* КОМПАКТНЫЙ Т-БАНК ВИДЖЕТ ДЛЯ МОБИЛЬНЫХ */
+    .tbank-payment-widget {
+        padding: 1rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+    }
+
+    .tbank-header {
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .tbank-logo {
+        font-size: 1rem;
+    }
+
+    .tbank-logo-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .tbank-flag {
+        width: 20px;
+        height: 14px;
+    }
+
+    .tbank-amount-section {
+        margin-bottom: 0.75rem;
+    }
+
+    .tbank-amount-display {
+        padding: 0.875rem 1rem;
+        font-size: 1.125rem;
+        border-radius: 10px;
+        min-height: 48px; /* Touch-friendly */
+    }
+
+    .tbank-card-section {
+        margin-bottom: 0.75rem;
+    }
+
+    .tbank-card-title {
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .tbank-card-input-container {
+        margin-bottom: 0.5rem;
+    }
+
+    .tbank-card-input {
+        padding: 1rem 3rem 1rem 1rem;
+        font-size: 1rem;
+        border-radius: 10px;
+        min-height: 48px; /* Touch-friendly */
+    }
+
+    .tbank-card-type-indicator {
+        width: 30px;
+        height: 20px;
+        right: 1rem;
+    }
+
+    .tbank-receipt-section {
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0;
+    }
+
+    .tbank-checkbox {
+        width: 20px;
+        height: 20px;
+        border-width: 2px;
+    }
+
+    .tbank-checkbox.checked::after {
+        font-size: 0.75rem;
+    }
+
+    .tbank-receipt-label {
+        font-size: 0.875rem;
+        padding: 0.5rem 0;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    .tbank-pay-button {
+        padding: 1rem;
+        font-size: 1.125rem;
+        margin-bottom: 0.75rem;
+        border-radius: 12px;
+        min-height: 52px; /* Touch-friendly */
+        font-weight: 600;
+    }
+
+    .tbank-security-footer {
+        padding-top: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .tbank-security-title {
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .tbank-security-items {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .tbank-security-item {
+        font-size: 0.75rem;
+        gap: 0.375rem;
+        padding: 0.25rem;
+        justify-content: center;
+    }
+
+    .tbank-security-item svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* Оптимизация модальных окон для десктопа */
+@media (min-width: 1024px) {
+    /* Предотвращение layout shifts при открытии модального окна */
+    body.modal-open {
+        overflow: hidden;
+        padding-right: var(--scrollbar-width, 0);
+    }
+    
+    /* Улучшенная анимация для десктопа */
+    .payment-modal {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+    
+    .payment-modal-content {
+        max-width: 480px;
+        max-height: 85vh; /* Оптимальная высота для десктопа */
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .payment-modal-scroll-container {
+        max-height: calc(85vh - 140px);
+    }
+    
+    /* КОМПАКТНЫЙ Т-БАНК ВИДЖЕТ ДЛЯ ДЕСКТОПА */
+    .tbank-payment-widget {
+        padding: 1rem; /* Уменьшаем отступы */
+        border-radius: 14px;
+        margin: 0;
+    }
+    
+    .tbank-header {
+        margin-bottom: 0.75rem; /* Уменьшаем отступ */
+        padding-bottom: 0.5rem;
+    }
+    
+    .tbank-logo {
+        font-size: 1rem; /* Уменьшаем размер логотипа */
+    }
+    
+    .tbank-logo-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+    
+    .tbank-flag {
+        width: 20px;
+        height: 14px;
+    }
+    
+    .tbank-amount-section {
+        margin-bottom: 0.75rem; /* Уменьшаем отступы */
+    }
+    
+    .tbank-amount-display {
+        padding: 0.75rem 0.875rem; /* Компактные отступы */
+        font-size: 1rem;
+        border-radius: 10px;
+    }
+    
+    .tbank-card-section {
+        margin-bottom: 0.75rem;
+    }
+    
+    .tbank-card-title {
+        font-size: 0.8125rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .tbank-card-input-container {
+        margin-bottom: 0.5rem;
+    }
+    
+    .tbank-card-input {
+        padding: 0.75rem 2.75rem 0.75rem 0.875rem;
+        font-size: 0.9375rem;
+        border-radius: 10px;
+    }
+    
+    .tbank-card-type-indicator {
+        width: 28px;
+        height: 18px;
+        right: 0.875rem;
+    }
+    
+    .tbank-receipt-section {
+        margin-bottom: 0.75rem;
+    }
+    
+    .tbank-checkbox {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .tbank-checkbox.checked::after {
+        font-size: 0.6875rem;
+    }
+    
+    .tbank-receipt-label {
+        font-size: 0.8125rem;
+    }
+    
+    .tbank-pay-button {
+        padding: 0.875rem;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        border-radius: 10px;
+    }
+    
+    .tbank-security-footer {
+        padding-top: 0.5rem;
+    }
+    
+    .tbank-security-title {
+        font-size: 0.6875rem;
+        margin-bottom: 0.375rem;
+    }
+    
+    .tbank-security-items {
+        gap: 0.375rem;
+    }
+    
+    .tbank-security-item {
+        font-size: 0.6875rem;
+        gap: 0.25rem;
+    }
+    
+    .tbank-security-item svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+@media (min-width: 1440px) {
+    .payment-modal-content {
+        max-width: 500px;
+        max-height: 80vh;
+    }
+    
+    /* Немного больше пространства на больших экранах */
+    .tbank-payment-widget {
+        padding: 1.125rem;
+        border-radius: 16px;
+    }
+    
+    .tbank-header {
+        margin-bottom: 0.875rem;
+        padding-bottom: 0.625rem;
+    }
+    
+    .tbank-logo {
+        font-size: 1.0625rem;
+    }
+    
+    .tbank-logo-icon {
+        width: 26px;
+        height: 26px;
+        font-size: 0.8125rem;
+    }
+    
+    .tbank-amount-display {
+        padding: 0.8125rem 0.9375rem;
+        font-size: 1.0625rem;
+    }
+    
+    .tbank-card-input {
+        padding: 0.8125rem 2.875rem 0.8125rem 0.9375rem;
+        font-size: 0.96875rem;
+    }
+    
+    .tbank-pay-button {
+        padding: 0.9375rem;
+        font-size: 1.0625rem;
+    }
+}
+
+/* ===== КОНТАКТЫ И ПОДВАЛ ===== */
+
+/* Адаптивные стили для сетки контактов */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 1023px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .contact-info {
+        order: 2;
+    }
+    
+    .contact-form-container {
+        order: 1;
+    }
+}
+
+/* Адаптивные стили для подвала */
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 1023px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 639px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .footer-logo {
+        margin: 0 auto;
+    }
+    
+    .footer-social {
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .footer-links {
+        margin-bottom: 1.5rem;
+    }
+    
+    .footer-copyright {
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+}
+
+/* ===== FAQ СЕКЦИЯ ===== */
+
+@media (max-width: 767px) {
+    .faq-accordion {
+        padding: 1.5rem 1rem;
+        border-radius: 16px;
+    }
+    
+    .faq-question {
+        font-size: 1rem;
+        padding: 1.25rem 1rem 1.25rem 2.5rem;
+        border-radius: 12px;
+        min-height: 56px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .faq-answer {
+        padding: 0 2rem;
+        border-radius: 0 0 12px 12px;
+    }
+    
+    .faq-answer p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        padding: 1.25rem 0;
+    }
+}
+
+/* ===== CTA СЕКЦИИ ===== */
+
+@media (max-width: 767px) {
+    .cta-section {
+        padding: 3rem 1rem;
+        text-align: center;
+    }
+    
+    .cta-heading {
+        font-size: 1.5rem;
+        line-height: 1.3;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+}
+
+/* ===== СТАТИСТИКА ===== */
+
+@media (max-width: 767px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2.25rem;
+        line-height: 1.1;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+}
+
+/* ===== ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ ===== */
+
+@media (max-width: 375px) {
+    .hero-title {
+        font-size: 1.625rem;
+        line-height: 1.25;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .mobile-menu {
+        padding: 1.5rem 1rem;
     }
     
     .product-card {
-  background: white;
-  border-radius: var(--radius-xl);
-  padding: var(--space-xl);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .product-title {
+        font-size: 1.125rem;
+        line-height: 1.3;
+    }
+    
+    .feature-list li {
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    
+    .cta-button {
+        min-height: 56px;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .expert-badge {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.875rem;
+        min-width: 160px;
+    }
+    
+    .section-title {
+        font-size: 1.375rem;
+        line-height: 1.3;
+    }
 }
 
-.product-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #f97316, #ea580c);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
+/* ===== ОПТИМИЗАЦИЯ ИЗОБРАЖЕНИЙ ===== */
+
+/* Ленивая загрузка изображений */
+.lazy {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
-.product-card:hover::before {
-  transform: scaleX(1);
+.loaded {
+    opacity: 1;
 }
 
-.product-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+picture img {
+    transition: opacity 0.3s ease-in-out;
 }
 
-/* =================================================================
-   СЕКЦИИ И ОТСТУПЫ
-   ================================================================= */
-
-.section-padding {
-  padding-top: var(--space-4xl);
-  padding-bottom: var(--space-4xl);
+/* Оптимизация для медленного интернета */
+@media (prefers-reduced-data: reduce) {
+    img {
+        filter: blur(2px);
+        transition: filter 0.3s ease;
+    }
+    
+    img.loaded {
+        filter: none;
+    }
+    
+    .expert-photo-glow {
+        display: none;
+    }
 }
 
-.section-padding-sm {
-  padding-top: var(--space-3xl);
-  padding-bottom: var(--space-3xl);
+/* ===== ЭКСТРЕМАЛЬНО МАЛЕНЬКИЕ ЭКРАНЫ ===== */
+
+@media (max-width: 320px) {
+    .hero-title {
+        font-size: 1.5rem;
+        line-height: 1.25;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .product-title {
+        font-size: 1rem;
+        line-height: 1.3;
+    }
+    
+    .product-price {
+        font-size: 1.5rem;
+    }
+    
+    .feature-list li {
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+    
+    .feature-check {
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    .cta-button {
+        min-height: 52px;
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .expert-badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        min-width: 140px;
+    }
+    
+    .expert-name {
+        font-size: 0.75rem;
+    }
+    
+    .expert-position {
+        font-size: 0.7rem;
+    }
 }
 
-/* =================================================================
-   ФОРМЫ И ПОЛЯ ВВОДА
-   ================================================================= */
+/* ===== УЛУЧШЕНИЯ ДОСТУПНОСТИ ===== */
+
+/* Увеличенные области касания */
+@media (hover: none) and (pointer: coarse) {
+    .nav-link,
+    .cta-button,
+    .product-card,
+    .faq-question,
+    .contact-link {
+        min-height: 44px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Улучшенная обратная связь при касании */
+    .cta-button:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    .nav-link:active,
+    .contact-link:active {
+        background-color: rgba(249, 115, 22, 0.1);
+        transition: background-color 0.1s ease;
+    }
+}
+
+/* Поддержка темной темы */
+@media (prefers-color-scheme: dark) {
+    .payment-modal-content {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
     
     .form-input,
     .form-textarea {
-  width: 100%;
-  min-height: var(--touch-target-comfortable);
-  padding: var(--space-md) var(--space-lg);
-  font-size: var(--font-size-base);
-  background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: var(--radius-lg);
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+    
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+        color: #9ca3af;
+    }
+}
+
+/* ===== АНИМАЦИИ И ПЕРЕХОДЫ ===== */
+
+/* Уменьшенные анимации для пользователей с ограниченными возможностями */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Плавные переходы для интерактивных элементов */
+.cta-button,
+.nav-link,
+.product-card,
+.form-input,
+.form-textarea {
     transition: all 0.2s ease;
-  font-family: inherit;
-  
-  /* Мобильная оптимизация */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
 }
 
-.form-input:focus,
-.form-textarea:focus {
-  outline: none;
-  border-color: #f97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+/* Улучшенные hover эффекты для устройств с мышью */
+@media (hover: hover) and (pointer: fine) {
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+    }
+    
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
 }
 
-/* =================================================================
-   FAQ И АККОРДЕОНЫ
-   ================================================================= */
+/* ===== КРИТИЧЕСКИЕ УЛУЧШЕНИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ===== */
 
-.faq-item {
-  background: white;
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--space-md);
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.faq-question {
+/* Базовые настройки для всех мобильных устройств */
+@media (max-width: 767px) {
+    /* Увеличиваем базовый размер шрифта для лучшей читаемости */
+    html {
+        font-size: 16px;
+    }
+    
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+        padding: 0;
+        margin: 0;
+    }
+    
+    /* Контейнеры с увеличенными отступами */
+    .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        max-width: 100%;
+    }
+    
+    /* Секции с оптимизированными отступами */
+    .section-padding {
+        padding: 3rem 1.5rem;
+    }
+    
+    /* Заголовки с увеличенными размерами */
+    .section-title {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 700;
+    }
+    
+    .section-subtitle {
+        font-size: 1.125rem;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: #64748b;
+    }
+    
+    /* Hero секция оптимизация */
+    .hero-title {
+        font-size: 2.25rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 800;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        text-align: center;
+        opacity: 0.95;
+    }
+    
+    /* Кнопки с увеличенными размерами */
+    .cta-button {
+        min-height: 56px;
+        padding: 1.25rem 2rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        border-radius: 16px;
         width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
         display: flex;
         align-items: center;
-  justify-content: space-between;
-  min-height: var(--touch-target-large);
-  padding: var(--space-lg);
-  background: white;
-  border: none;
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
+        justify-content: center;
+        gap: 0.75rem;
         touch-action: manipulation;
-}
-
-.faq-question:hover {
-  background: #f8fafc;
-}
-
-.faq-answer {
-  padding: 0 var(--space-lg) var(--space-lg);
-  font-size: var(--font-size-base);
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .cta-button:hover,
+    .cta-button:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+    }
+    
+    /* Карточки продуктов */
+    .product-card {
+        padding: 2rem 1.5rem;
+        margin-bottom: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        background: white;
+        border: 1px solid #f1f5f9;
+    }
+    
+    .product-title {
+        font-size: 1.5rem;
+        line-height: 1.3;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .product-price {
+        font-size: 2rem;
+        margin: 1.5rem 0;
+        font-weight: 800;
+        color: #f97316;
+    }
+    
+    /* Списки функций */
+    .feature-list li {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        padding-left: 2rem;
         line-height: 1.6;
-  color: #64748b;
+        position: relative;
+    }
+    
+    .feature-list li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #10b981;
+        font-weight: bold;
+        font-size: 1.125rem;
+    }
+    
+    /* Навигация */
+    .nav-link {
+        font-size: 1.125rem;
+        padding: 1rem 0.75rem;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    /* FAQ секция */
+    .faq-question {
+        font-size: 1.125rem;
+        min-height: 64px;
+        padding: 1.25rem 1rem 1.25rem 3rem;
+        border-radius: 16px;
+    }
+    
+    .faq-answer p {
+        font-size: 1rem;
+        line-height: 1.7;
+        margin: 1.5rem 0;
+    }
+    
+    /* Экспертное фото */
+    .expert-photo {
+        max-width: 240px;
+        max-height: 240px;
+        border-radius: 24px;
+        margin: 0 auto;
+        display: block;
+    }
+    
+    .expert-badge {
+        font-size: 0.95rem;
+        padding: 0.75rem 1.25rem;
+        min-width: 200px;
+        border-radius: 16px;
+        margin-top: 1rem;
+    }
 }
 
-/* =================================================================
-   МЕДИА ЗАПРОСЫ ПО УСТРОЙСТВАМ
-   ================================================================= */
-
-/* Очень маленькие устройства (< 375px) */
-@media (max-width: 23.4375rem) {
-  :root {
-    --space-xs: 0.25rem;
-    --space-sm: 0.5rem;
-    --space-md: 0.75rem;
-    --space-lg: 1rem;
-    --space-xl: 1.25rem;
-    --space-2xl: 1.5rem;
-    --space-3xl: 2rem;
-    --space-4xl: 2.5rem;
-  }
-  
-  .container {
-    padding-left: var(--space-sm);
-    padding-right: var(--space-sm);
-  }
-  
-  .mobile-menu {
-    padding: var(--space-lg) var(--space-md);
-  }
-}
-
-/* Маленькие устройства (375px - 767px) */
-@media (min-width: 23.4375rem) and (max-width: 47.9375rem) {
-  .header-nav-items {
-    display: none;
-  }
-  
-  .mobile-menu {
-    width: min(100%, 400px);
-  }
-}
-
-/* Планшеты (768px - 1023px) */
-@media (min-width: 48rem) and (max-width: 63.9375rem) {
-  .header-nav-items {
-    display: flex;
-    gap: var(--space-lg);
-  }
-  
-  .mobile-menu-toggle {
-    display: none;
-  }
-  
-  .mobile-menu {
-    display: none;
-  }
-  
-  .grid {
-    gap: var(--space-lg);
+/* ===== ОПТИМИЗАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ (480px и меньше) ===== */
+@media (max-width: 480px) {
+    /* Еще больше увеличиваем размеры для маленьких экранов */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .section-padding {
+        padding: 2.5rem 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.875rem;
+        line-height: 1.2;
+        margin-bottom: 1.25rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1.0625rem;
+        line-height: 1.6;
+        margin-bottom: 1.75rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+        line-height: 1.15;
+        margin-bottom: 1.25rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.0625rem;
+        line-height: 1.5;
+        margin-bottom: 1.75rem;
+    }
+    
+    /* Увеличенные кнопки для лучшего UX */
+    .cta-button {
+        min-height: 60px;
+        padding: 1.375rem 2rem;
+        font-size: 1.1875rem;
+        border-radius: 18px;
+        gap: 0.875rem;
     }
     
     .product-card {
-    padding: var(--space-2xl);
-  }
+        padding: 1.75rem 1.25rem;
+        margin-bottom: 1.75rem;
+        border-radius: 18px;
+    }
+    
+    .product-title {
+        font-size: 1.375rem;
+        line-height: 1.25;
+        margin-bottom: 0.875rem;
+    }
+    
+    .product-price {
+        font-size: 1.875rem;
+        margin: 1.25rem 0;
+    }
+    
+    .feature-list li {
+        font-size: 0.9375rem;
+        margin-bottom: 0.875rem;
+        padding-left: 1.75rem;
+    }
+    
+    .expert-photo {
+        max-width: 220px;
+        max-height: 220px;
+        border-radius: 20px;
+    }
+    
+    .expert-badge {
+        font-size: 0.875rem;
+        padding: 0.625rem 1rem;
+        min-width: 180px;
+        border-radius: 14px;
+    }
+    
+    /* Статистика */
+    .stat-number {
+        font-size: 2.25rem;
+        line-height: 1.1;
+        font-weight: 800;
+    }
+    
+    .stat-label {
+        font-size: 0.9375rem;
+        margin-top: 0.5rem;
+    }
 }
 
-/* Десктоп (1024px+) */
-@media (min-width: 64rem) {
-  .header-nav-items {
-    display: flex;
-    gap: var(--space-xl);
-  }
-  
-  .mobile-menu-toggle {
-    display: none;
-  }
-  
-  .mobile-menu {
-    display: none;
-  }
-  
-  .nav-link {
-    font-size: var(--font-size-base);
-    font-weight: 500;
-    color: #475569;
-    text-decoration: none;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-    position: relative;
-  }
-  
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: #f97316;
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-  }
-  
-  .nav-link:hover {
-    color: #f97316;
-  }
-  
-  .nav-link:hover::after {
-    width: 100%;
-  }
-  
-  .grid {
-    gap: var(--space-xl);
-  }
+/* ===== КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНОВ (375px и меньше) ===== */
+@media (max-width: 375px) {
+    .container {
+        padding-left: 0.875rem;
+        padding-right: 0.875rem;
+    }
+    
+    .section-padding {
+        padding: 2rem 0.875rem;
+    }
+    
+    .section-title {
+        font-size: 1.75rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-title {
+        font-size: 1.875rem;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .cta-button {
+        min-height: 56px;
+        padding: 1.25rem 1.75rem;
+        font-size: 1.125rem;
+        border-radius: 16px;
+    }
+    
+    .product-card {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 16px;
+    }
+    
+    .product-title {
+        font-size: 1.25rem;
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+    }
+    
+    .product-price {
+        font-size: 1.75rem;
+        margin: 1rem 0;
+    }
+    
+    .feature-list li {
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+        padding-left: 1.5rem;
+    }
+    
+    .expert-photo {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 18px;
+    }
+    
+    .expert-badge {
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.875rem;
+        min-width: 160px;
+        border-radius: 12px;
+    }
 }
 
-/* Большие экраны (1440px+) */
-@media (min-width: 90rem) {
-  .container {
-    max-width: 1400px;
-  }
-  
-  :root {
-    --space-4xl: clamp(4rem, 12vw, 8rem);
-  }
+/* ===== ЭКСТРЕМАЛЬНАЯ ОПТИМИЗАЦИЯ ДЛЯ МИНИМАЛЬНЫХ ЭКРАНОВ (320px) ===== */
+@media (max-width: 320px) {
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    .section-padding {
+        padding: 1.75rem 0.75rem;
+    }
+    
+    .section-title {
+        font-size: 1.625rem;
+        line-height: 1.15;
+        margin-bottom: 0.875rem;
+    }
+    
+    .hero-title {
+        font-size: 1.75rem;
+        line-height: 1.1;
+        margin-bottom: 0.875rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.9375rem;
+        line-height: 1.4;
+        margin-bottom: 1.25rem;
+    }
+    
+    .cta-button {
+        min-height: 52px;
+        padding: 1.125rem 1.5rem;
+        font-size: 1.0625rem;
+        border-radius: 14px;
+    }
+    
+    .product-card {
+        padding: 1.25rem 0.875rem;
+        margin-bottom: 1.25rem;
+        border-radius: 14px;
+    }
+    
+    .product-title {
+        font-size: 1.125rem;
+        line-height: 1.2;
+        margin-bottom: 0.625rem;
+    }
+    
+    .product-price {
+        font-size: 1.625rem;
+        margin: 0.875rem 0;
+    }
+    
+    .feature-list li {
+        font-size: 0.8125rem;
+        margin-bottom: 0.625rem;
+        padding-left: 1.25rem;
+    }
+    
+    .expert-photo {
+        max-width: 180px;
+        max-height: 180px;
+        border-radius: 16px;
+    }
+    
+    .expert-badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        min-width: 140px;
+        border-radius: 10px;
+    }
 }
 
-/* =================================================================
-   УТИЛИТЫ ДЛЯ ОТЗЫВЧИВОСТИ
-   ================================================================= */
+/* ===== АДАПТИВНАЯ ОПТИМИЗАЦИЯ ЭКРАНА ОПЛАТЫ ===== */
 
-/* Скрытие элементов на разных устройствах */
-.hidden-mobile {
-  display: none;
+/* Мобильные устройства (≤640px) - максимальная компактность */
+@media (max-width: 640px) {
+    .payment-modal-content.payment-screen-active {
+        max-height: 85vh; /* Больше места на мобильных */
+    }
+    
+    .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+        max-height: 85vh;
+        padding: 0.5rem 0.75rem 0.75rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-payment-widget {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-header,
+    .payment-modal-content.payment-screen-active .tbank-amount-section,
+    .payment-modal-content.payment-screen-active .tbank-card-section,
+    .payment-modal-content.payment-screen-active .tbank-receipt-section {
+        margin-bottom: 0.5rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-pay-button {
+        margin-bottom: 0.5rem;
+        padding: 0.625rem;
+        font-size: 1rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-security-footer {
+        padding-top: 0.375rem;
+        margin-top: 0.375rem;
+    }
 }
 
-@media (min-width: 48rem) {
-  .hidden-mobile {
-    display: block;
-  }
-  
-  .hidden-tablet {
-    display: none;
-  }
+/* Планшеты (641px - 1023px) - сбалансированные размеры */
+@media (min-width: 641px) and (max-width: 1023px) {
+    .payment-modal-content.payment-screen-active {
+        max-height: 80vh;
+    }
+    
+    .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+        max-height: 80vh;
+        padding: 0.625rem 1rem 1rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-payment-widget {
+        padding: 0.75rem 1rem;
+    }
 }
 
-@media (min-width: 64rem) {
-  .hidden-tablet {
-    display: block;
-  }
-  
-  .hidden-desktop {
-    display: none;
-  }
+/* Десктоп (≥1024px) - компактные отступы */
+@media (min-width: 1024px) {
+    .payment-modal-content.payment-screen-active {
+        max-height: 75vh;
+    }
+    
+    .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+        max-height: 75vh;
+        padding: 0.75rem 1.25rem 1.25rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-payment-widget {
+        padding: 1rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-header,
+    .payment-modal-content.payment-screen-active .tbank-amount-section,
+    .payment-modal-content.payment-screen-active .tbank-card-section {
+        margin-bottom: 1rem;
+    }
 }
 
-/* Показ только на определенных устройствах */
-.mobile-only {
-  display: block;
-}
-
-.tablet-only,
-.desktop-only {
-  display: none;
-}
-
-@media (min-width: 48rem) and (max-width: 63.9375rem) {
-  .mobile-only {
-    display: none;
-  }
-  
-  .tablet-only {
-    display: block;
-  }
-}
-
-@media (min-width: 64rem) {
-  .mobile-only,
-  .tablet-only {
-    display: none;
-  }
-  
-  .desktop-only {
-    display: block;
-  }
-}
-
-/* =================================================================
-   УЛУЧШЕНИЯ ДЛЯ ACCESSIBILITY
-   ================================================================= */
-
-/* Фокус для клавиатурной навигации */
-*:focus {
-  outline: 2px solid #f97316;
-  outline-offset: 2px;
-}
-
-/* Улучшенная видимость для пользователей с нарушениями зрения */
-@media (prefers-contrast: high) {
-  .card {
-    border: 2px solid #000;
-  }
-  
-  .cta-button {
-    border: 2px solid #000;
-  }
-}
-
-/* Режим темной темы */
-@media (prefers-color-scheme: dark) {
-  .card {
-    background: #1e293b;
-    color: white;
-  }
-  
-  .mobile-menu {
-    background: #1e293b;
-    color: white;
-  }
-  
-  .main-nav {
-    background: rgba(30, 41, 59, 0.95);
-  }
-}
-
-/* =================================================================
-   ПРОИЗВОДИТЕЛЬНОСТЬ И ОПТИМИЗАЦИЯ
-   ================================================================= */
-
-/* Аппаратное ускорение для анимаций */
-.cta-button,
-.card,
-.product-card,
-.mobile-menu {
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-/* Ленивая загрузка изображений */
-img[loading="lazy"] {
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-img[loading="lazy"].loaded {
-  opacity: 1;
-}
-
-/* Оптимизация для медленных соединений */
-@media (prefers-reduced-data: reduce) {
-  .hero-gradient,
-  .hero-decor {
-    display: none;
-  }
-  
-  .card::before,
-  .product-card::before {
-    display: none;
-  }
+/* Большие экраны (≥1440px) - еще более компактно */
+@media (min-width: 1440px) {
+    .payment-modal-content.payment-screen-active {
+        max-height: 70vh; /* Еще более компактно на больших экранах */
+    }
+    
+    .payment-modal-content.payment-screen-active .payment-modal-scroll-container {
+        max-height: 70vh;
+        padding: 1rem 1.5rem 1.5rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-payment-widget {
+        padding: 1.125rem;
+    }
+    
+    .payment-modal-content.payment-screen-active .tbank-header,
+    .payment-modal-content.payment-screen-active .tbank-amount-section,
+    .payment-modal-content.payment-screen-active .tbank-card-section {
+        margin-bottom: 1.125rem;
+    }
 }
