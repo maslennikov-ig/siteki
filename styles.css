@@ -10,6 +10,11 @@ body {
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale; 
     font-size: 16px;
+    /* Улучшения для мобильных устройств */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Адаптивные базовые стили */
@@ -22,6 +27,29 @@ body {
 @media (max-width: 480px) {
     body {
         font-size: 14px;
+    }
+}
+
+/* Улучшения для touch-устройств */
+@media (hover: none) and (pointer: coarse) {
+    /* Увеличенные области касания для всех интерактивных элементов */
+    button, 
+    a, 
+    input, 
+    textarea, 
+    select,
+    .clickable {
+        min-height: 44px;
+        min-width: 44px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Улучшенная обратная связь при касании */
+    button:active,
+    .cta-button:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
     }
 }
 
@@ -55,6 +83,10 @@ body {
     position: relative;
     border-radius: 0.75rem;
     transition: background 0.2s;
+    /* Мобильные улучшения */
+    min-height: 56px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 .faq-question:hover, .faq-question[aria-expanded="true"] {
     background: linear-gradient(90deg, #f97316 0%, #e84c18 100%, #fff 100%);
@@ -97,6 +129,7 @@ body {
     .faq-question {
         font-size: 1rem;
         padding-left: 2rem;
+        min-height: 60px;
     }
     .faq-answer {
         padding: 0 1.5rem;
@@ -2449,4 +2482,5 @@ transform: translateY(-0.25rem);
     .payment-form-submit {
         flex: none;
     }
+}
 }

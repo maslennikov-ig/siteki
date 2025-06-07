@@ -2,11 +2,19 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#f97316">
     <meta name="description" content="Узнайте почему банки отказывают в кредите и как исправить кредитную историю. Профессиональная помощь от экспертов Академии финансов.">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Академия Финансов">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Preconnect для улучшения производительности -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    
     <title>Узнайте почему банки отказывают и как исправить кредитную историю - Академия финансов</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -55,6 +63,21 @@
                 }
             });
         });
+        
+        // Улучшенная обработка touch-событий для мобильных устройств
+        if ('ontouchstart' in window) {
+            document.body.classList.add('touch-device');
+            
+            // Предотвращение двойного тапа для зума на iOS
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
     });
     </script>
     <style>
@@ -175,36 +198,71 @@
                 font-size: 0.85rem;
             }
         }
+        
+        /* Улучшения для touch-устройств */
+        .touch-device .cta-button {
+            min-height: 48px;
+            padding: 1rem 1.5rem;
+        }
+        
+        .touch-device .nav-link {
+            min-height: 48px;
+            padding: 1rem 0;
+        }
+        
+        .touch-device .faq-question {
+            min-height: 56px;
+        }
+        
+        /* Улучшенная обратная связь при касании */
+        .touch-device .cta-button:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+        
+        /* Предотвращение выделения текста при касании */
+        .touch-device .cta-button,
+        .touch-device .nav-link,
+        .touch-device .faq-question {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
     </style>
 </head>
 <body class="bg-slate-50">
-    <!-- Мобильное меню -->
-    <div id="mobile-menu-overlay" class="mobile-menu-overlay opacity-0 invisible" onclick="toggleMobileMenu()"></div>
-    <div id="mobile-menu" class="mobile-menu mobile-menu-hidden p-6">
+    <!-- Улучшенное мобильное меню -->
+    <div id="mobile-menu-overlay" class="mobile-menu-overlay opacity-0 invisible" onclick="toggleMobileMenu()" role="button" tabindex="0" aria-label="Закрыть меню"></div>
+    <div id="mobile-menu" class="mobile-menu mobile-menu-hidden p-6" role="navigation" aria-label="Мобильное меню">
         <div class="flex-between mb-8">
             <img src="logo.png" alt="Академия Финансов Логотип" class="h-8">
-            <button onclick="toggleMobileMenu()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="feature-check"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+            <button onclick="toggleMobileMenu()" aria-label="Закрыть меню" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
             </button>
         </div>
         <nav class="flex-col">
-            <a href="#what-is-ki" class="nav-link text-base mb-4 smooth-scroll" onclick="toggleMobileMenu()">О кредитной истории</a>
-            <a href="#products" class="nav-link text-base mb-4 smooth-scroll" onclick="toggleMobileMenu()">Наши решения</a>
-            <a href="#about" class="nav-link text-base mb-4 smooth-scroll" onclick="toggleMobileMenu()">О нас</a>
-            <a href="#faq" class="nav-link text-base mb-4 smooth-scroll" onclick="toggleMobileMenu()">Частые вопросы</a>
-            <a href="#testimonials" class="nav-link text-base mb-4 smooth-scroll" onclick="toggleMobileMenu()">Отзывы клиентов</a>
-                            <a href="#products" class="cta-button text-base text-center mt-4 smooth-scroll" onclick="toggleMobileMenu()">Заказать консультацию</a>
+            <a href="#what-is-ki" class="nav-link text-base mb-4 smooth-scroll block py-3 px-2 rounded-lg hover:bg-orange-50 transition-colors" onclick="toggleMobileMenu()">О кредитной истории</a>
+            <a href="#products" class="nav-link text-base mb-4 smooth-scroll block py-3 px-2 rounded-lg hover:bg-orange-50 transition-colors" onclick="toggleMobileMenu()">Наши решения</a>
+            <a href="#about" class="nav-link text-base mb-4 smooth-scroll block py-3 px-2 rounded-lg hover:bg-orange-50 transition-colors" onclick="toggleMobileMenu()">О нас</a>
+            <a href="#faq" class="nav-link text-base mb-4 smooth-scroll block py-3 px-2 rounded-lg hover:bg-orange-50 transition-colors" onclick="toggleMobileMenu()">Частые вопросы</a>
+            <a href="#testimonials" class="nav-link text-base mb-4 smooth-scroll block py-3 px-2 rounded-lg hover:bg-orange-50 transition-colors" onclick="toggleMobileMenu()">Отзывы клиентов</a>
+            <a href="#products" class="cta-button text-base text-center mt-4 smooth-scroll block" onclick="toggleMobileMenu()">Заказать консультацию</a>
         </nav>
         <div class="mt-8 pt-6 border-t border-gray-200">
-            <p class="text-sm mb-2">Свяжитесь с нами:</p>
-            <a href="tel:+79682248261" class="contact-link mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm">
+            <p class="text-sm mb-2 text-gray-600">Свяжитесь с нами:</p>
+            <a href="tel:+79682248261" class="contact-link mb-2 flex items-center py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm mr-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                 </svg>
                 +7 (968) 224-82-61
             </a>
-            <a href="mailto:info@academfin.ru" class="contact-link">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm">
+            <a href="mailto:info@academfin.ru" class="contact-link flex items-center py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm mr-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                 </svg>
                 info@academfin.ru
@@ -212,8 +270,8 @@
         </div>
     </div>
 
-    <!-- Кнопка "Наверх" -->
-    <button id="scroll-to-top" class="scroll-to-top" aria-label="Прокрутить наверх">
+    <!-- Кнопка "Наверх" с улучшенной доступностью -->
+    <button id="scroll-to-top" class="scroll-to-top" aria-label="Прокрутить наверх" role="button">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
         </svg>
