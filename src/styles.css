@@ -104,6 +104,10 @@
     @apply py-16 lg:py-20;
   }
 
+  .hero-padding {
+    @apply pt-24 pb-16 lg:pt-28 lg:pb-20;
+  }
+
   .section-title {
     @apply text-3xl md:text-4xl lg:text-5xl font-bold text-brand-slate-dark 
            leading-tight mb-4;
@@ -874,7 +878,39 @@
   }
 
   .bg-gradient-hero {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #581c87 100%);
+  }
+
+  /* Enhanced Hero Animations & Effects */
+  .group:hover .group-hover\:scale-x-100 {
+    transform: scaleX(1);
+  }
+  
+  .transform.scale-x-0 {
+    transform: scaleX(0);
+  }
+  
+  .origin-left {
+    transform-origin: left;
+  }
+
+  /* Backdrop blur for trust badge */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+
+  /* Enhanced button hover effects */
+  .hover\:-translate-y-1:hover {
+    transform: translateY(-0.25rem);
+  }
+
+  /* Focus ring for accessibility */
+  .focus\:ring-4:focus {
+    box-shadow: 0 0 0 4px var(--ring-color);
+  }
+
+  .focus\:ring-orange-500\/50:focus {
+    --ring-color: rgba(249, 115, 22, 0.5);
   }
 
   /* === ТЕНИ === */
