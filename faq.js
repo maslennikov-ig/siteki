@@ -1,27 +1,33 @@
-// FAQ аккордеон — современная, адаптивная реализация
+// FAQ аккордеон для Tailwind CSS
 
 document.addEventListener('DOMContentLoaded', function() {
     const faqQuestions = document.querySelectorAll('.faq-question');
-    faqQuestions.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const expanded = this.getAttribute('aria-expanded') === 'true';
-            // Свернуть все
-            faqQuestions.forEach(b => {
-                b.setAttribute('aria-expanded', 'false');
-                document.getElementById(b.getAttribute('aria-controls')).style.maxHeight = null;
-            });
-            // Если был закрыт — открыть
-            if (!expanded) {
-                this.setAttribute('aria-expanded', 'true');
-                const answer = document.getElementById(this.getAttribute('aria-controls'));
-                answer.style.maxHeight = answer.scrollHeight + 'px';
-            }
+    
+    faqQuestions.forEach(question => {
+        question.addEventListener('click', function() {
+            toggleFaq(this);
         });
     });
-    // Для плавного открытия — скрыть все по умолчанию
-    document.querySelectorAll('.faq-answer').forEach(a => {
-        a.style.overflow = 'hidden';
-        a.style.transition = 'max-height 0.35s cubic-bezier(0.4,0,0.2,1)';
-        a.style.maxHeight = null;
-    });
 });
+
+function toggleFaq(button) {
+    const isExpanded = button.getAttribute('aria-expanded') === 'true';
+    const answer = button.nextElementSibling;
+    
+    // Закрываем все остальные ответы
+    document.querySelectorAll('.faq-question').forEach(q => {
+        if (q !== button) {
+            q.setAttribute('aria-expanded', 'false');
+            q.nextElementSibling.classList.remove('open');
+        }
+    });
+    
+    // Переключаем состояние текущего элемента
+    button.setAttribute('aria-expanded', !isExpanded);
+    
+    if (!isExpanded) {
+        answer.classList.add('open');
+    } else {
+        answer.classList.remove('open');
+    }
+}
