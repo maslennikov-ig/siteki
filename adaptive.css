@@ -1591,3 +1591,10 @@ picture img {
         margin-bottom: 1.125rem;
     }
 }
+
+/* ===== СКРЫТИЕ ГАЛОЧЕК НА МОБИЛЬНЫХ УСТРОЙСТВАХ ===== */
+@media (max-width: 767px) {
+    .feature-check {
+        display: none !important;
+    }
+}

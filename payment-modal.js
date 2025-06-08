@@ -144,6 +144,26 @@ function openPaymentModal(productId) {
     document.getElementById('modal-product-price').textContent = `${product.price.toLocaleString()} ₽`;
     document.getElementById('modal-product-description').textContent = product.description;
     
+    // Для мобильной версии добавляем цену в заголовок
+    const modalTitle = document.getElementById('modal-title');
+    const modalHeader = document.querySelector('.payment-modal-header');
+    
+    if (window.innerWidth <= 640 && modalTitle && modalHeader) {
+        modalTitle.textContent = product.name;
+        
+        // Удаляем старую цену если есть
+        const existingPrice = modalHeader.querySelector('.product-price-mobile');
+        if (existingPrice) {
+            existingPrice.remove();
+        }
+        
+        // Добавляем цену в заголовок для мобильной версии
+        const priceElement = document.createElement('div');
+        priceElement.className = 'product-price-mobile';
+        priceElement.textContent = `${product.price.toLocaleString()} ₽`;
+        modalHeader.appendChild(priceElement);
+    }
+    
     // Обновляем текст кнопки
     const submitButton = document.getElementById('submit-payment');
     if (submitButton) {
@@ -164,13 +184,15 @@ function openPaymentModal(productId) {
     lockBodyScroll();
     paymentModal.classList.remove('hidden');
     
-    // Фокус на первое поле
-    setTimeout(() => {
-        const nameInput = document.getElementById('customer-name');
-        if (nameInput) {
-            nameInput.focus();
-        }
-    }, 300);
+    // Фокус на первое поле для десктопа
+    if (window.innerWidth > 640) {
+        setTimeout(() => {
+            const nameInput = document.getElementById('customer-name');
+            if (nameInput) {
+                nameInput.focus();
+            }
+        }, 300);
+    }
     
     console.log('✅ Модальное окно открыто для продукта:', product.name);
 }
