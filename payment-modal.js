@@ -355,7 +355,7 @@ async function createTBankPayment() {
         if (result.Success && result.PaymentURL) {
             console.log('✅ Платеж создан успешно:', result.PaymentURL);
             
-            // Показываем iframe с платежной формой T-Bank
+            // Показываем нативную форму T-Bank
             showTBankIframe(result.PaymentURL);
             
         } else {
@@ -369,114 +369,333 @@ async function createTBankPayment() {
 }
 
 function showTBankIframe(paymentURL) {
-    console.log('💳 Показываем iframe T-Bank:', paymentURL);
+    console.log('💳 Показываем нативную форму T-Bank:', paymentURL);
     
     const container = document.getElementById('tbank-payment-container');
     container.innerHTML = `
-        <div class="bg-white rounded-lg overflow-hidden border">
-            <!-- Заголовок -->
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <img src="tbank_logo.svg" alt="T-Bank" class="h-6" onerror="this.style.display='none'">
-                    <h3 class="font-semibold">T-Bank - Безопасная оплата</h3>
+        <!-- T-Bank Native Payment Interface -->
+        <div class="bg-gray-900 text-white rounded-xl overflow-hidden shadow-2xl border border-gray-800">
+            
+            <!-- Header with T-Bank Branding -->
+            <div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 p-6 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-yellow-300/5"></div>
+                <div class="relative flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center">
+                            <span class="text-black font-black text-xl">T</span>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Безопасная оплата</h2>
+                            <p class="text-gray-400 text-sm">Защищено банком T-Bank</p>
+                        </div>
+                    </div>
+                    <button 
+                        onclick="showCustomerDataSection()" 
+                        class="p-2 rounded-lg hover:bg-gray-800 transition-colors group"
+                        aria-label="Назад к данным"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-400 group-hover:text-white">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                    </button>
                 </div>
+            </div>
+
+            <!-- Security Indicators -->
+            <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 border-b border-gray-700">
+                <div class="flex items-center justify-center space-x-8 text-sm">
+                    <div class="flex items-center space-x-2 text-green-400">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="font-medium">SSL шифрование</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-green-400">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="font-medium">PCI DSS</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-green-400">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="font-medium">Лицензия ЦБ РФ</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Amount Display -->
+            <div class="bg-gray-800 p-6 text-center border-b border-gray-700">
+                <div class="text-3xl font-bold text-white mb-2" id="tbank-amount">5 000 ₽</div>
+                <div class="text-gray-400 text-sm" id="tbank-description">Оплата картой</div>
+            </div>
+
+            <!-- Payment Form -->
+            <div class="p-6 space-y-6">
+                
+                <!-- Card Section -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-white flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-yellow-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                        </svg>
+                        <span>Оплата картой</span>
+                        <div class="flex-1 flex justify-end space-x-2">
+                            <div class="w-8 h-5 bg-blue-600 rounded text-xs flex items-center justify-center text-white font-bold">VISA</div>
+                            <div class="w-8 h-5 bg-red-600 rounded text-xs flex items-center justify-center text-white font-bold">MC</div>
+                            <div class="w-8 h-5 bg-blue-500 rounded text-xs flex items-center justify-center text-white font-bold">МИР</div>
+                        </div>
+                    </h3>
+                    
+                    <!-- Card Number -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-300">Номер карты</label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="tbank-card-number"
+                                placeholder="0000 0000 0000 0000"
+                                maxlength="19"
+                                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                                oninput="formatCardNumber(this)"
+                            >
+                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <div id="card-type-icon" class="w-8 h-5 bg-gray-600 rounded flex items-center justify-center text-xs text-gray-400">
+                                    CARD
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Expiry & CVV -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-300">Срок действия</label>
+                            <input 
+                                type="text" 
+                                id="tbank-expiry"
+                                placeholder="ММ/ГГ"
+                                maxlength="5"
+                                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                                oninput="formatExpiry(this)"
+                            >
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-300 flex items-center space-x-1">
+                                <span>CVV</span>
+                                <div class="group relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-400 cursor-help">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c0-1.032.771-1.87 1.72-1.87s1.72.838 1.72 1.87c0 .897-.557 1.663-1.34 1.897l-.362.15c-.415.172-.647.547-.647.952v.487M12 15.75h.007v.008H12v-.008z" />
+                                    </svg>
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                                        3 цифры на обороте карты
+                                    </div>
+                                </div>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="tbank-cvv"
+                                placeholder="123"
+                                maxlength="4"
+                                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                                oninput="formatCVV(this)"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Checkbox for saving card -->
+                    <div class="flex items-center space-x-3 pt-2">
+                        <input type="checkbox" id="save-card" class="w-4 h-4 text-yellow-400 bg-gray-800 border-gray-600 rounded focus:ring-yellow-400 focus:ring-2">
+                        <label for="save-card" class="text-sm text-gray-300">Нужна квитанция?</label>
+                    </div>
+                </div>
+                
+                <!-- Continue Button -->
                 <button 
-                    onclick="showCustomerDataSection()" 
-                    class="text-blue-100 hover:text-white transition-colors"
-                    aria-label="Назад"
+                    onclick="processTBankPayment('${paymentURL}')"
+                    class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                    id="tbank-pay-button"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
+                    <div class="flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                        </svg>
+                        <span>Оплатить 5 000 ₽</span>
+                    </div>
                 </button>
             </div>
             
-            <!-- Индикаторы безопасности -->
-            <div class="bg-blue-50 p-3 border-b">
-                <div class="flex items-center justify-center space-x-6 text-xs text-blue-700">
-                    <div class="flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                        </svg>
-                        <span>SSL шифрование</span>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                        </svg>
-                        <span>PCI DSS</span>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-                        </svg>
-                        <span>Лицензия ЦБ РФ</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Iframe загрузки -->
-            <div id="tbank-loading" class="p-8 text-center">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                <p class="text-gray-600">Загружаем платежную форму...</p>
-            </div>
-            
-            <!-- Iframe -->
-            <iframe 
-                id="tbank-iframe"
-                src="${paymentURL}"
-                class="w-full h-96 border-0 hidden"
-                frameborder="0"
-                scrolling="auto"
-                onload="hideTBankLoading()"
-                onerror="showTBankError('Ошибка загрузки платежной формы')"
-            ></iframe>
-            
-            <!-- Trust буллеты -->
-            <div class="bg-gray-50 p-4 border-t">
-                <div class="grid grid-cols-2 gap-3 text-xs text-gray-600">
+            <!-- Trust Footer -->
+            <div class="bg-gray-800 p-4 border-t border-gray-700">
+                <div class="grid grid-cols-2 gap-3 text-xs text-gray-400">
                     <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
                         <span>Мгновенный чек</span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
                         <span>Возврат 14 дней</span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
                         <span>Техподдержка 24/7</span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
                         <span>Лицензия ЦБ РФ</span>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-gray-700 text-center">
+                    <div class="flex items-center justify-center space-x-2 text-green-400">
+                        <div class="w-3 h-3 bg-yellow-400 rounded-full flex items-center justify-center">
+                            <span class="text-black text-xs font-bold">T</span>
+                        </div>
+                        <span class="text-sm font-medium">T-Bank</span>
+                        <span class="text-xs text-gray-500">Официальная платежная система</span>
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-xs text-green-400 font-medium">Защищено</span>
                     </div>
                 </div>
             </div>
         </div>
     `;
+    
+    // Initialize form validation and card type detection
+    initializeTBankForm();
 }
 
-function hideTBankLoading() {
-    console.log('✅ T-Bank iframe загружен');
-    const loading = document.getElementById('tbank-loading');
-    const iframe = document.getElementById('tbank-iframe');
+// ==================== T-BANK FORM UTILITIES ====================
+
+function initializeTBankForm() {
+    // Update amount display with current product price
+    const selectedProduct = window.selectedProduct;
+    if (selectedProduct) {
+        const amountEl = document.getElementById('tbank-amount');
+        const descriptionEl = document.getElementById('tbank-description');
+        const payButton = document.getElementById('tbank-pay-button');
+        
+        if (amountEl) amountEl.textContent = `${selectedProduct.price} ₽`;
+        if (descriptionEl) descriptionEl.textContent = selectedProduct.name;
+        if (payButton) {
+            payButton.innerHTML = `
+                <div class="flex items-center justify-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    </svg>
+                    <span>Оплатить ${selectedProduct.price} ₽</span>
+                </div>
+            `;
+        }
+    }
+}
+
+function formatCardNumber(input) {
+    let value = input.value.replace(/\D/g, '');
+    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    input.value = value;
     
-    if (loading) {
-        loading.classList.add('hidden');
+    // Detect card type
+    detectCardType(value.replace(/\s/g, ''));
+}
+
+function formatExpiry(input) {
+    let value = input.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+    input.value = value;
+}
+
+function formatCVV(input) {
+    input.value = input.value.replace(/\D/g, '');
+}
+
+function detectCardType(cardNumber) {
+    const cardTypeIcon = document.getElementById('card-type-icon');
+    if (!cardTypeIcon) return;
+    
+    if (cardNumber.startsWith('4')) {
+        cardTypeIcon.className = 'w-8 h-5 bg-blue-600 rounded flex items-center justify-center text-xs text-white font-bold';
+        cardTypeIcon.textContent = 'VISA';
+    } else if (cardNumber.startsWith('5') || cardNumber.startsWith('2')) {
+        cardTypeIcon.className = 'w-8 h-5 bg-red-600 rounded flex items-center justify-center text-xs text-white font-bold';
+        cardTypeIcon.textContent = 'MC';
+    } else if (cardNumber.startsWith('2')) {
+        cardTypeIcon.className = 'w-8 h-5 bg-blue-500 rounded flex items-center justify-center text-xs text-white font-bold';
+        cardTypeIcon.textContent = 'МИР';
+    } else if (cardNumber.length > 0) {
+        cardTypeIcon.className = 'w-8 h-5 bg-gray-600 rounded flex items-center justify-center text-xs text-gray-400';
+        cardTypeIcon.textContent = 'CARD';
+    } else {
+        cardTypeIcon.className = 'w-8 h-5 bg-gray-600 rounded flex items-center justify-center text-xs text-gray-400';
+        cardTypeIcon.textContent = 'CARD';
+    }
+}
+
+function processTBankPayment(paymentURL) {
+    console.log('💳 Обрабатываем оплату T-Bank:', paymentURL);
+    
+    // Validate form
+    const cardNumber = document.getElementById('tbank-card-number')?.value?.replace(/\s/g, '');
+    const expiry = document.getElementById('tbank-expiry')?.value;
+    const cvv = document.getElementById('tbank-cvv')?.value;
+    
+    if (!cardNumber || cardNumber.length < 16) {
+        showTBankFormError('Введите корректный номер карты');
+        return;
     }
     
-    if (iframe) {
-        iframe.classList.remove('hidden');
+    if (!expiry || expiry.length < 5) {
+        showTBankFormError('Введите срок действия карты');
+        return;
     }
+    
+    if (!cvv || cvv.length < 3) {
+        showTBankFormError('Введите CVV код');
+        return;
+    }
+    
+    // Show processing state
+    const payButton = document.getElementById('tbank-pay-button');
+    if (payButton) {
+        payButton.disabled = true;
+        payButton.innerHTML = `
+            <div class="flex items-center justify-center space-x-2">
+                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
+                <span>Обрабатываем платеж...</span>
+            </div>
+        `;
+    }
+    
+    // Redirect to T-Bank processing
+    setTimeout(() => {
+        window.open(paymentURL, '_blank');
+        closePaymentModal();
+    }, 1500);
+}
+
+function showTBankFormError(message) {
+    // Create or update error message
+    let errorEl = document.getElementById('tbank-form-error');
+    if (!errorEl) {
+        errorEl = document.createElement('div');
+        errorEl.id = 'tbank-form-error';
+        errorEl.className = 'mt-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-300 text-sm';
+        
+        const payButton = document.getElementById('tbank-pay-button');
+        if (payButton) {
+            payButton.parentNode.insertBefore(errorEl, payButton);
+        }
+    }
+    
+    errorEl.innerHTML = `
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-red-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9-.75a9 9 0 1118 0 9 9 0 01-18 0zm9 3.75h.008v.008H12v-.008z" />
+            </svg>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Remove error after 5 seconds
+    setTimeout(() => {
+        if (errorEl) errorEl.remove();
+    }, 5000);
 }
 
 function showTBankError(message) {
@@ -484,32 +703,22 @@ function showTBankError(message) {
     
     const container = document.getElementById('tbank-payment-container');
     container.innerHTML = `
-        <div class="p-8 text-center">
-            <div class="text-red-500 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto">
+        <div class="bg-gray-900 text-white rounded-xl overflow-hidden shadow-2xl border border-gray-800 p-8 text-center">
+            <div class="text-red-400 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                 </svg>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Ошибка оплаты</h3>
-            <p class="text-gray-600 mb-4">${message}</p>
+            <h3 class="text-xl font-bold text-white mb-2">Ошибка оплаты</h3>
+            <p class="text-gray-400 mb-6">${message}</p>
             <button 
                 onclick="showCustomerDataSection()"
-                class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                class="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-3 px-6 rounded-xl transition-all duration-200"
             >
                 Попробовать снова
             </button>
         </div>
     `;
-}
-
-function createTBankWidget() {
-    // Эта функция больше не используется, заменена на createTBankPayment
-    return document.createElement('div');
-}
-
-function processPayment() {
-    // Эта функция больше не используется, заменена на createTBankPayment
-    console.log('💳 processPayment() вызвана, но теперь используется createTBankPayment()');
 }
 
 // ==================== МАСКИРОВАНИЕ ТЕЛЕФОНА ====================
