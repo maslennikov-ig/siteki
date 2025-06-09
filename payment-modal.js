@@ -297,83 +297,219 @@ function initializeTBankWidget() {
     // Очищаем контейнер
     container.innerHTML = '';
     
-    // Создаем T-Bank виджет
-    const widget = createTBankWidget();
-    container.appendChild(widget);
+    // Создаем реальную интеграцию с T-Bank вместо виджета
+    createTBankPayment();
 }
 
-function createTBankWidget() {
-    const widget = document.createElement('div');
-    widget.className = 'tbank-widget';
+async function createTBankPayment() {
+    console.log('💰 Создаем реальный платеж T-Bank:', selectedProduct, customerData);
     
-    widget.innerHTML = `
-        <div class="p-6 bg-gray-50 rounded-lg">
-            <div class="text-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Оплата через T-Bank</h3>
-                <p class="text-3xl font-bold text-orange-600">${selectedProduct.price}</p>
-            </div>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Номер карты</label>
-                    <input 
-                        type="text" 
-                        id="card-number" 
-                        placeholder="1234 5678 9012 3456"
-                        class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-colors"
-                        maxlength="19"
-                    >
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Срок действия</label>
-                        <input 
-                            type="text" 
-                            id="card-expiry" 
-                            placeholder="ММ/ГГ"
-                            class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-colors"
-                            maxlength="5"
-                        >
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                        <input 
-                            type="text" 
-                            id="card-cvv" 
-                            placeholder="123"
-                            class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-colors"
-                            maxlength="3"
-                        >
-                        </div>
-                </div>
-                
-                <button 
-                    type="button"
-                    onclick="processPayment()"
-                    class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-                >
-                    Оплатить ${selectedProduct.price}
-                </button>
-            </div>
-            
-            <div class="mt-4 text-center text-xs text-gray-500">
-                🔒 Защищённое соединение SSL
-            </div>
+    if (!selectedProduct || !customerData) {
+        showError('Данные о продукте или покупателе не найдены');
+        return;
+    }
+    
+    // Показываем индикатор загрузки
+    const container = document.getElementById('tbank-payment-container');
+    container.innerHTML = `
+        <div class="p-8 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p class="text-gray-600">Создаем платеж...</p>
         </div>
     `;
     
-    return widget;
+    // Извлекаем цену из строки (убираем "₽" и пробелы)
+    const priceString = selectedProduct.price.replace(/[^\d]/g, '');
+    const priceNumber = parseInt(priceString, 10);
+    
+    // Подготавливаем данные для платежа
+    const paymentData = {
+        Amount: priceNumber * 100, // В копейках
+        OrderId: 'order-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        Description: selectedProduct.name,
+        Email: customerData.email,
+        Phone: customerData.phone,
+        SuccessURL: window.location.origin + '/thankyou.html',
+        FailURL: window.location.origin + '/fail.html'
+    };
+    
+    console.log('📋 Данные платежа:', paymentData);
+    
+    try {
+        // Отправляем запрос на создание платежа через backend
+        const response = await fetch('/.netlify/functions/create-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(paymentData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('📨 Ответ от T-Bank:', result);
+        
+        if (result.Success && result.PaymentURL) {
+            console.log('✅ Платеж создан успешно:', result.PaymentURL);
+            
+            // Показываем iframe с платежной формой T-Bank
+            showTBankIframe(result.PaymentURL);
+            
+        } else {
+            throw new Error(result.Message || result.Details || result.error || 'Неизвестная ошибка при создании платежа');
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка при создании платежа:', error);
+        showTBankError(error.message);
+    }
+}
+
+function showTBankIframe(paymentURL) {
+    console.log('💳 Показываем iframe T-Bank:', paymentURL);
+    
+    const container = document.getElementById('tbank-payment-container');
+    container.innerHTML = `
+        <div class="bg-white rounded-lg overflow-hidden border">
+            <!-- Заголовок -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img src="tbank_logo.svg" alt="T-Bank" class="h-6" onerror="this.style.display='none'">
+                    <h3 class="font-semibold">T-Bank - Безопасная оплата</h3>
+                </div>
+                <button 
+                    onclick="showCustomerDataSection()" 
+                    class="text-blue-100 hover:text-white transition-colors"
+                    aria-label="Назад"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Индикаторы безопасности -->
+            <div class="bg-blue-50 p-3 border-b">
+                <div class="flex items-center justify-center space-x-6 text-xs text-blue-700">
+                    <div class="flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                        <span>SSL шифрование</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                        </svg>
+                        <span>PCI DSS</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                        </svg>
+                        <span>Лицензия ЦБ РФ</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Iframe загрузки -->
+            <div id="tbank-loading" class="p-8 text-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p class="text-gray-600">Загружаем платежную форму...</p>
+            </div>
+            
+            <!-- Iframe -->
+            <iframe 
+                id="tbank-iframe"
+                src="${paymentURL}"
+                class="w-full h-96 border-0 hidden"
+                frameborder="0"
+                scrolling="auto"
+                onload="hideTBankLoading()"
+                onerror="showTBankError('Ошибка загрузки платежной формы')"
+            ></iframe>
+            
+            <!-- Trust буллеты -->
+            <div class="bg-gray-50 p-4 border-t">
+                <div class="grid grid-cols-2 gap-3 text-xs text-gray-600">
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Мгновенный чек</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Возврат 14 дней</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Техподдержка 24/7</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Лицензия ЦБ РФ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function hideTBankLoading() {
+    console.log('✅ T-Bank iframe загружен');
+    const loading = document.getElementById('tbank-loading');
+    const iframe = document.getElementById('tbank-iframe');
+    
+    if (loading) {
+        loading.classList.add('hidden');
+    }
+    
+    if (iframe) {
+        iframe.classList.remove('hidden');
+    }
+}
+
+function showTBankError(message) {
+    console.error('❌ Ошибка T-Bank:', message);
+    
+    const container = document.getElementById('tbank-payment-container');
+    container.innerHTML = `
+        <div class="p-8 text-center">
+            <div class="text-red-500 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Ошибка оплаты</h3>
+            <p class="text-gray-600 mb-4">${message}</p>
+            <button 
+                onclick="showCustomerDataSection()"
+                class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+                Попробовать снова
+            </button>
+        </div>
+    `;
+}
+
+function createTBankWidget() {
+    // Эта функция больше не используется, заменена на createTBankPayment
+    return document.createElement('div');
 }
 
 function processPayment() {
-    console.log('💳 Обрабатываем оплату...');
-    
-    // Здесь будет интеграция с реальным T-Bank API
-    // Пока что показываем сообщение об успехе
-    alert(`Спасибо, ${customerData.name}! Оплата на сумму ${selectedProduct.price} обрабатывается. Инструкции отправлены на ${customerData.email}`);
-    
-        closePaymentModal();
+    // Эта функция больше не используется, заменена на createTBankPayment
+    console.log('💳 processPayment() вызвана, но теперь используется createTBankPayment()');
 }
 
 // ==================== МАСКИРОВАНИЕ ТЕЛЕФОНА ====================
@@ -425,4 +561,6 @@ function resetForm() {
 // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ ВЫЗОВА ИЗ HTML ====================
 window.openPaymentModal = openPaymentModal;
 window.closePaymentModal = closePaymentModal;
-window.processPayment = processPayment; 
+window.processPayment = processPayment;
+window.hideTBankLoading = hideTBankLoading;
+window.showTBankError = showTBankError; 
