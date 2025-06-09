@@ -788,7 +788,7 @@
                         </li>
                     </ul>
                     
-                    <button class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 hover:-translate-y-0.5 group-hover:scale-105 flex items-center justify-center gap-2" onclick="openPaymentModal('Гайд «Узнай причину отказов и исправь КИ»', '1 399 ₽', 'Подробный гайд с пошаговыми инструкциями по исправлению кредитной истории')"
+                    <button type="button" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 hover:-translate-y-0.5 group-hover:scale-105 flex items-center justify-center gap-2" onclick="openPaymentModal('Гайд «Узнай причину отказов и исправь КИ»', '1 399 ₽', 'Подробный гайд с пошаговыми инструкциями по исправлению кредитной истории', event)"
                         <span>Купить гайд за 1399 ₽</span>
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -869,7 +869,7 @@
                         </li>
                     </ul>
                     
-                    <button class="w-full bg-gradient-to-r from-brand-orange to-red-600 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl hover:from-orange-600 hover:to-red-700 transition-all duration-300 hover:-translate-y-0.5 group-hover:scale-105 flex items-center justify-center gap-2 relative z-10" onclick="openPaymentModal('Персональная консультация по КИ', '5 000 ₽', 'Индивидуальная консультация эксперта с анализом кредитной истории')"
+                    <button type="button" class="w-full bg-gradient-to-r from-brand-orange to-red-600 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl hover:from-orange-600 hover:to-red-700 transition-all duration-300 hover:-translate-y-0.5 group-hover:scale-105 flex items-center justify-center gap-2 relative z-10" onclick="openPaymentModal('Персональная консультация по КИ', '5 000 ₽', 'Индивидуальная консультация эксперта с анализом кредитной истории', event)"
                         <span>Заказать консультацию за 5000 ₽</span>
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -945,7 +945,7 @@
                         </li>
                     </ul>
                     
-                    <button class="w-full bg-gradient-to-r from-purple-600 to-indigo-700 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-indigo-800 transition-all duration-300 hover:-translate-y-0.5 group-hover:scale-105 flex items-center justify-center gap-2" onclick="openPaymentModal('Исправление КИ + ведение до кредита', '5 000 ₽', 'Полное сопровождение процесса исправления кредитной истории с ежемесячной поддержкой')"
+                    <button type="button" class="w-full bg-gradient-to-r from-purple-600 to-indigo-700 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-indigo-800 transition-all duration-300 hover:-translate-y-0.5 group-hover:scale-105 flex items-center justify-center gap-2" onclick="openPaymentModal('Исправление КИ + ведение до кредита', '5 000 ₽', 'Полное сопровождение процесса исправления кредитной истории с ежемесячной поддержкой', event)"
                         <span>Заказать полное сопровождение</span>
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -2052,16 +2052,9 @@
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-2xl p-6 text-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <!-- T-Bank Official Logo -->
-                        <div class="bg-white rounded-lg p-2">
-                            <svg class="w-10 h-10" viewBox="0 0 290 235" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <style>.cls-1{fill:#333;}.cls-2{fill:#ffdd2d;}.cls-3{fill:#333;fill-rule:evenodd;}</style>
-                                </defs>
-                                <!-- T-Bank Shield -->
-                                <path class="cls-2" d="M79.13,57.15h131.89v66.33c0,17-9.07,32.72-23.8,41.22l-42.15,24.34-42.15-24.34c-14.72-8.5-23.8-24.22-23.8-41.22V57.15Z"/>
-                                <path class="cls-3" d="M115.33,92.06v20.63c2.82-3.19,7.95-5.34,13.81-5.34h6.37v23.98c0,6.38-1.73,11.96-4.31,15.04h27.72c-2.57-3.07-4.3-8.65-4.3-15.02V107.35h6.37c5.86,0,10.99,2.16,13.81,5.34V92.06h-59.49Z"/>
-                            </svg>
+                        <!-- T-Bank Logo -->
+                        <div class="bg-white rounded-lg p-1 flex items-center justify-center w-12 h-12">
+                            <img src="tbank_logo_sq.png" alt="T-Bank" class="w-10 h-10 object-contain">
                         </div>
                         <div>
                             <h2 class="text-xl font-semibold">Безопасная оплата</h2>
@@ -2103,13 +2096,15 @@
                 </div>
 
                 <!-- Product Summary -->
-                <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-medium text-gray-900" id="selected-product-name">Персональная консультация по КИ</p>
-                            <p class="text-sm text-gray-600" id="selected-product-description">Индивидуальная консультация эксперта</p>
+                <div id="product-summary" class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium text-gray-900 leading-tight" id="selected-product-name">Персональная консультация по КИ</p>
+                            <p class="text-sm text-gray-600 mt-1" id="selected-product-description">Индивидуальная консультация эксперта</p>
                         </div>
-                        <p class="text-xl font-bold text-gray-900" id="selected-product-price">5 000 ₽</p>
+                        <div class="flex-shrink-0">
+                            <p class="text-lg sm:text-xl font-bold text-gray-900 whitespace-nowrap" id="selected-product-price">5 000 ₽</p>
+                        </div>
                     </div>
                 </div>
 
@@ -2188,7 +2183,7 @@
                                         <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700 font-medium">Мгновенный чек</span>
+                                <span class="text-gray-700 font-medium">Моментальный доступ</span>
                             </div>
                             <div class="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
                                 <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
@@ -2196,7 +2191,7 @@
                                         <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700 font-medium">Моментальная проверка</span>
+                                <span class="text-gray-700 font-medium">Гарантия результата</span>
                             </div>
                             <div class="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
                                 <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
@@ -2220,21 +2215,17 @@
 
                 <!-- T-Bank Payment Section (Initially Hidden) -->
                 <div id="tbank-payment-section" class="hidden">
-                    <!-- T-Bank Header -->
-                    <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
-                        <div class="bg-white rounded p-1 border">
-                            <svg class="w-8 h-8" viewBox="0 0 290 235" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <style>.cls-1{fill:#333;}.cls-2{fill:#ffdd2d;}.cls-3{fill:#333;fill-rule:evenodd;}</style>
-                                </defs>
-                                <!-- T-Bank Shield -->
-                                <path class="cls-2" d="M79.13,57.15h131.89v66.33c0,17-9.07,32.72-23.8,41.22l-42.15,24.34-42.15-24.34c-14.72-8.5-23.8-24.22-23.8-41.22V57.15Z"/>
-                                <path class="cls-3" d="M115.33,92.06v20.63c2.82-3.19,7.95-5.34,13.81-5.34h6.37v23.98c0,6.38-1.73,11.96-4.31,15.04h27.72c-2.57-3.07-4.3-8.65-4.3-15.02V107.35h6.37c5.86,0,10.99,2.16,13.81,5.34V92.06h-59.49Z"/>
-                            </svg>
+                    <!-- T-Bank Widget will be inserted here -->
+                    <div id="tbank-payment-container"></div>
+                    
+                    <!-- T-Bank Header - Moved below container -->
+                    <div class="flex items-center gap-3 mt-4 p-3 bg-gray-50 rounded-lg">
+                        <div class="bg-white rounded-lg p-1 flex items-center justify-center w-10 h-10">
+                            <img src="tbank_logo_sq.png" alt="T-Bank" class="w-8 h-8 object-contain">
                         </div>
                         <div>
                             <p class="font-medium text-gray-900">T-Bank</p>
-                            <p class="text-xs text-gray-600">🔒 Защищённое соединение SSL</p>
+                            <p class="text-xs text-gray-600">Официальная платежная система</p>
                         </div>
                         <div class="ml-auto text-right">
                             <div class="flex items-center gap-1 text-green-600">
@@ -2244,19 +2235,6 @@
                         </div>
                     </div>
 
-                    <!-- T-Bank Widget will be inserted here -->
-                    <div id="tbank-payment-container"></div>
-                    
-                    <!-- Payment Security Footer -->
-                    <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <div class="flex items-center gap-2 text-sm">
-                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span class="text-blue-800 font-medium">Ваши данные не сохраняются на нашем сервере</span>
-                        </div>
-                        <p class="text-xs text-blue-600 mt-1">Вся информация о карте обрабатывается напрямую в T-Bank</p>
-                    </div>
                     
                     <!-- Back Button -->
                     <button 

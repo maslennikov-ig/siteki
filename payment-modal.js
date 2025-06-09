@@ -1,23 +1,16 @@
 /**
  * Доверительное модальное окно оплаты
- * Версия: 3.2.0 - Официальный T-Bank брендинг и улучшенные trust элементы
+ * Версия: 3.1.0 - Добавлены элементы доверия и T-Bank брендинг
  * Дата: Январь 2025
  * 
- * Обновления v3.2.0:
- * - Интегрирован официальный логотип T-Bank (желтый щит)
- * - Убрано слово "Онлайн" из названия банка
- * - Добавлено "🔒 Защищённое соединение SSL" под названием T-Bank
- * - Заменено "Возврат 14 дней" на "Моментальная проверка"
- * - Улучшена визуальная иерархия и доверие к платежной системе
- * 
- * Предыдущие обновления v3.1.0:
+ * Обновления v3.1.0:
  * - Добавлено лого T-Bank в заголовке
  * - Индикаторы безопасности (SSL, PCI DSS, Банк России)
- * - Trust буллеты (мгновенный чек, техподдержка 24/7)
+ * - Trust буллеты (мгновенный чек, возврат 14 дней, техподдержка 24/7)
  * - Улучшенная секция T-Bank с дополнительными элементами доверия
  */
 
-console.log('📄 payment-modal.js v3.2.0 загружен - Официальный T-Bank брендинг');
+console.log('📄 payment-modal.js v3.1.0 загружен - Доверительный дизайн с T-Bank брендингом');
 
 // ==================== ПЕРЕМЕННЫЕ ====================
 let selectedProduct = null;
@@ -78,7 +71,16 @@ function bindEventHandlers() {
 }
 
 // ==================== ОТКРЫТИЕ/ЗАКРЫТИЕ МОДАЛЬНОГО ОКНА ====================
-function openPaymentModal(productName, productPrice, productDescription) {
+function openPaymentModal(productName, productPrice, productDescription, event) {
+    // Предотвращаем скролл страницы при открытии модального окна
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    // Сохраняем текущую позицию скролла
+    const currentScrollPosition = window.pageYOffset;
+    
     console.log(`🛒 Открываем модальное окно для продукта: ${productName}`);
     
     // Сохраняем данные о продукте
@@ -103,8 +105,14 @@ function openPaymentModal(productName, productPrice, productDescription) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         
-        // Блокируем скролл страницы
+        // Блокируем скролл страницы и сохраняем позицию
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${currentScrollPosition}px`;
+        document.body.style.width = '100%';
         document.body.classList.add('modal-open');
+        
+        // Сохраняем позицию для восстановления
+        window.modalScrollPosition = currentScrollPosition;
         
         // Фокусируемся на первом поле
         setTimeout(() => {
@@ -124,8 +132,16 @@ function closePaymentModal() {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         
-        // Разблокируем скролл страницы
+        // Восстанавливаем скролл страницы
+        const scrollPosition = window.modalScrollPosition || 0;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
         document.body.classList.remove('modal-open');
+        
+        // Восстанавливаем позицию скролла
+        window.scrollTo(0, scrollPosition);
+        window.modalScrollPosition = null;
     }
     
     // Очищаем данные
@@ -140,6 +156,7 @@ function showCustomerDataSection() {
     
     const customerSection = document.getElementById('customer-data-section');
     const paymentSection = document.getElementById('tbank-payment-section');
+    const productSummary = document.getElementById('product-summary');
     
     if (customerSection) {
         customerSection.classList.remove('hidden');
@@ -148,6 +165,11 @@ function showCustomerDataSection() {
     if (paymentSection) {
         paymentSection.classList.add('hidden');
     }
+    
+    // Показываем Product Summary на первом экране
+    if (productSummary) {
+        productSummary.classList.remove('hidden');
+    }
 }
 
 function showPaymentSection() {
@@ -155,6 +177,7 @@ function showPaymentSection() {
     
     const customerSection = document.getElementById('customer-data-section');
     const paymentSection = document.getElementById('tbank-payment-section');
+    const productSummary = document.getElementById('product-summary');
     
     if (customerSection) {
         customerSection.classList.add('hidden');
@@ -162,6 +185,11 @@ function showPaymentSection() {
     
     if (paymentSection) {
         paymentSection.classList.remove('hidden');
+    }
+    
+    // Скрываем Product Summary на втором экране
+    if (productSummary) {
+        productSummary.classList.add('hidden');
     }
     
     // Инициализируем T-Bank виджет
