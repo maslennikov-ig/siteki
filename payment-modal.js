@@ -1,18 +1,18 @@
 /**
  * Доверительное модальное окно оплаты
- * Версия: 4.0.0 - Чистый T-Bank виджет с элементами доверия
+ * Версия: 4.1.0 - Минималистичный T-Bank виджет
  * Дата: Январь 2025
  * 
- * Обновления v4.0.0:
- * - Полностью убраны дублирующиеся элементы интерфейса из HTML
- * - Чистый T-Bank виджет в отдельном контейнере с рамкой
- * - Элементы доверия встроены прямо в нижнюю часть виджета
- * - Кнопка "Изменить данные покупателя" перенесена в футер виджета
- * - Убраны все заголовки, логотипы и индикаторы из верхней части
- * - Минималистичный и профессиональный дизайн платежного окна
+ * Обновления v4.1.0:
+ * - Убраны все лишние элементы доверия (буллеты, trust элементы)
+ * - Оставлены только индикаторы безопасности: SSL шифрование, PCI DSS, Банк России
+ * - Кнопка "Назад к данным" вынесена в HTML, вне виджета
+ * - Максимально чистый дизайн: только T-Bank iframe + индикаторы безопасности
+ * - Убраны рамки и границы для более интегрированного вида
+ * - Зеленый фон для индикаторов безопасности
  */
 
-console.log('📄 payment-modal.js v4.0.0 загружен - Чистый T-Bank виджет с элементами доверия внизу');
+console.log('📄 payment-modal.js v4.1.0 загружен - Минималистичный T-Bank виджет только с индикаторами безопасности');
 
 // Слушаем сообщения от iframe для динамической подстройки высоты
 window.addEventListener('message', function(event) {
@@ -412,13 +412,13 @@ function showTBankIframe(paymentURL) {
             <p class="text-gray-600 text-sm">Загружаем платежную форму T-Bank...</p>
         </div>
         
-        <!-- Контейнер для iframe и футера -->
-        <div id="tbank-widget-container" class="hidden rounded-lg overflow-hidden border border-gray-200">
+        <!-- Контейнер для iframe с индикаторами безопасности -->
+        <div id="tbank-widget-container" class="hidden">
             <!-- Iframe -->
             <iframe 
                 id="tbank-iframe"
                 src="${paymentURL}"
-                class="w-full min-h-80 border-0 block"
+                class="w-full min-h-80 border-0 rounded-lg block"
                 style="height: 500px; max-height: 80vh;"
                 frameborder="0"
                 scrolling="auto"
@@ -426,40 +426,25 @@ function showTBankIframe(paymentURL) {
                 onerror="showTBankError('Ошибка загрузки платежной формы')"
             ></iframe>
             
-            <!-- Trust буллеты внизу T-Bank виджета -->
-            <div class="bg-white border-t border-gray-200 p-4">
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-gray-600">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>Мгновенный чек на e-mail</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>Возврат в течение 14 дней</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>Техподдержка 24/7</span>
-                    </div>
+            <!-- Индикаторы безопасности под виджетом -->
+            <div class="flex items-center justify-center gap-4 mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                <div class="flex items-center gap-2 text-green-700">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-sm font-medium">SSL шифрование</span>
                 </div>
-                
-                <!-- Кнопка возврата внизу -->
-                <div class="mt-4 pt-3 border-t border-gray-100">
-                    <button 
-                        onclick="showCustomerDataSection()" 
-                        class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        Изменить данные покупателя
-                    </button>
+                <div class="flex items-center gap-2 text-green-700">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-sm font-medium">PCI DSS</span>
+                </div>
+                <div class="flex items-center gap-2 text-green-700">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-sm font-medium">Банк России</span>
                 </div>
             </div>
         </div>
