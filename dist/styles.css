@@ -2519,6 +2519,11 @@ body.modal-open {
   margin-right: auto;
 }
 
+.my-8 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
 .mb-1 {
   margin-bottom: 0.25rem;
 }
@@ -2729,6 +2734,10 @@ body.modal-open {
 
 .h-96 {
   height: 24rem;
+}
+
+.h-64 {
+  height: 16rem;
 }
 
 .max-h-0 {
@@ -4465,6 +4474,11 @@ body.modal-open {
 .py-1 {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+}
+
+.py-2\.5 {
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
 }
 
 .pb-4 {
@@ -6285,6 +6299,14 @@ body.modal-open {
 @media (min-width: 640px) {
   .sm\:block {
     display: block;
+  }
+
+  .sm\:h-72 {
+    height: 18rem;
+  }
+
+  .sm\:max-w-lg {
+    max-width: 32rem;
   }
 
   .sm\:grid-cols-2 {

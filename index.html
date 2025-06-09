@@ -2046,8 +2046,8 @@
     </section>
 
     <!-- Доверительное модальное окно оплаты -->
-    <div id="payment-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
-        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-xl">
+    <div id="payment-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
+        <div class="relative w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl my-8">
             <!-- Header with Trust Badge -->
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-2xl p-6 text-white">
                 <div class="flex items-center justify-between">
@@ -2219,7 +2219,7 @@
                     <div id="tbank-payment-container"></div>
                     
                     <!-- T-Bank Header - Moved below container -->
-                    <div class="flex items-center gap-3 mt-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3 mt-3 p-2 bg-gray-50 rounded-lg">
                         <div class="bg-white rounded-lg p-1 flex items-center justify-center w-10 h-10">
                             <img src="tbank_logo_sq.png" alt="T-Bank" class="w-8 h-8 object-contain">
                         </div>
@@ -2240,7 +2240,7 @@
                     <button 
                         type="button" 
                         id="back-to-customer-data" 
-                        class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                        class="w-full mt-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>

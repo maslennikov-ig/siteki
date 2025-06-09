@@ -376,16 +376,16 @@ function showTBankIframe(paymentURL) {
     // Теперь создаем только iframe без дублированных элементов интерфейса
     container.innerHTML = `
         <!-- Iframe загрузки -->
-        <div id="tbank-loading" class="p-8 text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p class="text-gray-600">Загружаем платежную форму T-Bank...</p>
+        <div id="tbank-loading" class="p-6 text-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto mb-3"></div>
+            <p class="text-gray-600 text-sm">Загружаем платежную форму T-Bank...</p>
         </div>
         
         <!-- Iframe -->
         <iframe 
             id="tbank-iframe"
             src="${paymentURL}"
-            class="w-full h-96 border-0 rounded-lg hidden"
+            class="w-full h-64 sm:h-72 border-0 rounded-lg hidden"
             frameborder="0"
             scrolling="auto"
             onload="hideTBankLoading()"
