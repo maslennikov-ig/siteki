@@ -3201,6 +3201,11 @@ body.modal-open {
   border-top-right-radius: 20px;
 }
 
+.rounded-b-2xl {
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
 .border {
   border-width: 1px;
 }
