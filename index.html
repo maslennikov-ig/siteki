@@ -2052,11 +2052,16 @@
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-2xl p-6 text-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <!-- T-Bank Logo -->
+                        <!-- T-Bank Official Logo -->
                         <div class="bg-white rounded-lg p-2">
-                            <div class="w-8 h-8 bg-black rounded flex items-center justify-center">
-                                <span class="text-white font-bold text-xs">T</span>
-                            </div>
+                            <svg class="w-10 h-10" viewBox="0 0 290 235" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <style>.cls-1{fill:#333;}.cls-2{fill:#ffdd2d;}.cls-3{fill:#333;fill-rule:evenodd;}</style>
+                                </defs>
+                                <!-- T-Bank Shield -->
+                                <path class="cls-2" d="M79.13,57.15h131.89v66.33c0,17-9.07,32.72-23.8,41.22l-42.15,24.34-42.15-24.34c-14.72-8.5-23.8-24.22-23.8-41.22V57.15Z"/>
+                                <path class="cls-3" d="M115.33,92.06v20.63c2.82-3.19,7.95-5.34,13.81-5.34h6.37v23.98c0,6.38-1.73,11.96-4.31,15.04h27.72c-2.57-3.07-4.3-8.65-4.3-15.02V107.35h6.37c5.86,0,10.99,2.16,13.81,5.34V92.06h-59.49Z"/>
+                            </svg>
                         </div>
                         <div>
                             <h2 class="text-xl font-semibold">Безопасная оплата</h2>
@@ -2191,7 +2196,7 @@
                                         <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-700 font-medium">Безопасный платёж</span>
+                                <span class="text-gray-700 font-medium">Моментальная проверка</span>
                             </div>
                             <div class="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
                                 <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
@@ -2215,31 +2220,26 @@
 
                 <!-- T-Bank Payment Section (Initially Hidden) -->
                 <div id="tbank-payment-section" class="hidden">
-                    <!-- T-Bank Header с официальным лого -->
+                    <!-- T-Bank Header -->
                     <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
-                        <!-- Официальное T-Bank Logo SVG -->
-                        <svg width="40" height="14" viewBox="0 0 95 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 8.5C0 3.80558 3.80558 0 8.5 0H25.5C30.1944 0 34 3.80558 34 8.5V25.5C34 30.1944 30.1944 34 25.5 34H8.5C3.80558 34 0 30.1944 0 25.5V8.5Z" fill="#000000"/>
-                            <path d="M13 12H21V15H18V22H15V15H13V12Z" fill="white"/>
-                            <path d="M41.5 9H48.5V12H45V22H42V12H41.5V9Z" fill="#000000"/>
-                            <path d="M50 15.5C50 12.5 52 10.5 55 10.5H58V13.5H55.5C54 13.5 53 14.5 53 16V19H58V22H50V15.5Z" fill="#000000"/>
-                            <path d="M64 13.5C65.5 13.5 66.5 14.5 66.5 16V19H70V22H63.5V19C63.5 17 65 15.5 66.5 15.5H69V13.5H64Z" fill="#000000"/>
-                            <path d="M75 10.5C78 10.5 80 12.5 80 15.5V22H77V16C77 14.5 76 13.5 74.5 13.5H72V22H69V10.5H75Z" fill="#000000"/>
-                            <path d="M85 10.5C88 10.5 90 12.5 90 15.5V22H87V16C87 14.5 86 13.5 84.5 13.5H82V22H79V10.5H85Z" fill="#000000"/>
-                        </svg>
+                        <div class="bg-white rounded p-1 border">
+                            <svg class="w-8 h-8" viewBox="0 0 290 235" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <style>.cls-1{fill:#333;}.cls-2{fill:#ffdd2d;}.cls-3{fill:#333;fill-rule:evenodd;}</style>
+                                </defs>
+                                <!-- T-Bank Shield -->
+                                <path class="cls-2" d="M79.13,57.15h131.89v66.33c0,17-9.07,32.72-23.8,41.22l-42.15,24.34-42.15-24.34c-14.72-8.5-23.8-24.22-23.8-41.22V57.15Z"/>
+                                <path class="cls-3" d="M115.33,92.06v20.63c2.82-3.19,7.95-5.34,13.81-5.34h6.37v23.98c0,6.38-1.73,11.96-4.31,15.04h27.72c-2.57-3.07-4.3-8.65-4.3-15.02V107.35h6.37c5.86,0,10.99,2.16,13.81,5.34V92.06h-59.49Z"/>
+                            </svg>
+                        </div>
                         <div>
                             <p class="font-medium text-gray-900">T-Bank</p>
-                            <p class="text-xs text-gray-600">Официальная платежная система</p>
+                            <p class="text-xs text-gray-600">🔒 Защищённое соединение SSL</p>
                         </div>
-                        <div class="ml-auto">
-                            <div class="text-center">
-                                <div class="flex items-center gap-1 text-green-600 justify-center">
-                                    <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    <span class="text-xs font-medium">Защищено</span>
-                                </div>
-                                <p class="text-xs text-gray-500">🔒 Защищённое соединение SSL</p>
+                        <div class="ml-auto text-right">
+                            <div class="flex items-center gap-1 text-green-600">
+                                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <span class="text-xs font-medium">Защищено</span>
                             </div>
                         </div>
                     </div>
