@@ -1,18 +1,18 @@
 /**
  * Доверительное модальное окно оплаты
- * Версия: 3.3.0 - Автоматическая подстройка высоты iframe
+ * Версия: 3.4.0 - Увеличенная максимальная высота iframe
  * Дата: Январь 2025
  * 
- * Обновления v3.3.0:
- * - Добавлена автоматическая подстройка высоты iframe под содержимое T-Bank виджета
- * - Функция adjustIframeHeight() для динамического изменения размеров
- * - postMessage listener для получения сообщений о высоте от T-Bank
- * - Безопасные границы: min-h-64 (256px) до max-h-96 (384px)
- * - Автоматическое включение скролла при превышении максимальной высоты
- * - Fallback на адаптивную высоту при cross-origin ограничениях
+ * Обновления v3.4.0:
+ * - Увеличена максимальная высота iframe до 600px или 80vh экрана
+ * - Минимальная высота увеличена до 320px (min-h-80)
+ * - Fallback высота: 450px (мобильные) / 500px (десктоп)
+ * - Улучшена адаптивность модального окна: max-w-xl на больших экранах
+ * - Добавлен max-h-screen overflow-y-auto для модального окна
+ * - Оптимизированное управление скроллом внутри iframe
  */
 
-console.log('📄 payment-modal.js v3.3.0 загружен - Добавлена автоподстройка высоты iframe');
+console.log('📄 payment-modal.js v3.4.0 загружен - Увеличена максимальная высота iframe до 600px/80vh');
 
 // Слушаем сообщения от iframe для динамической подстройки высоты
 window.addEventListener('message', function(event) {
@@ -23,17 +23,21 @@ window.addEventListener('message', function(event) {
         if (iframe && event.data && typeof event.data === 'object') {
             // Если T-Bank отправляет информацию о высоте
             if (event.data.height && typeof event.data.height === 'number') {
-                const minHeight = 256;
-                const maxHeight = 384;
+                const minHeight = 320;
+                const maxHeight = Math.min(window.innerHeight * 0.8, 600);
                 const adjustedHeight = Math.min(Math.max(event.data.height, minHeight), maxHeight);
                 
                 iframe.style.height = adjustedHeight + 'px';
-                console.log(`📐 Высота iframe обновлена через postMessage: ${adjustedHeight}px`);
+                iframe.style.maxHeight = maxHeight + 'px';
+                console.log(`📐 Высота iframe обновлена через postMessage: ${adjustedHeight}px (макс: ${maxHeight}px)`);
                 
                 // Включаем скролл если контент превышает максимальную высоту
                 if (event.data.height > maxHeight) {
                     iframe.style.overflowY = 'auto';
                     iframe.scrolling = 'yes';
+                } else {
+                    iframe.style.overflowY = 'hidden';
+                    iframe.scrolling = 'no';
                 }
             }
         }
@@ -412,9 +416,10 @@ function showTBankIframe(paymentURL) {
         <iframe 
             id="tbank-iframe"
             src="${paymentURL}"
-            class="w-full min-h-64 max-h-96 border-0 rounded-lg hidden"
+            class="w-full min-h-80 border-0 rounded-lg hidden"
+            style="height: 500px; max-height: 80vh;"
             frameborder="0"
-            scrolling="no"
+            scrolling="auto"
             onload="adjustIframeHeight(this); hideTBankLoading()"
             onerror="showTBankError('Ошибка загрузки платежной формы')"
         ></iframe>
@@ -440,27 +445,39 @@ function adjustIframeHeight(iframe) {
                 );
                 
                 // Устанавливаем минимальную и максимальную высоту
-                const minHeight = 256; // min-h-64 = 256px
-                const maxHeight = 384; // max-h-96 = 384px
+                const minHeight = 320; // min-h-80 = 320px
+                const maxHeight = Math.min(window.innerHeight * 0.8, 600); // 80vh или 600px максимум
                 
                 // Подстраиваем высоту в допустимых пределах
                 const adjustedHeight = Math.min(Math.max(contentHeight, minHeight), maxHeight);
                 
                 iframe.style.height = adjustedHeight + 'px';
+                iframe.style.maxHeight = maxHeight + 'px';
                 
-                console.log(`📐 Высота iframe установлена: ${adjustedHeight}px (контент: ${contentHeight}px)`);
+                console.log(`📐 Высота iframe установлена: ${adjustedHeight}px (контент: ${contentHeight}px, макс: ${maxHeight}px)`);
                 
                 // Если контент больше максимальной высоты, включаем скролл
                 if (contentHeight > maxHeight) {
                     iframe.style.overflowY = 'auto';
                     iframe.scrolling = 'yes';
+                } else {
+                    iframe.style.overflowY = 'hidden';
+                    iframe.scrolling = 'no';
                 }
             }, 500); // Даем время на полную загрузку контента
         }
     } catch (error) {
         console.log('⚠️ Не удалось подстроить высоту iframe (cross-origin ограничения), используем стандартную высоту');
-        // В случае cross-origin ограничений используем адаптивную высоту
-        iframe.style.height = window.innerWidth < 640 ? '280px' : '320px';
+        // В случае cross-origin ограничений используем увеличенную адаптивную высоту
+        const fallbackHeight = window.innerWidth < 640 ? '450px' : '500px';
+        const maxHeight = Math.min(window.innerHeight * 0.8, 600) + 'px';
+        
+        iframe.style.height = fallbackHeight;
+        iframe.style.maxHeight = maxHeight;
+        iframe.style.overflowY = 'auto';
+        iframe.scrolling = 'yes';
+        
+        console.log(`📐 Fallback высота установлена: ${fallbackHeight} (макс: ${maxHeight})`);
     }
 }
 
