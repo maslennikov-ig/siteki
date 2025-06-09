@@ -1,16 +1,17 @@
 /**
  * Доверительное модальное окно оплаты
- * Версия: 3.1.0 - Добавлены элементы доверия и T-Bank брендинг
+ * Версия: 3.2.0 - Устранение дублирования интерфейса
  * Дата: Январь 2025
  * 
- * Обновления v3.1.0:
- * - Добавлено лого T-Bank в заголовке
- * - Индикаторы безопасности (SSL, PCI DSS, Банк России)
- * - Trust буллеты (мгновенный чек, возврат 14 дней, техподдержка 24/7)
- * - Улучшенная секция T-Bank с дополнительными элементами доверия
+ * Обновления v3.2.0:
+ * - Убрано дублирование элементов интерфейса между HTML и JavaScript
+ * - Упрощена функция showTBankIframe() - только iframe без дублированных элементов
+ * - Все статические элементы доверия остаются в HTML (заголовки, индикаторы, кнопки)
+ * - Значительно уменьшен объем кода (~100 строк меньше)
+ * - Улучшена производительность и удобство поддержки
  */
 
-console.log('📄 payment-modal.js v3.1.0 загружен - Доверительный дизайн с T-Bank брендингом');
+console.log('📄 payment-modal.js v3.2.0 загружен - Устранено дублирование интерфейса');
 
 // ==================== ПЕРЕМЕННЫЕ ====================
 let selectedProduct = null;
@@ -372,96 +373,24 @@ function showTBankIframe(paymentURL) {
     console.log('💳 Показываем iframe T-Bank:', paymentURL);
     
     const container = document.getElementById('tbank-payment-container');
+    // Теперь создаем только iframe без дублированных элементов интерфейса
     container.innerHTML = `
-        <div class="bg-white rounded-lg overflow-hidden border">
-            <!-- Заголовок -->
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <img src="tbank_logo.svg" alt="T-Bank" class="h-6" onerror="this.style.display='none'">
-                    <h3 class="font-semibold">T-Bank - Безопасная оплата</h3>
-                </div>
-                <button 
-                    onclick="showCustomerDataSection()" 
-                    class="text-blue-100 hover:text-white transition-colors"
-                    aria-label="Назад"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Индикаторы безопасности -->
-            <div class="bg-blue-50 p-3 border-b">
-                <div class="flex items-center justify-center space-x-6 text-xs text-blue-700">
-                    <div class="flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                        </svg>
-                        <span>SSL шифрование</span>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                        </svg>
-                        <span>PCI DSS</span>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-                        </svg>
-                        <span>Лицензия ЦБ РФ</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Iframe загрузки -->
-            <div id="tbank-loading" class="p-8 text-center">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                <p class="text-gray-600">Загружаем платежную форму...</p>
-            </div>
-            
-            <!-- Iframe -->
-            <iframe 
-                id="tbank-iframe"
-                src="${paymentURL}"
-                class="w-full h-96 border-0 hidden"
-                frameborder="0"
-                scrolling="auto"
-                onload="hideTBankLoading()"
-                onerror="showTBankError('Ошибка загрузки платежной формы')"
-            ></iframe>
-            
-            <!-- Trust буллеты -->
-            <div class="bg-gray-50 p-4 border-t">
-                <div class="grid grid-cols-2 gap-3 text-xs text-gray-600">
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>Мгновенный чек</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>Возврат 14 дней</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>Техподдержка 24/7</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>Лицензия ЦБ РФ</span>
-                    </div>
-                </div>
-            </div>
+        <!-- Iframe загрузки -->
+        <div id="tbank-loading" class="p-8 text-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p class="text-gray-600">Загружаем платежную форму T-Bank...</p>
         </div>
+        
+        <!-- Iframe -->
+        <iframe 
+            id="tbank-iframe"
+            src="${paymentURL}"
+            class="w-full h-96 border-0 rounded-lg hidden"
+            frameborder="0"
+            scrolling="auto"
+            onload="hideTBankLoading()"
+            onerror="showTBankError('Ошибка загрузки платежной формы')"
+        ></iframe>
     `;
 }
 
