@@ -1,18 +1,18 @@
 /**
  * Доверительное модальное окно оплаты
- * Версия: 3.4.0 - Увеличенная максимальная высота iframe
+ * Версия: 4.0.0 - Чистый T-Bank виджет с элементами доверия
  * Дата: Январь 2025
  * 
- * Обновления v3.4.0:
- * - Увеличена максимальная высота iframe до 600px или 80vh экрана
- * - Минимальная высота увеличена до 320px (min-h-80)
- * - Fallback высота: 450px (мобильные) / 500px (десктоп)
- * - Улучшена адаптивность модального окна: max-w-xl на больших экранах
- * - Добавлен max-h-screen overflow-y-auto для модального окна
- * - Оптимизированное управление скроллом внутри iframe
+ * Обновления v4.0.0:
+ * - Полностью убраны дублирующиеся элементы интерфейса из HTML
+ * - Чистый T-Bank виджет в отдельном контейнере с рамкой
+ * - Элементы доверия встроены прямо в нижнюю часть виджета
+ * - Кнопка "Изменить данные покупателя" перенесена в футер виджета
+ * - Убраны все заголовки, логотипы и индикаторы из верхней части
+ * - Минималистичный и профессиональный дизайн платежного окна
  */
 
-console.log('📄 payment-modal.js v3.4.0 загружен - Увеличена максимальная высота iframe до 600px/80vh');
+console.log('📄 payment-modal.js v4.0.0 загружен - Чистый T-Bank виджет с элементами доверия внизу');
 
 // Слушаем сообщения от iframe для динамической подстройки высоты
 window.addEventListener('message', function(event) {
@@ -404,7 +404,7 @@ function showTBankIframe(paymentURL) {
     console.log('💳 Показываем iframe T-Bank:', paymentURL);
     
     const container = document.getElementById('tbank-payment-container');
-    // Теперь создаем только iframe без дублированных элементов интерфейса
+    // Чистый T-Bank виджет с элементами доверия внизу
     container.innerHTML = `
         <!-- Iframe загрузки -->
         <div id="tbank-loading" class="p-6 text-center">
@@ -412,17 +412,57 @@ function showTBankIframe(paymentURL) {
             <p class="text-gray-600 text-sm">Загружаем платежную форму T-Bank...</p>
         </div>
         
-        <!-- Iframe -->
-        <iframe 
-            id="tbank-iframe"
-            src="${paymentURL}"
-            class="w-full min-h-80 border-0 rounded-lg hidden"
-            style="height: 500px; max-height: 80vh;"
-            frameborder="0"
-            scrolling="auto"
-            onload="adjustIframeHeight(this); hideTBankLoading()"
-            onerror="showTBankError('Ошибка загрузки платежной формы')"
-        ></iframe>
+        <!-- Контейнер для iframe и футера -->
+        <div id="tbank-widget-container" class="hidden rounded-lg overflow-hidden border border-gray-200">
+            <!-- Iframe -->
+            <iframe 
+                id="tbank-iframe"
+                src="${paymentURL}"
+                class="w-full min-h-80 border-0 block"
+                style="height: 500px; max-height: 80vh;"
+                frameborder="0"
+                scrolling="auto"
+                onload="adjustIframeHeight(this); hideTBankLoading()"
+                onerror="showTBankError('Ошибка загрузки платежной формы')"
+            ></iframe>
+            
+            <!-- Trust буллеты внизу T-Bank виджета -->
+            <div class="bg-white border-t border-gray-200 p-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-gray-600">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Мгновенный чек на e-mail</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Возврат в течение 14 дней</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Техподдержка 24/7</span>
+                    </div>
+                </div>
+                
+                <!-- Кнопка возврата внизу -->
+                <div class="mt-4 pt-3 border-t border-gray-100">
+                    <button 
+                        onclick="showCustomerDataSection()" 
+                        class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Изменить данные покупателя
+                    </button>
+                </div>
+            </div>
+        </div>
     `;
 }
 
@@ -484,15 +524,18 @@ function adjustIframeHeight(iframe) {
 function hideTBankLoading() {
     console.log('✅ T-Bank iframe загружен');
     const loading = document.getElementById('tbank-loading');
+    const widgetContainer = document.getElementById('tbank-widget-container');
     const iframe = document.getElementById('tbank-iframe');
     
     if (loading) {
         loading.classList.add('hidden');
     }
     
+    if (widgetContainer) {
+        widgetContainer.classList.remove('hidden');
+    }
+    
     if (iframe) {
-        iframe.classList.remove('hidden');
-        
         // Дополнительная попытка подстройки высоты после показа iframe
         setTimeout(() => {
             adjustIframeHeight(iframe);
