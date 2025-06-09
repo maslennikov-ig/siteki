@@ -18,6 +18,15 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Блокировка скролла при открытом модальном окне */
+  body.modal-open {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding-right: var(--scrollbar-width, 0px);
+  }
+
   /* Улучшения для touch-устройств */
   .touch-device button,
   .touch-device a,
@@ -86,6 +95,170 @@
   .nav-link:hover::after,
   .nav-link.active::after {
     @apply w-full;
+  }
+
+  /* === УЛУЧШЕННАЯ НАВИГАЦИЯ === */
+  .nav-link-enhanced {
+    @apply relative flex items-center px-4 py-2 text-sm font-medium text-gray-700 
+           rounded-lg transition-all duration-300 ease-out hover:text-brand-orange 
+           hover:bg-orange-50/50 focus:outline-none focus:ring-2 
+           focus:ring-brand-orange/20 focus:bg-orange-50/50;
+  }
+
+  .nav-link-enhanced:hover .nav-link-indicator {
+    @apply w-full bg-gradient-to-r from-brand-orange to-orange-500;
+  }
+
+  .nav-link-enhanced.active {
+    @apply text-brand-orange bg-orange-50 font-semibold;
+  }
+
+  .nav-link-enhanced.active .nav-link-indicator {
+    @apply w-full bg-gradient-to-r from-brand-orange to-orange-500;
+  }
+
+  .nav-link-text {
+    @apply relative z-10 motion-safe:transition-transform motion-safe:duration-200;
+  }
+
+  .nav-link-enhanced:hover .nav-link-text {
+    @apply motion-safe:translate-x-0.5;
+  }
+
+  .nav-link-indicator {
+    @apply absolute bottom-0 left-0 h-0.5 w-0 bg-transparent 
+           transition-all duration-300 ease-out rounded-full;
+  }
+
+  /* === КНОПКИ НАВИГАЦИИ === */
+  .btn-primary-enhanced {
+    @apply inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold 
+           text-white bg-gradient-to-r from-brand-orange to-orange-600 
+           rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 
+           hover:-translate-y-0.5 hover:from-orange-600 hover:to-orange-700 
+           focus:outline-none focus:ring-2 focus:ring-brand-orange/50 focus:ring-offset-2 
+           motion-safe:transform active:translate-y-0 active:shadow-md;
+  }
+
+  .btn-secondary-compact {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium 
+           text-brand-orange border border-brand-orange/30 rounded-lg 
+           bg-orange-50/50 hover:bg-brand-orange hover:text-white 
+           transition-all duration-300 focus:outline-none focus:ring-2 
+           focus:ring-brand-orange/20;
+  }
+
+  .btn-text {
+    @apply relative z-10;
+  }
+
+  .btn-icon {
+    @apply relative z-10;
+  }
+
+  /* === МОБИЛЬНАЯ КНОПКА МЕНЮ === */
+  .mobile-menu-button {
+    @apply flex items-center justify-center w-10 h-10 p-2 rounded-lg 
+           bg-gray-50 hover:bg-gray-100 active:bg-gray-200 
+           transition-all duration-200 focus:outline-none focus:ring-2 
+           focus:ring-gray-300 touch-manipulation;
+  }
+
+  .mobile-menu-button[aria-expanded="true"] .hamburger-line:nth-child(1) {
+    @apply rotate-45 translate-y-1.5;
+  }
+
+  .mobile-menu-button[aria-expanded="true"] .hamburger-line:nth-child(2) {
+    @apply opacity-0;
+  }
+
+  .mobile-menu-button[aria-expanded="true"] .hamburger-line:nth-child(3) {
+    @apply -rotate-45 -translate-y-1.5;
+  }
+
+  .hamburger-lines {
+    @apply flex flex-col items-center justify-center w-6 h-6;
+  }
+
+  .hamburger-line {
+    @apply w-5 h-0.5 bg-gray-700 rounded-full transition-all duration-300 
+           transform-gpu will-change-transform;
+  }
+
+  .hamburger-line:not(:last-child) {
+    @apply mb-1;
+  }
+
+  /* === МОБИЛЬНАЯ КНОПКА ЗАКРЫТИЯ === */
+  .mobile-close-button {
+    @apply flex items-center justify-center w-10 h-10 p-2 rounded-lg 
+           bg-gray-100 hover:bg-gray-200 active:bg-gray-300 
+           transition-all duration-200 focus:outline-none focus:ring-2 
+           focus:ring-gray-300 touch-manipulation;
+  }
+
+  /* === УЛУЧШЕННЫЕ МОБИЛЬНЫЕ ССЫЛКИ === */
+  .mobile-nav-link-enhanced {
+    @apply flex items-center w-full px-4 py-4 text-base font-medium 
+           text-gray-700 rounded-xl hover:text-brand-orange 
+           hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100/50 
+           transition-all duration-300 ease-out touch-manipulation 
+           focus:outline-none focus:ring-2 focus:ring-brand-orange/20 
+           motion-safe:hover:translate-x-1 min-h-[56px];
+  }
+
+  .mobile-nav-link-enhanced.active {
+    @apply text-brand-orange bg-gradient-to-r from-orange-50 to-orange-100/50 
+           font-semibold;
+  }
+
+  .mobile-nav-icon {
+    @apply flex items-center justify-center w-8 h-8 mr-3 text-gray-500 
+           transition-colors duration-300 
+           motion-safe:group-hover:scale-110;
+  }
+
+  .mobile-nav-link-enhanced:hover .mobile-nav-icon {
+    @apply text-brand-orange;
+    transform: scale(1.1);
+  }
+
+  .mobile-nav-text {
+    @apply flex-1 transition-colors duration-300;
+  }
+
+  .mobile-nav-arrow {
+    @apply flex items-center justify-center w-6 h-6 text-gray-400 
+           transition-all duration-300;
+  }
+
+  .mobile-nav-link-enhanced:hover .mobile-nav-arrow {
+    @apply text-brand-orange;
+    transform: translateX(0.25rem);
+  }
+
+  /* === УЛУЧШЕННАЯ CTA КНОПКА ДЛЯ МОБИЛЬНОГО === */
+  .mobile-cta-button-enhanced {
+    @apply flex items-center justify-center w-full px-6 py-4 text-base font-semibold 
+           text-white bg-gradient-to-r from-brand-orange to-orange-600 
+           rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 
+           hover:-translate-y-0.5 hover:from-orange-600 hover:to-orange-700 
+           focus:outline-none focus:ring-2 focus:ring-brand-orange/50 
+           motion-safe:transform active:translate-y-0 active:shadow-md 
+           touch-manipulation min-h-[56px];
+  }
+
+  .mobile-cta-icon {
+    @apply flex items-center justify-center w-6 h-6 mr-2 
+           transition-transform duration-300;
+  }
+
+  .mobile-cta-button-enhanced:hover .mobile-cta-icon {
+    transform: translateX(0.25rem);
+  }
+
+  .mobile-cta-text {
+    @apply transition-transform duration-300;
   }
 
   /* === ФОРМЫ === */
@@ -186,6 +359,53 @@
     @apply scale-95 translate-y-4;
   }
 
+  /* Прогресс-бар для двухшагового процесса */
+  .payment-progress-container {
+    @apply p-6 pb-4 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-amber-50;
+  }
+
+  .payment-progress-bar {
+    @apply flex items-center justify-between relative;
+  }
+
+  .payment-progress-step {
+    @apply flex flex-col items-center z-10;
+  }
+
+  .payment-progress-step-circle {
+    @apply w-10 h-10 rounded-full border-2 border-gray-300 bg-white 
+           flex items-center justify-center text-gray-400 
+           transition-all duration-300 ease-out;
+  }
+
+  .payment-progress-step.active .payment-progress-step-circle {
+    @apply border-brand-orange bg-brand-orange text-white 
+           shadow-lg shadow-orange-200 scale-110;
+  }
+
+  .payment-progress-step-label {
+    @apply text-xs font-medium text-gray-500 mt-2 transition-colors duration-300;
+  }
+
+  .payment-progress-step.active .payment-progress-step-label {
+    @apply text-brand-orange font-semibold;
+  }
+
+  .payment-progress-line {
+    @apply absolute top-5 left-1/2 w-full h-0.5 bg-gray-200 -z-10 
+           transform -translate-x-1/2 -translate-y-1/2;
+  }
+
+  .payment-progress-line-fill {
+    @apply h-full bg-gradient-to-r from-brand-orange to-orange-600 
+           transition-all duration-500 ease-out;
+    width: 0%;
+  }
+
+  .payment-progress-line-fill.completed {
+    width: 100%;
+  }
+
   /* Заголовок модального окна */
   .payment-modal-header {
     @apply flex items-center justify-between p-6 pb-4 border-b border-gray-100 
@@ -244,22 +464,36 @@
   }
 
   .payment-form-group {
-    @apply mb-5;
+    @apply mb-6;
   }
 
   .payment-form-label {
-    @apply block text-sm font-medium text-gray-700 mb-2;
+    @apply block text-sm font-medium text-gray-700 mb-3 
+           flex items-center;
   }
 
   .payment-form-label .required {
     @apply text-red-500 ml-0.5;
   }
 
+  .payment-form-input-wrapper {
+    @apply relative;
+  }
+
   .payment-form-input {
-    @apply w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl text-base 
+    @apply w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-base 
            transition-all duration-200 bg-white box-border 
            focus:outline-none focus:border-brand-orange focus:ring-4 focus:ring-orange-100 
            placeholder:text-gray-400;
+  }
+
+  .payment-form-input-icon {
+    @apply absolute left-4 top-1/2 transform -translate-y-1/2 
+           text-gray-400 pointer-events-none transition-colors duration-200;
+  }
+
+  .payment-form-input:focus + .payment-form-input-icon {
+    @apply text-brand-orange;
   }
 
   .payment-form-input.error {
@@ -267,7 +501,7 @@
   }
 
   .payment-form-hint {
-    @apply text-xs text-gray-500 mt-1 leading-relaxed;
+    @apply text-xs text-gray-500 mt-2 leading-relaxed;
   }
 
   .payment-form-error {
@@ -288,7 +522,8 @@
     @apply w-full px-6 py-3 border-2 border-gray-300 bg-white text-gray-700 
            font-medium rounded-xl cursor-pointer transition-all duration-200 
            hover:bg-gray-50 hover:border-gray-400 hover:text-gray-800 
-           active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-gray-300;
+           active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-gray-300
+           flex items-center justify-center;
   }
 
   .payment-form-submit {
@@ -296,16 +531,29 @@
            text-white font-semibold rounded-xl cursor-pointer border-0 
            transition-all duration-300 hover:from-orange-600 hover:to-orange-700 
            hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0
+           overflow-hidden;
+  }
+
+  .payment-submit-content {
+    @apply flex items-center justify-center;
   }
 
   .payment-submit-icon {
     @apply inline-flex items-center justify-center w-5 h-5 ml-2 
-           transition-transform duration-200;
+           transition-transform duration-300;
+  }
+
+  .payment-submit-text {
+    @apply transition-all duration-200;
+  }
+
+  .payment-submit-loading {
+    @apply flex items-center justify-center gap-2;
   }
 
   .payment-form-submit:hover .payment-submit-icon {
-    @apply translate-x-0.5;
+    @apply translate-x-1;
   }
 
   /* Информация о безопасности */
@@ -315,11 +563,12 @@
   }
 
   .payment-security-item {
-    @apply flex items-center text-sm text-gray-600 mb-2 last:mb-0;
+    @apply flex items-center text-sm text-gray-600 mb-2 last:mb-0
+           transition-all duration-200 hover:text-gray-800;
   }
 
   .payment-security-item svg {
-    @apply w-4 h-4 mr-2 text-green-600 flex-shrink-0;
+    @apply w-4 h-4 mr-3 text-green-600 flex-shrink-0;
   }
 
   /* Степы оплаты */
@@ -350,8 +599,15 @@
     @apply max-w-md mx-auto bg-white rounded-2xl shadow-lg overflow-hidden;
   }
 
+  .tbank-back-button {
+    @apply absolute top-6 left-6 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm
+           rounded-full border border-gray-200 flex items-center justify-center
+           text-gray-600 hover:bg-white hover:text-gray-800 
+           transition-all duration-200 cursor-pointer;
+  }
+
   .tbank-header {
-    @apply p-6 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black;
+    @apply p-6 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black relative;
   }
 
   .tbank-logo {
@@ -373,7 +629,12 @@
 
   .tbank-amount-display {
     @apply text-2xl font-bold text-gray-900 p-3 border border-gray-200 
-           rounded-lg hover:border-gray-300 transition-colors cursor-pointer;
+           rounded-lg hover:border-gray-300 transition-all duration-200 cursor-pointer
+           flex items-center justify-between;
+  }
+
+  .tbank-amount-dropdown svg {
+    @apply transition-transform duration-200;
   }
 
   .tbank-card-section {
@@ -1187,4 +1448,123 @@
   .no-print {
     display: none !important;
   }
+}
+
+/* ============================================
+   📄 СТИЛИ МОДАЛЬНОГО ОКНА ОПЛАТЫ - МИНИМАЛИЗМ
+   ============================================ */
+
+/* Основное модальное окно */
+#payment-modal {
+  backdrop-filter: blur(4px);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+#payment-modal.hidden {
+  display: none !important;
+}
+
+/* Анимация появления модального окна */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Контейнер модального окна */
+#payment-modal .relative {
+  animation: modalSlideIn 0.3s ease-out;
+  transform-origin: center;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Стили полей ввода */
+#payment-modal input:focus {
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+/* Стили кнопки оплаты */
+#proceed-to-payment {
+  box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.15);
+  transition: all 0.2s ease;
+}
+
+#proceed-to-payment:hover {
+  box-shadow: 0 6px 20px 0 rgba(249, 115, 22, 0.25);
+  transform: translateY(-1px);
+}
+
+#proceed-to-payment:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px 0 rgba(249, 115, 22, 0.2);
+}
+
+/* Стили для состояния загрузки */
+#proceed-to-payment.loading {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+#proceed-to-payment.loading:hover {
+  transform: none;
+}
+
+/* Блокировка скролла тела при открытом модальном окне */
+body.modal-open {
+  overflow: hidden;
+  padding-right: var(--scrollbar-width, 0px);
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 640px) {
+  #payment-modal .relative {
+    margin: 0;
+    max-width: none;
+    width: calc(100% - 32px);
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+  
+  #payment-modal .px-6 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Убираем все старые стили модального окна */
+.payment-modal,
+.payment-modal-overlay,
+.payment-modal-content,
+.payment-progress-container,
+.payment-form-group,
+.payment-form-label,
+.payment-form-input-wrapper,
+.payment-form-input,
+.payment-form-input-icon,
+.payment-form-hint,
+.payment-form-actions,
+.payment-form-cancel,
+.payment-form-submit,
+.payment-submit-content,
+.payment-submit-loading,
+.tbank-payment-widget,
+.tbank-header,
+.tbank-amount-section,
+.tbank-card-section,
+.tbank-security-footer,
+.payment-security-info {
+  /* Удаляем все старые стили */
 } 
