@@ -1,334 +1,464 @@
 /**
- * Доверительное модальное окно оплаты
- * Версия: 3.1.0 - Добавлены элементы доверия и T-Bank брендинг
- * Дата: Январь 2025
- * 
- * Обновления v3.1.0:
- * - Добавлено лого T-Bank в заголовке
- * - Индикаторы безопасности (SSL, PCI DSS, Банк России)
- * - Trust буллеты (мгновенный чек, возврат 14 дней, техподдержка 24/7)
- * - Улучшенная секция T-Bank с дополнительными элементами доверия
+ * payment-modal.js
+ * Управление модальным окном оплаты и интеграция с тестовыми платежами
+ * Версия 1.0.0
  */
 
-console.log('📄 payment-modal.js v3.1.0 загружен - Доверительный дизайн с T-Bank брендингом');
+// Информация о продуктах для модального окна
+const productInfo = {
+    'guide-1399': {
+        name: 'Гайд "Узнай причину отказов и исправь КИ"',
+        price: 1399,
+        description: 'Подробный гайд с пошаговыми инструкциями по исправлению кредитной истории. Включает шаблоны заявлений и секретные методы работы с БКИ.'
+    },
+    'consult-5000': {
+        name: 'Персональная консультация по КИ',
+        price: 5000,
+        description: 'Индивидуальная консультация эксперта с анализом вашей кредитной истории, персональным планом действий и ответами на все вопросы.'
+    },
+    'fullsupport-5000': {
+        name: 'Исправление КИ + ведение до кредита',
+        price: 5000,
+        description: 'Полное сопровождение процесса исправления кредитной истории с ежемесячной поддержкой и ведением до получения кредита.'
+    }
+};
 
-// ==================== ПЕРЕМЕННЫЕ ====================
-let selectedProduct = null;
-let customerData = {};
+// Глобальные переменные
+let currentProductId = null;
+let currentProductData = null;
+let customerData = null;
+let paymentModal = null;
 
-// ==================== ИНИЦИАЛИЗАЦИЯ ====================
+/**
+ * Инициализация модального окна при загрузке страницы
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    initializePaymentModal();
-});
-
-function initializePaymentModal() {
-    console.log('🚀 Инициализация модального окна оплаты...');
+    console.log('🔧 Инициализация модального окна оплаты');
     
-    // Привязываем обработчики событий
-    bindEventHandlers();
+    // Находим модальное окно
+    paymentModal = document.getElementById('payment-modal');
     
-    // Инициализируем маскирование телефона
+    if (!paymentModal) {
+        console.error('❌ Модальное окно не найдено');
+        return;
+    }
+    
+    // Инициализируем систему предотвращения layout shifts
+    initScrollbarCompensation();
+    
+    // Добавляем обработчик формы
+    const paymentForm = document.getElementById('payment-form');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', handlePaymentFormSubmit);
+        console.log('✅ Форма оплаты инициализирована');
+    }
+    
+    // Добавляем маскирование телефона
     initPhoneMask();
     
-    console.log('✅ Модальное окно оплаты инициализировано');
-}
-
-function bindEventHandlers() {
-    // Кнопка закрытия модального окна
-    const closeButton = document.getElementById('close-payment-modal');
-    if (closeButton) {
-        closeButton.addEventListener('click', closePaymentModal);
-    }
-    
-    // Закрытие по клику на фон
-    const modal = document.getElementById('payment-modal');
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closePaymentModal();
-            }
-        });
-    }
-    
-    // Закрытие по Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+    // Добавляем обработчик клавиши Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && paymentModal && !paymentModal.classList.contains('hidden')) {
             closePaymentModal();
         }
     });
     
-    // Форма отправки данных покупателя
-    const paymentForm = document.getElementById('payment-form');
-    if (paymentForm) {
-        paymentForm.addEventListener('submit', handleFormSubmit);
-    }
+    console.log('✅ Модальное окно оплаты готово к работе');
+});
+
+/**
+ * Инициализация системы компенсации скроллбара для предотвращения layout shifts
+ */
+function initScrollbarCompensation() {
+    // Вычисляем ширину скроллбара
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     
-    // Кнопка возврата к данным покупателя
-    const backButton = document.getElementById('back-to-customer-data');
-    if (backButton) {
-        backButton.addEventListener('click', showCustomerDataSection);
-    }
+    // Устанавливаем CSS переменную для ширины скроллбара
+    document.documentElement.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`);
+    
+    console.log('📏 Ширина скроллбара:', scrollbarWidth + 'px');
 }
 
-// ==================== ОТКРЫТИЕ/ЗАКРЫТИЕ МОДАЛЬНОГО ОКНА ====================
-function openPaymentModal(productName, productPrice, productDescription, event) {
-    // Предотвращаем скролл страницы при открытии модального окна
-    if (event) {
-        event.preventDefault();
-        event.stopPropagation();
+/**
+ * Блокировка скролла страницы с предотвращением layout shifts
+ */
+function lockBodyScroll() {
+    // Сохраняем текущую позицию скролла
+    const scrollY = window.scrollY;
+    
+    // Добавляем класс для блокировки скролла
+    document.body.classList.add('modal-open');
+    
+    // Устанавливаем позицию для предотвращения скачков
+    document.body.style.top = `-${scrollY}px`;
+    
+    // Сохраняем позицию для восстановления
+    document.body.setAttribute('data-scroll-y', scrollY.toString());
+    
+    console.log('🔒 Скролл заблокирован на позиции:', scrollY);
+}
+
+/**
+ * Разблокировка скролла страницы с восстановлением позиции
+ */
+function unlockBodyScroll() {
+    // Получаем сохраненную позицию скролла
+    const scrollY = document.body.getAttribute('data-scroll-y');
+    
+    // Убираем класс блокировки скролла
+    document.body.classList.remove('modal-open');
+    
+    // Очищаем стили
+    document.body.style.top = '';
+    document.body.removeAttribute('data-scroll-y');
+    
+    // Восстанавливаем позицию скролла
+    if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY, 10));
     }
     
-    // Сохраняем текущую позицию скролла
-    const currentScrollPosition = window.pageYOffset;
+    console.log('🔓 Скролл разблокирован, позиция восстановлена:', scrollY || '0');
+}
+
+/**
+ * Открытие модального окна с информацией о продукте
+ */
+function openPaymentModal(productId) {
+    console.log('💳 Открываем модальное окно для продукта:', productId);
     
-    console.log(`🛒 Открываем модальное окно для продукта: ${productName}`);
+    if (!paymentModal) {
+        console.error('❌ Модальное окно не найдено');
+        return;
+    }
     
-    // Сохраняем данные о продукте
-    selectedProduct = {
-        name: productName,
-        price: productPrice,
-        description: productDescription
-    };
+    const product = productInfo[productId];
+    if (!product) {
+        console.error('❌ Продукт не найден:', productId);
+        alert('Ошибка: Продукт не найден');
+        return;
+    }
     
-    // Обновляем информацию о продукте в модальном окне
-    updateProductInfo();
+    // Сохраняем текущий продукт
+    currentProductId = productId;
+    
+    // Заполняем информацию о продукте
+    document.getElementById('modal-product-name').textContent = product.name;
+    document.getElementById('modal-product-price').textContent = `${product.price.toLocaleString()} ₽`;
+    document.getElementById('modal-product-description').textContent = product.description;
+    
+    // Для мобильной версии добавляем цену в заголовок
+    const modalTitle = document.getElementById('modal-title');
+    const modalHeader = document.querySelector('.payment-modal-header');
+    
+    if (window.innerWidth <= 640 && modalTitle && modalHeader) {
+        modalTitle.textContent = product.name;
+        
+        // Удаляем старую цену если есть
+        const existingPrice = modalHeader.querySelector('.product-price-mobile');
+        if (existingPrice) {
+            existingPrice.remove();
+        }
+        
+        // Добавляем цену в заголовок для мобильной версии
+        const priceElement = document.createElement('div');
+        priceElement.className = 'product-price-mobile';
+        priceElement.textContent = `${product.price.toLocaleString()} ₽`;
+        modalHeader.appendChild(priceElement);
+    }
+    
+    // Обновляем текст кнопки
+    const submitButton = document.getElementById('submit-payment');
+    if (submitButton) {
+        submitButton.innerHTML = `
+            <span class="payment-submit-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                </svg>
+            </span>
+            Оплатить ${product.price.toLocaleString()} ₽
+        `;
+    }
     
     // Очищаем форму
-    resetForm();
+    resetPaymentForm();
     
-    // Показываем секцию ввода данных покупателя
-    showCustomerDataSection();
+    // Показываем модальное окно с предотвращением layout shifts
+    lockBodyScroll();
+    paymentModal.classList.remove('hidden');
     
-    // Показываем модальное окно
-    const modal = document.getElementById('payment-modal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        
-        // Блокируем скролл страницы и сохраняем позицию
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${currentScrollPosition}px`;
-        document.body.style.width = '100%';
-        document.body.classList.add('modal-open');
-        
-        // Сохраняем позицию для восстановления
-        window.modalScrollPosition = currentScrollPosition;
-        
-        // Фокусируемся на первом поле
+    // Фокус на первое поле для десктопа
+    if (window.innerWidth > 640) {
         setTimeout(() => {
-            const firstInput = document.getElementById('customer-name');
-            if (firstInput) {
-                firstInput.focus();
+            const nameInput = document.getElementById('customer-name');
+            if (nameInput) {
+                nameInput.focus();
             }
-        }, 100);
+        }, 300);
     }
+    
+    console.log('✅ Модальное окно открыто для продукта:', product.name);
 }
 
+/**
+ * Закрытие модального окна
+ */
 function closePaymentModal() {
-    console.log('❌ Закрываем модальное окно оплаты');
+    console.log('❌ Закрываем модальное окно');
     
-    const modal = document.getElementById('payment-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        
-        // Восстанавливаем скролл страницы
-        const scrollPosition = window.modalScrollPosition || 0;
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        document.body.classList.remove('modal-open');
-        
-        // Восстанавливаем позицию скролла
-        window.scrollTo(0, scrollPosition);
-        window.modalScrollPosition = null;
+    if (!paymentModal) {
+        return;
     }
     
-    // Очищаем данные
-    selectedProduct = null;
-    customerData = {};
-    resetForm();
+    // Скрываем модальное окно
+    paymentModal.classList.add('hidden');
+    
+    // Восстанавливаем скролл страницы с предотвращением layout shifts
+    unlockBodyScroll();
+    
+    // Сбрасываем состояние загрузки
+    setFormLoading(false);
+    
+    // Очищаем текущий продукт
+    currentProductId = null;
+    
+    console.log('✅ Модальное окно закрыто');
 }
 
-// ==================== УПРАВЛЕНИЕ СЕКЦИЯМИ ====================
-function showCustomerDataSection() {
-    console.log('👤 Показываем секцию ввода данных покупателя');
+/**
+ * Сброс формы оплаты
+ */
+function resetPaymentForm() {
+    const form = document.getElementById('payment-form');
+    if (form) {
+        form.reset();
+        
+        // Убираем состояния ошибок
+        const inputs = form.querySelectorAll('.payment-form-input');
+        inputs.forEach(input => {
+            input.classList.remove('error');
+        });
+    }
     
+    // Сбрасываем состояние двухэтапного процесса
     const customerSection = document.getElementById('customer-data-section');
-    const paymentSection = document.getElementById('tbank-payment-section');
-    const productSummary = document.getElementById('product-summary');
+    const iframeSection = document.getElementById('payment-iframe-section');
+    const iframe = document.getElementById('payment-iframe');
+    const customerSecurity = document.querySelector('.customer-screen-security');
+    const modalHeader = document.querySelector('.payment-modal-header');
+    const modalProduct = document.querySelector('.payment-modal-product');
     
-    if (customerSection) {
+    if (customerSection && iframeSection) {
         customerSection.classList.remove('hidden');
-    }
-    
-    if (paymentSection) {
-        paymentSection.classList.add('hidden');
-    }
-    
-    // Показываем Product Summary на первом экране
-    if (productSummary) {
-        productSummary.classList.remove('hidden');
+        iframeSection.classList.add('hidden');
+        
+        // Показываем блок безопасности первого экрана
+        if (customerSecurity) {
+            customerSecurity.classList.remove('hidden');
+        }
+        
+        // Показываем заголовок и информацию о продукте на первом экране
+        if (modalHeader) {
+            modalHeader.classList.remove('hidden');
+        }
+        if (modalProduct) {
+            modalProduct.classList.remove('hidden');
+        }
+        
+        // Очищаем iframe
+        if (iframe) {
+            iframe.src = '';
+            iframe.classList.add('hidden');
+        }
     }
 }
 
-function showPaymentSection() {
-    console.log('💳 Показываем секцию оплаты');
+/**
+ * Обработка отправки формы оплаты
+ */
+async function handlePaymentFormSubmit(event) {
+    event.preventDefault();
+    console.log('📝 Обработка формы оплаты');
     
-    const customerSection = document.getElementById('customer-data-section');
-    const paymentSection = document.getElementById('tbank-payment-section');
-    const productSummary = document.getElementById('product-summary');
-    
-    if (customerSection) {
-        customerSection.classList.add('hidden');
+    if (!currentProductId) {
+        console.error('❌ Продукт не выбран');
+        alert('Ошибка: Продукт не выбран');
+        return;
     }
     
-    if (paymentSection) {
-        paymentSection.classList.remove('hidden');
-    }
+    // Получаем данные формы
+    const formData = getFormData();
     
-    // Скрываем Product Summary на втором экране
-    if (productSummary) {
-        productSummary.classList.add('hidden');
-    }
-    
-    // Инициализируем T-Bank виджет
-    initializeTBankWidget();
-}
-
-// ==================== ОБРАБОТКА ФОРМЫ ====================
-function handleFormSubmit(e) {
-    e.preventDefault();
-    console.log('📝 Обработка отправки формы...');
-    
-    // Собираем данные формы
-    const formData = collectFormData();
-    
-    // Валидируем данные
+    // Валидация
     if (!validateFormData(formData)) {
+        console.warn('⚠️ Данные формы не прошли валидацию');
         return;
     }
     
-    // Сохраняем данные покупателя
+    // Сохраняем данные клиента и продукта глобально
     customerData = formData;
-    
-    console.log('✅ Данные покупателя сохранены:', customerData);
-    
-    // Переходим к секции оплаты
-    showPaymentSection();
-}
-
-function collectFormData() {
-    const name = document.getElementById('customer-name').value.trim();
-    const phone = document.getElementById('customer-phone').value.trim();
-    const email = document.getElementById('customer-email').value.trim();
-    
-    return {
-        name,
-        phone,
-        email
-    };
-}
-
-function validateFormData(data) {
-    // Проверяем обязательные поля
-    if (!data.name) {
-        showError('Пожалуйста, введите ваше имя');
-        document.getElementById('customer-name').focus();
-        return false;
-    }
-    
-    if (!data.phone) {
-        showError('Пожалуйста, введите номер телефона');
-        document.getElementById('customer-phone').focus();
-        return false;
-    }
-    
-    if (!data.email) {
-        showError('Пожалуйста, введите email');
-        document.getElementById('customer-email').focus();
-        return false;
-    }
-    
-    // Проверяем формат email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
-        showError('Пожалуйста, введите корректный email');
-        document.getElementById('customer-email').focus();
-        return false;
-    }
-    
-    return true;
-}
-
-function showError(message) {
-    // Можно добавить более красивое отображение ошибок
-    alert(message);
-}
-
-// ==================== ОБНОВЛЕНИЕ ИНФОРМАЦИИ О ПРОДУКТЕ ====================
-function updateProductInfo() {
-    if (!selectedProduct) return;
-    
-    const nameElement = document.getElementById('selected-product-name');
-    const descriptionElement = document.getElementById('selected-product-description');
-    const priceElement = document.getElementById('selected-product-price');
-    
-    if (nameElement) {
-        nameElement.textContent = selectedProduct.name;
-    }
-    
-    if (descriptionElement) {
-        descriptionElement.textContent = selectedProduct.description;
-    }
-    
-    if (priceElement) {
-        priceElement.textContent = selectedProduct.price;
-    }
-}
-
-// ==================== T-BANK ИНТЕГРАЦИЯ ====================
-function initializeTBankWidget() {
-    console.log('🏦 Инициализируем T-Bank виджет...');
-    
-    const container = document.getElementById('tbank-payment-container');
-    if (!container || !selectedProduct) return;
-    
-    // Очищаем контейнер
-    container.innerHTML = '';
-    
-    // Создаем реальную интеграцию с T-Bank вместо виджета
-    createTBankPayment();
-}
-
-async function createTBankPayment() {
-    console.log('💰 Создаем реальный платеж T-Bank:', selectedProduct, customerData);
-    
-    if (!selectedProduct || !customerData) {
-        showError('Данные о продукте или покупателе не найдены');
-        return;
+    if (currentProductId && productInfo[currentProductId]) {
+        currentProductData = productInfo[currentProductId];
     }
     
     // Показываем индикатор загрузки
-    const container = document.getElementById('tbank-payment-container');
-    container.innerHTML = `
-        <div class="p-8 text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-            <p class="text-gray-600">Создаем платеж...</p>
-        </div>
-    `;
+    setFormLoading(true);
     
-    // Извлекаем цену из строки (убираем "₽" и пробелы)
-    const priceString = selectedProduct.price.replace(/[^\d]/g, '');
-    const priceNumber = parseInt(priceString, 10);
+    try {
+        // Переходим к экрану оплаты Т-банка
+        showTBankPaymentScreen(currentProductId, formData);
+        
+    } catch (error) {
+        console.error('❌ Ошибка при создании платежа:', error);
+        alert(`Ошибка при создании платежа: ${error.message}`);
+        setFormLoading(false);
+    }
+}
+
+/**
+ * Получение данных из формы
+ */
+function getFormData() {
+    return {
+        name: document.getElementById('customer-name')?.value?.trim() || '',
+        phone: document.getElementById('customer-phone')?.value?.trim() || '',
+        email: document.getElementById('customer-email')?.value?.trim() || ''
+    };
+}
+
+/**
+ * Валидация данных формы
+ */
+function validateFormData(data) {
+    let isValid = true;
+    
+    // Проверка email
+    const emailInput = document.getElementById('customer-email');
+    if (!data.email || !isValidEmail(data.email)) {
+        showFieldError(emailInput, 'Введите корректный email');
+        isValid = false;
+    } else {
+        clearFieldError(emailInput);
+    }
+    
+    // Проверка телефона
+    const phoneInput = document.getElementById('customer-phone');
+    if (!data.phone || !isValidPhone(data.phone)) {
+        showFieldError(phoneInput, 'Введите корректный телефон');
+        isValid = false;
+    } else {
+        clearFieldError(phoneInput);
+    }
+    
+    return isValid;
+}
+
+/**
+ * Валидация email
+ */
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+/**
+ * Валидация телефона
+ */
+function isValidPhone(phone) {
+    // Простая проверка на наличие цифр (минимум 10)
+    const digitsOnly = phone.replace(/\D/g, '');
+    return digitsOnly.length >= 10;
+}
+
+/**
+ * Показать ошибку поля
+ */
+function showFieldError(input, message) {
+    if (!input) return;
+    
+    input.classList.add('error');
+    input.style.borderColor = '#ef4444';
+    
+    // Добавляем сообщение об ошибке
+    let errorMsg = input.parentNode.querySelector('.error-message');
+    if (!errorMsg) {
+        errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.style.cssText = 'color: #ef4444; font-size: 0.75rem; margin-top: 4px;';
+        input.parentNode.appendChild(errorMsg);
+    }
+    errorMsg.textContent = message;
+}
+
+/**
+ * Очистить ошибку поля
+ */
+function clearFieldError(input) {
+    if (!input) return;
+    
+    input.classList.remove('error');
+    input.style.borderColor = '';
+    
+    const errorMsg = input.parentNode.querySelector('.error-message');
+    if (errorMsg) {
+        errorMsg.remove();
+    }
+}
+
+/**
+ * Установка состояния загрузки формы
+ */
+function setFormLoading(loading) {
+    const submitButton = document.getElementById('submit-payment');
+    const cancelButton = document.querySelector('.payment-form-cancel');
+    
+    if (loading) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = `
+            <span class="payment-submit-icon">
+                <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+            </span>
+            Обработка...
+        `;
+        cancelButton.disabled = true;
+    } else {
+        submitButton.disabled = false;
+        cancelButton.disabled = false;
+        // Восстанавливаем оригинальный текст кнопки
+        const product = productInfo[currentProductId];
+        if (product) {
+            submitButton.innerHTML = `
+                <span class="payment-submit-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                    </svg>
+                </span>
+                Оплатить ${product.price.toLocaleString()} ₽
+            `;
+        }
+    }
+}
+
+/**
+ * Создание тестового платежа и показ iframe
+ */
+async function createTestPayment(productId, customerData) {
+    console.log('💰 Создаем тестовый платеж:', productId, customerData);
+    
+    const product = productInfo[productId];
+    if (!product) {
+        throw new Error('Продукт не найден');
+    }
     
     // Подготавливаем данные для платежа
     const paymentData = {
-        Amount: priceNumber * 100, // В копейках
-        OrderId: 'order-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-        Description: selectedProduct.name,
+        Amount: product.price * 100, // В копейках
+        OrderId: 'test-order-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        Description: product.name,
         Email: customerData.email,
         Phone: customerData.phone,
+        CustomerName: customerData.name || 'Покупатель',
         SuccessURL: window.location.origin + '/thankyou.html',
         FailURL: window.location.origin + '/fail.html'
     };
@@ -336,7 +466,7 @@ async function createTBankPayment() {
     console.log('📋 Данные платежа:', paymentData);
     
     try {
-        // Отправляем запрос на создание платежа через backend
+        // Отправляем запрос на создание платежа через существующую систему
         const response = await fetch('/.netlify/functions/create-payment', {
             method: 'POST',
             headers: {
@@ -350,13 +480,13 @@ async function createTBankPayment() {
         }
         
         const result = await response.json();
-        console.log('📨 Ответ от T-Bank:', result);
+        console.log('📨 Ответ сервера:', result);
         
         if (result.Success && result.PaymentURL) {
             console.log('✅ Платеж создан успешно:', result.PaymentURL);
             
-            // Показываем нативную форму T-Bank
-            showTBankIframe(result.PaymentURL);
+            // Переходим к этапу оплаты в модальном окне
+            showPaymentIframe(result.PaymentURL);
             
         } else {
             throw new Error(result.Message || result.Details || result.error || 'Неизвестная ошибка при создании платежа');
@@ -364,364 +494,482 @@ async function createTBankPayment() {
         
     } catch (error) {
         console.error('❌ Ошибка при создании платежа:', error);
-        showTBankError(error.message);
+        throw error;
     }
 }
 
-function showTBankIframe(paymentURL) {
-    console.log('💳 Показываем нативную форму T-Bank:', paymentURL);
+/**
+ * Показать этап оплаты с iframe
+ */
+function showPaymentIframe(paymentURL) {
+    console.log('💳 Показываем iframe оплаты:', paymentURL);
     
-    const container = document.getElementById('tbank-payment-container');
-    container.innerHTML = `
-        <!-- T-Bank Native Payment Interface -->
-        <div class="bg-gray-900 text-white rounded-xl overflow-hidden shadow-2xl border border-gray-800">
-            
-            <!-- Header with T-Bank Branding -->
-            <div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 p-6 relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-yellow-300/5"></div>
-                <div class="relative flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center">
-                            <span class="text-black font-black text-xl">T</span>
-                        </div>
-                        <div>
-                            <h2 class="text-xl font-bold text-white">Безопасная оплата</h2>
-                            <p class="text-gray-400 text-sm">Защищено банком T-Bank</p>
-                        </div>
-                    </div>
-                    <button 
-                        onclick="showCustomerDataSection()" 
-                        class="p-2 rounded-lg hover:bg-gray-800 transition-colors group"
-                        aria-label="Назад к данным"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-400 group-hover:text-white">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Security Indicators -->
-            <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 border-b border-gray-700">
-                <div class="flex items-center justify-center space-x-8 text-sm">
-                    <div class="flex items-center space-x-2 text-green-400">
-                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span class="font-medium">SSL шифрование</span>
-                    </div>
-                    <div class="flex items-center space-x-2 text-green-400">
-                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span class="font-medium">PCI DSS</span>
-                    </div>
-                    <div class="flex items-center space-x-2 text-green-400">
-                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span class="font-medium">Лицензия ЦБ РФ</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Amount Display -->
-            <div class="bg-gray-800 p-6 text-center border-b border-gray-700">
-                <div class="text-3xl font-bold text-white mb-2" id="tbank-amount">5 000 ₽</div>
-                <div class="text-gray-400 text-sm" id="tbank-description">Оплата картой</div>
-            </div>
-
-            <!-- Payment Form -->
-            <div class="p-6 space-y-6">
-                
-                <!-- Card Section -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-white flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-yellow-400">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-                        </svg>
-                        <span>Оплата картой</span>
-                        <div class="flex-1 flex justify-end space-x-2">
-                            <div class="w-8 h-5 bg-blue-600 rounded text-xs flex items-center justify-center text-white font-bold">VISA</div>
-                            <div class="w-8 h-5 bg-red-600 rounded text-xs flex items-center justify-center text-white font-bold">MC</div>
-                            <div class="w-8 h-5 bg-blue-500 rounded text-xs flex items-center justify-center text-white font-bold">МИР</div>
-                        </div>
-                    </h3>
-                    
-                    <!-- Card Number -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-300">Номер карты</label>
-                        <div class="relative">
-                            <input 
-                                type="text" 
-                                id="tbank-card-number"
-                                placeholder="0000 0000 0000 0000"
-                                maxlength="19"
-                                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                                oninput="formatCardNumber(this)"
-                            >
-                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <div id="card-type-icon" class="w-8 h-5 bg-gray-600 rounded flex items-center justify-center text-xs text-gray-400">
-                                    CARD
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Expiry & CVV -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-300">Срок действия</label>
-                            <input 
-                                type="text" 
-                                id="tbank-expiry"
-                                placeholder="ММ/ГГ"
-                                maxlength="5"
-                                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                                oninput="formatExpiry(this)"
-                            >
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-300 flex items-center space-x-1">
-                                <span>CVV</span>
-                                <div class="group relative">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-400 cursor-help">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c0-1.032.771-1.87 1.72-1.87s1.72.838 1.72 1.87c0 .897-.557 1.663-1.34 1.897l-.362.15c-.415.172-.647.547-.647.952v.487M12 15.75h.007v.008H12v-.008z" />
-                                    </svg>
-                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-                                        3 цифры на обороте карты
-                                    </div>
-                                </div>
-                            </label>
-                            <input 
-                                type="text" 
-                                id="tbank-cvv"
-                                placeholder="123"
-                                maxlength="4"
-                                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                                oninput="formatCVV(this)"
-                            >
-                        </div>
-                    </div>
-                    
-                    <!-- Checkbox for saving card -->
-                    <div class="flex items-center space-x-3 pt-2">
-                        <input type="checkbox" id="save-card" class="w-4 h-4 text-yellow-400 bg-gray-800 border-gray-600 rounded focus:ring-yellow-400 focus:ring-2">
-                        <label for="save-card" class="text-sm text-gray-300">Нужна квитанция?</label>
-                    </div>
-                </div>
-                
-                <!-- Continue Button -->
-                <button 
-                    onclick="processTBankPayment('${paymentURL}')"
-                    class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
-                    id="tbank-pay-button"
-                >
-                    <div class="flex items-center justify-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                        </svg>
-                        <span>Оплатить 5 000 ₽</span>
-                    </div>
-                </button>
-            </div>
-            
-            <!-- Trust Footer -->
-            <div class="bg-gray-800 p-4 border-t border-gray-700">
-                <div class="grid grid-cols-2 gap-3 text-xs text-gray-400">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span>Мгновенный чек</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span>Возврат 14 дней</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span>Техподдержка 24/7</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span>Лицензия ЦБ РФ</span>
-                    </div>
-                </div>
-                <div class="mt-3 pt-3 border-t border-gray-700 text-center">
-                    <div class="flex items-center justify-center space-x-2 text-green-400">
-                        <div class="w-3 h-3 bg-yellow-400 rounded-full flex items-center justify-center">
-                            <span class="text-black text-xs font-bold">T</span>
-                        </div>
-                        <span class="text-sm font-medium">T-Bank</span>
-                        <span class="text-xs text-gray-500">Официальная платежная система</span>
-                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span class="text-xs text-green-400 font-medium">Защищено</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    // Обновляем заголовок модального окна
+    const modalTitle = document.querySelector('.payment-modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = 'Оплата заказа';
+    }
     
-    // Initialize form validation and card type detection
-    initializeTBankForm();
+    // Скрываем форму данных клиента
+    const customerSection = document.getElementById('customer-data-section');
+    const iframeSection = document.getElementById('payment-iframe-section');
+    
+    if (customerSection && iframeSection) {
+        customerSection.classList.add('hidden');
+        iframeSection.classList.remove('hidden');
+        
+        // Показываем индикатор загрузки
+        const loadingElement = document.getElementById('payment-iframe-loading');
+        const iframe = document.getElementById('payment-iframe');
+        
+        if (loadingElement) {
+            loadingElement.classList.remove('hidden');
+        }
+        
+        if (iframe) {
+            iframe.classList.add('hidden');
+            
+            // Настраиваем iframe
+            iframe.src = paymentURL;
+            
+            // Обработчик загрузки iframe
+            iframe.onload = function() {
+                console.log('✅ Iframe загружен');
+                if (loadingElement) {
+                    loadingElement.classList.add('hidden');
+                }
+                iframe.classList.remove('hidden');
+            };
+            
+            // Обработчик ошибки загрузки
+            iframe.onerror = function() {
+                console.error('❌ Ошибка загрузки iframe');
+                if (loadingElement) {
+                    loadingElement.innerHTML = `
+                        <div class="payment-error-message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 32px; height: 32px; color: #ef4444;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                            </svg>
+                            <span style="font-size: 16px; color: #ef4444; font-weight: 500;">Ошибка загрузки формы оплаты</span>
+                            <button onclick="goBackToCustomerData()" style="margin-top: 12px; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">Попробовать снова</button>
+                        </div>
+                    `;
+                }
+            };
+        }
+        
+        console.log('✅ Переключились на этап оплаты');
+    }
 }
 
-// ==================== T-BANK FORM UTILITIES ====================
-
-function initializeTBankForm() {
-    // Update amount display with current product price
-    const selectedProduct = window.selectedProduct;
-    if (selectedProduct) {
-        const amountEl = document.getElementById('tbank-amount');
-        const descriptionEl = document.getElementById('tbank-description');
-        const payButton = document.getElementById('tbank-pay-button');
+/**
+ * Вернуться к форме ввода данных
+ */
+function goBackToCustomerData() {
+    console.log('⬅️ Возвращаемся к форме данных');
+    
+    // Восстанавливаем заголовок модального окна
+    const modalTitle = document.querySelector('.payment-modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = 'Оформление заказа';
+    }
+    
+    const customerSection = document.getElementById('customer-data-section');
+    const iframeSection = document.getElementById('payment-iframe-section');
+    const iframe = document.getElementById('payment-iframe');
+    
+    if (customerSection && iframeSection) {
+        // Показываем форму данных
+        iframeSection.classList.add('hidden');
+        customerSection.classList.remove('hidden');
         
-        if (amountEl) amountEl.textContent = `${selectedProduct.price} ₽`;
-        if (descriptionEl) descriptionEl.textContent = selectedProduct.name;
-        if (payButton) {
-            payButton.innerHTML = `
-                <div class="flex items-center justify-center space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+        // Очищаем iframe
+        if (iframe) {
+            iframe.src = '';
+            iframe.classList.add('hidden');
+        }
+        
+        // Сбрасываем состояние загрузки
+        const loadingElement = document.getElementById('payment-iframe-loading');
+        if (loadingElement) {
+            loadingElement.classList.remove('hidden');
+            loadingElement.innerHTML = `
+                <div class="payment-loading-spinner">
+                    <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                     </svg>
-                    <span>Оплатить ${selectedProduct.price} ₽</span>
                 </div>
+                <div class="payment-loading-text">Подготавливаем форму оплаты...</div>
             `;
         }
-    }
-}
-
-function formatCardNumber(input) {
-    let value = input.value.replace(/\D/g, '');
-    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-    input.value = value;
-    
-    // Detect card type
-    detectCardType(value.replace(/\s/g, ''));
-}
-
-function formatExpiry(input) {
-    let value = input.value.replace(/\D/g, '');
-    if (value.length >= 2) {
-        value = value.substring(0, 2) + '/' + value.substring(2, 4);
-    }
-    input.value = value;
-}
-
-function formatCVV(input) {
-    input.value = input.value.replace(/\D/g, '');
-}
-
-function detectCardType(cardNumber) {
-    const cardTypeIcon = document.getElementById('card-type-icon');
-    if (!cardTypeIcon) return;
-    
-    if (cardNumber.startsWith('4')) {
-        cardTypeIcon.className = 'w-8 h-5 bg-blue-600 rounded flex items-center justify-center text-xs text-white font-bold';
-        cardTypeIcon.textContent = 'VISA';
-    } else if (cardNumber.startsWith('5') || cardNumber.startsWith('2')) {
-        cardTypeIcon.className = 'w-8 h-5 bg-red-600 rounded flex items-center justify-center text-xs text-white font-bold';
-        cardTypeIcon.textContent = 'MC';
-    } else if (cardNumber.startsWith('2')) {
-        cardTypeIcon.className = 'w-8 h-5 bg-blue-500 rounded flex items-center justify-center text-xs text-white font-bold';
-        cardTypeIcon.textContent = 'МИР';
-    } else if (cardNumber.length > 0) {
-        cardTypeIcon.className = 'w-8 h-5 bg-gray-600 rounded flex items-center justify-center text-xs text-gray-400';
-        cardTypeIcon.textContent = 'CARD';
-    } else {
-        cardTypeIcon.className = 'w-8 h-5 bg-gray-600 rounded flex items-center justify-center text-xs text-gray-400';
-        cardTypeIcon.textContent = 'CARD';
-    }
-}
-
-function processTBankPayment(paymentURL) {
-    console.log('💳 Обрабатываем оплату T-Bank:', paymentURL);
-    
-    // Validate form
-    const cardNumber = document.getElementById('tbank-card-number')?.value?.replace(/\s/g, '');
-    const expiry = document.getElementById('tbank-expiry')?.value;
-    const cvv = document.getElementById('tbank-cvv')?.value;
-    
-    if (!cardNumber || cardNumber.length < 16) {
-        showTBankFormError('Введите корректный номер карты');
-        return;
-    }
-    
-    if (!expiry || expiry.length < 5) {
-        showTBankFormError('Введите срок действия карты');
-        return;
-    }
-    
-    if (!cvv || cvv.length < 3) {
-        showTBankFormError('Введите CVV код');
-        return;
-    }
-    
-    // Show processing state
-    const payButton = document.getElementById('tbank-pay-button');
-    if (payButton) {
-        payButton.disabled = true;
-        payButton.innerHTML = `
-            <div class="flex items-center justify-center space-x-2">
-                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
-                <span>Обрабатываем платеж...</span>
-            </div>
-        `;
-    }
-    
-    // Redirect to T-Bank processing
-    setTimeout(() => {
-        window.open(paymentURL, '_blank');
-        closePaymentModal();
-    }, 1500);
-}
-
-function showTBankFormError(message) {
-    // Create or update error message
-    let errorEl = document.getElementById('tbank-form-error');
-    if (!errorEl) {
-        errorEl = document.createElement('div');
-        errorEl.id = 'tbank-form-error';
-        errorEl.className = 'mt-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-300 text-sm';
         
-        const payButton = document.getElementById('tbank-pay-button');
-        if (payButton) {
-            payButton.parentNode.insertBefore(errorEl, payButton);
-        }
+        // Убираем состояние загрузки с кнопки
+        setFormLoading(false);
+        
+        console.log('✅ Вернулись к форме данных');
+    }
+}
+
+/**
+ * Инициализация маски телефона
+ */
+/**
+ * Показать экран оплаты Т-банка
+ */
+function showTBankPaymentScreen(productId, customerData) {
+    console.log('🏦 Переход к экрану оплаты Т-банка');
+    
+    const product = productInfo[productId];
+    if (!product) {
+        console.error('❌ Продукт не найден:', productId);
+        return;
     }
     
-    errorEl.innerHTML = `
-        <div class="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-red-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9-.75a9 9 0 1118 0 9 9 0 01-18 0zm9 3.75h.008v.008H12v-.008z" />
+    // Скрываем секцию данных клиента
+    const customerSection = document.getElementById('customer-data-section');
+    const iframeSection = document.getElementById('payment-iframe-section');
+    const customerSecurity = document.querySelector('.customer-screen-security');
+    const modalHeader = document.querySelector('.payment-modal-header');
+    const modalProduct = document.querySelector('.payment-modal-product');
+    
+    if (customerSection && iframeSection) {
+        customerSection.classList.add('hidden');
+        iframeSection.classList.remove('hidden');
+        
+        // Скрываем блок безопасности первого экрана
+        if (customerSecurity) {
+            customerSecurity.classList.add('hidden');
+        }
+        
+        // Скрываем заголовок и информацию о продукте на втором экране
+        if (modalHeader) {
+            modalHeader.classList.add('hidden');
+        }
+        if (modalProduct) {
+            modalProduct.classList.add('hidden');
+        }
+        
+        // Устанавливаем сумму в виджете
+        const amountDisplay = document.getElementById('tbank-selected-amount');
+        if (amountDisplay) {
+            amountDisplay.textContent = `${product.price.toLocaleString()} ₽`;
+        }
+        
+        // Добавляем класс для оптимизации высоты модального окна
+        const modalContent = document.querySelector('.payment-modal-content');
+        if (modalContent) {
+            modalContent.classList.add('payment-screen-active');
+        }
+        
+        // Фокус на поле номера карты
+        setTimeout(() => {
+            const cardInput = document.getElementById('tbank-card-number');
+            if (cardInput) {
+                cardInput.focus();
+            }
+        }, 300);
+    }
+    
+    // Сбрасываем состояние загрузки
+    setFormLoading(false);
+    
+    console.log('✅ Экран оплаты Т-банка показан с компактной оптимизацией');
+}
+
+/**
+ * Переключение выпадающего списка суммы (пока заглушка)
+ */
+function toggleAmountDropdown() {
+    console.log('💰 Клик по выбору суммы (функция не реализована)');
+    // В реальной версии здесь был бы выпадающий список с вариантами сумм
+}
+
+/**
+ * Переключение чекбокса квитанции
+ */
+function toggleReceiptCheckbox() {
+    const checkbox = document.getElementById('tbank-receipt-checkbox');
+    if (checkbox) {
+        checkbox.classList.toggle('checked');
+        console.log('📄 Чекбокс квитанции:', checkbox.classList.contains('checked') ? 'включен' : 'выключен');
+    }
+}
+
+/**
+ * Обработка оплаты через Т-банк
+ */
+async function processTBankPayment() {
+    console.log('💳 Обработка оплаты через Т-банк');
+    
+    const cardNumberInput = document.getElementById('tbank-card-number');
+    const payButton = document.querySelector('.tbank-pay-button');
+    
+    if (!cardNumberInput || !cardNumberInput.value.trim()) {
+        showPaymentError('Пожалуйста, введите номер карты');
+        if (cardNumberInput) cardNumberInput.focus();
+        return;
+    }
+    
+    // Получаем чистый номер карты
+    const cleanCardNumber = cardNumberInput.value.replace(/\s/g, '');
+    const cardType = detectCardType(cleanCardNumber);
+    
+    // Расширенная валидация номера карты
+    const validationResult = validateCardNumber(cleanCardNumber, cardType);
+    if (!validationResult.isValid) {
+        showPaymentError(validationResult.message);
+        cardNumberInput.focus();
+        return;
+    }
+    
+    const needsReceipt = document.getElementById('tbank-receipt-checkbox')?.classList.contains('checked') || false;
+    
+    // Показываем индикатор загрузки
+    payButton.classList.add('loading');
+    payButton.textContent = 'Обработка...';
+    payButton.disabled = true;
+    
+    console.log('💳 Данные для оплаты:', {
+        product: currentProductId,
+        amount: document.getElementById('tbank-selected-amount')?.textContent,
+        cardType: cardType,
+        cardMasked: cleanCardNumber.replace(/\d(?=\d{4})/g, '*'),
+        needsReceipt: needsReceipt
+    });
+    
+    // Реальная обработка платежа через T-Bank API
+    try {
+        const paymentData = {
+            Amount: currentProductData.price * 100, // в копейках
+            OrderId: 'ORDER_' + Date.now(),
+            Description: currentProductData.name,
+            Email: customerData.email,
+            Phone: customerData.phone.replace(/\D/g, '')
+        };
+        
+        console.log('📤 Отправляем данные на сервер:', paymentData);
+        
+        const response = await fetch('/.netlify/functions/create-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(paymentData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.PaymentURL) {
+            console.log('✅ Получен PaymentURL от T-Bank:', result.PaymentURL);
+            
+            // Перенаправляем на форму оплаты T-Bank
+            window.location.href = result.PaymentURL;
+        } else {
+            throw new Error(result.error || 'Ошибка создания платежа');
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка при создании платежа:', error);
+        showPaymentError('Произошла ошибка при создании платежа. Попробуйте еще раз.');
+        
+        // Восстанавливаем кнопку
+        payButton.classList.remove('loading');
+        payButton.textContent = 'Оплатить';
+        payButton.disabled = false;
+    }
+}
+
+/**
+ * Валидация номера карты
+ */
+function validateCardNumber(cardNumber, cardType) {
+    if (cardNumber.length < 13) {
+        return {
+            isValid: false,
+            message: 'Номер карты слишком короткий'
+        };
+    }
+    
+    if (cardType === 'unknown') {
+        return {
+            isValid: false,
+            message: 'Неизвестный тип карты'
+        };
+    }
+    
+    // Проверяем длину для конкретного типа карты
+    const expectedLengths = {
+        visa: [13, 16, 19],
+        mastercard: [16],
+        mir: [16, 17, 18, 19],
+        amex: [15],
+        discover: [16],
+        jcb: [16]
+    };
+    
+    if (!expectedLengths[cardType].includes(cardNumber.length)) {
+        return {
+            isValid: false,
+            message: `Неверная длина номера для карты ${getCardTypeName(cardType)}`
+        };
+    }
+    
+    // Алгоритм Луна для проверки контрольной суммы
+    if (!luhnCheck(cardNumber)) {
+        return {
+            isValid: false,
+            message: 'Неверный номер карты'
+        };
+    }
+    
+    return {
+        isValid: true,
+        message: 'Номер карты действителен'
+    };
+}
+
+/**
+ * Алгоритм Луна для проверки номера карты
+ */
+function luhnCheck(cardNumber) {
+    let sum = 0;
+    let isEven = false;
+    
+    for (let i = cardNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(cardNumber.charAt(i));
+        
+        if (isEven) {
+            digit *= 2;
+            if (digit > 9) {
+                digit -= 9;
+            }
+        }
+        
+        sum += digit;
+        isEven = !isEven;
+    }
+    
+    return (sum % 10) === 0;
+}
+
+/**
+ * Получение красивого названия типа карты
+ */
+function getCardTypeName(cardType) {
+    const names = {
+        visa: 'Visa',
+        mastercard: 'MasterCard',
+        mir: 'МИР',
+        amex: 'American Express',
+        discover: 'Discover',
+        jcb: 'JCB'
+    };
+    return names[cardType] || 'Неизвестная';
+}
+
+/**
+ * Показ ошибки платежа
+ */
+function showPaymentError(message) {
+    // Создаем уведомление об ошибке
+    const notification = document.createElement('div');
+    notification.className = 'payment-notification payment-error';
+    notification.innerHTML = `
+        <div class="payment-notification-content">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="payment-notification-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
             </svg>
             <span>${message}</span>
         </div>
     `;
     
-    // Remove error after 5 seconds
+    // Добавляем стили для уведомления
+    if (!document.querySelector('.payment-notification-styles')) {
+        const styles = document.createElement('style');
+        styles.className = 'payment-notification-styles';
+        styles.textContent = `
+            .payment-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                max-width: 400px;
+                border-radius: 12px;
+                padding: 16px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+            .payment-error {
+                background: #ff453a;
+                color: white;
+            }
+            .payment-success {
+                background: #34c759;
+                color: white;
+            }
+            .payment-notification.show {
+                transform: translateX(0);
+            }
+            .payment-notification-content {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .payment-notification-icon {
+                width: 24px;
+                height: 24px;
+                flex-shrink: 0;
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Показываем уведомление
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Убираем уведомление через 4 секунды
     setTimeout(() => {
-        if (errorEl) errorEl.remove();
-    }, 5000);
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
 }
 
-function showTBankError(message) {
-    console.error('❌ Ошибка T-Bank:', message);
-    
-    const container = document.getElementById('tbank-payment-container');
-    container.innerHTML = `
-        <div class="bg-gray-900 text-white rounded-xl overflow-hidden shadow-2xl border border-gray-800 p-8 text-center">
-            <div class="text-red-400 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                </svg>
-            </div>
-            <h3 class="text-xl font-bold text-white mb-2">Ошибка оплаты</h3>
-            <p class="text-gray-400 mb-6">${message}</p>
-            <button 
-                onclick="showCustomerDataSection()"
-                class="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-3 px-6 rounded-xl transition-all duration-200"
-            >
-                Попробовать снова
-            </button>
+/**
+ * Показ успешного платежа
+ */
+function showPaymentSuccess() {
+    const notification = document.createElement('div');
+    notification.className = 'payment-notification payment-success';
+    notification.innerHTML = `
+        <div class="payment-notification-content">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="payment-notification-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Платеж успешно обработан!</span>
         </div>
     `;
+    
+    document.body.appendChild(notification);
+    
+    // Показываем уведомление
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Показываем подробную информацию
+    setTimeout(() => {
+        alert('🎉 Демо-платеж успешно обработан!\n\n✅ Это демо-версия интерфейса T-Bank\n💳 В реальном приложении здесь происходил бы настоящий платеж\n📧 Инструкции отправлены на ваш email\n\nСпасибо за покупку!');
+        closePaymentModal();
+    }, 1500);
+    
+    // Убираем уведомление
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 6000);
 }
 
-// ==================== МАСКИРОВАНИЕ ТЕЛЕФОНА ====================
 function initPhoneMask() {
     const phoneInput = document.getElementById('customer-phone');
     if (!phoneInput) return;
@@ -732,44 +980,197 @@ function initPhoneMask() {
         if (value.length > 0) {
             if (value[0] === '8') {
                 value = '7' + value.slice(1);
-            }
-            if (value[0] !== '7') {
+            } else if (value[0] !== '7') {
                 value = '7' + value;
             }
         }
         
-        let formattedValue = '';
-        if (value.length > 0) {
-            formattedValue = '+7';
+        if (value.length <= 11) {
+            let formatted = '+7';
             if (value.length > 1) {
-                formattedValue += ' (' + value.slice(1, 4);
-                if (value.length > 4) {
-                    formattedValue += ') ' + value.slice(4, 7);
-                    if (value.length > 7) {
-                        formattedValue += '-' + value.slice(7, 9);
-                        if (value.length > 9) {
-                            formattedValue += '-' + value.slice(9, 11);
-                        }
-                    }
-                }
+                formatted += ' (' + value.slice(1, 4);
             }
+            if (value.length > 4) {
+                formatted += ') ' + value.slice(4, 7);
+            }
+            if (value.length > 7) {
+                formatted += '-' + value.slice(7, 9);
+            }
+            if (value.length > 9) {
+                formatted += '-' + value.slice(9, 11);
+            }
+            
+            e.target.value = formatted;
         }
-        
-        e.target.value = formattedValue;
+    });
+    
+    phoneInput.addEventListener('keydown', function(e) {
+        // Разрешаем backspace, delete, tab, escape, enter
+        if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+            // Разрешаем Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+            (e.keyCode === 65 && e.ctrlKey === true) ||
+            (e.keyCode === 67 && e.ctrlKey === true) ||
+            (e.keyCode === 86 && e.ctrlKey === true) ||
+            (e.keyCode === 88 && e.ctrlKey === true) ||
+            // Разрешаем home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+            return;
+        }
+        // Разрешаем только цифры
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
     });
 }
 
-// ==================== СБРОС ФОРМЫ ====================
-function resetForm() {
-    const form = document.getElementById('payment-form');
-    if (form) {
-        form.reset();
+// Закрытие модального окна по клавише Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && paymentModal && !paymentModal.classList.contains('hidden')) {
+        closePaymentModal();
     }
+});
+
+console.log('📄 payment-modal.js загружен');
+
+/**
+ * Форматирование номера карты с определением типа
+ */
+function formatCardNumber(input) {
+    let value = input.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
+    let formattedValue = '';
+    let cardType = detectCardType(value);
+    
+    // Форматируем по группам цифр в зависимости от типа карты
+    if (cardType === 'amex') {
+        // American Express: 4-6-5
+        formattedValue = value.replace(/(\d{4})(\d{6})(\d{5})/, '$1 $2 $3');
+        if (value.length <= 10) {
+            formattedValue = value.replace(/(\d{4})(\d{0,6})/, '$1 $2');
+        }
+    } else {
+        // Visa, MasterCard, Мир: 4-4-4-4
+        formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    }
+    
+    input.value = formattedValue;
+    
+    // Обновляем визуальные индикаторы типа карты
+    updateCardTypeIndicator(cardType, value.length);
 }
 
-// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ ВЫЗОВА ИЗ HTML ====================
-window.openPaymentModal = openPaymentModal;
-window.closePaymentModal = closePaymentModal;
-window.processPayment = processPayment;
-window.hideTBankLoading = hideTBankLoading;
-window.showTBankError = showTBankError; 
+/**
+ * Определение типа карты по номеру
+ */
+function detectCardType(number) {
+    const patterns = {
+        visa: /^4[0-9]{0,15}$/,
+        mastercard: /^5[1-5][0-9]{0,14}$|^2[2-7][0-9]{0,14}$/,
+        mir: /^220[0-4][0-9]{0,12}$/,
+        amex: /^3[47][0-9]{0,13}$/,
+        discover: /^6(?:011|5[0-9]{2})[0-9]{0,12}$/,
+        jcb: /^(?:2131|1800|35\d{3})\d{0,11}$/
+    };
+    
+    for (let type in patterns) {
+        if (patterns[type].test(number)) {
+            return type;
+        }
+    }
+    return 'unknown';
+}
+
+/**
+ * Обновление индикатора типа карты
+ */
+function updateCardTypeIndicator(cardType, length) {
+    const cardInput = document.getElementById('tbank-card-number');
+    if (!cardInput) return;
+    
+    // Убираем все предыдущие классы типов карт
+    cardInput.classList.remove('card-visa', 'card-mastercard', 'card-mir', 'card-amex', 'card-valid', 'card-invalid');
+    
+    // Добавляем класс для текущего типа карты
+    if (cardType !== 'unknown') {
+        cardInput.classList.add(`card-${cardType}`);
+    }
+    
+    // Проверяем валидность длины
+    const expectedLengths = {
+        visa: [13, 16, 19],
+        mastercard: [16],
+        mir: [16, 17, 18, 19],
+        amex: [15],
+        discover: [16],
+        jcb: [16]
+    };
+    
+    if (expectedLengths[cardType] && expectedLengths[cardType].includes(length)) {
+        cardInput.classList.add('card-valid');
+    } else if (length > 0) {
+        cardInput.classList.add('card-invalid');
+    }
+    
+    // Обновляем placeholder в зависимости от типа карты
+    updateCardPlaceholder(cardType);
+}
+
+/**
+ * Обновление placeholder в зависимости от типа карты
+ */
+function updateCardPlaceholder(cardType) {
+    const cardInput = document.getElementById('tbank-card-number');
+    if (!cardInput) return;
+    
+    const placeholders = {
+        visa: '4111 1111 1111 1111',
+        mastercard: '5555 5555 5555 4444',
+        mir: '2204 1111 1111 1111',
+        amex: '3782 822463 10005',
+        unknown: 'Номер карты'
+    };
+    
+    cardInput.placeholder = placeholders[cardType] || placeholders.unknown;
+}
+
+/**
+ * Вернуться к данным клиента (если понадобится)
+ */
+function goBackToCustomerData() {
+    console.log('⬅️ Возврат к данным клиента');
+    
+    const customerSection = document.getElementById('customer-data-section');
+    const iframeSection = document.getElementById('payment-iframe-section');
+    const customerSecurity = document.querySelector('.customer-screen-security');
+    const modalHeader = document.querySelector('.payment-modal-header');
+    const modalProduct = document.querySelector('.payment-modal-product');
+    const modalContent = document.querySelector('.payment-modal-content');
+    
+    if (customerSection && iframeSection) {
+        customerSection.classList.remove('hidden');
+        iframeSection.classList.add('hidden');
+        
+        // Показываем блок безопасности первого экрана
+        if (customerSecurity) {
+            customerSecurity.classList.remove('hidden');
+        }
+        
+        // Показываем заголовок и информацию о продукте
+        if (modalHeader) {
+            modalHeader.classList.remove('hidden');
+        }
+        if (modalProduct) {
+            modalProduct.classList.remove('hidden');
+        }
+        
+        // Убираем класс оптимизации экрана оплаты
+        if (modalContent) {
+            modalContent.classList.remove('payment-screen-active');
+        }
+        
+        // Восстанавливаем заголовок модального окна
+        const modalTitle = document.querySelector('.payment-modal-title');
+        if (modalTitle) {
+            modalTitle.textContent = 'Оформление заказа';
+        }
+    }
+} 
