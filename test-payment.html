@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестовая оплата - 1 рубль</title>
+    
+    <!-- Tailwind CSS (режим watch) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'orange': {
+                            400: '#FB923C',
+                            500: '#F97316',
+                            600: '#EA580C'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom styles */
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    
+    <!-- Header -->
+    <header class="text-center py-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">
+            🧪 Тестовая оплата
+        </h1>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+            Скрытая страница для проверки работы платежной системы с рабочими параметрами
+        </p>
+    </header>
+
+    <!-- Test Product -->
+    <div class="max-w-md mx-auto px-4">
+        <div class="glass-effect rounded-2xl p-8 shadow-xl border border-white/20">
+            
+            <!-- Product Info -->
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl text-white">🧪</span>
+                </div>
+                
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                    Тестовый товар
+                </h2>
+                
+                <p class="text-gray-600 mb-4">
+                    Товар для проверки интеграции с T-Bank на рабочих данных
+                </p>
+                
+                <div class="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                    <div class="text-3xl font-bold text-orange-600">
+                        1 ₽
+                    </div>
+                    <div class="text-sm text-orange-500 mt-1">
+                        Тестовая стоимость
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pay Button -->
+            <button 
+                class="payment-btn w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                data-product-id="test-1rub"
+                data-product-name="Тестовый товар"
+                data-product-price="1"
+            >
+                <span class="flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                    Оплатить 1 рубль
+                </span>
+            </button>
+            
+            <!-- Warning -->
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class="flex items-start">
+                    <div class="text-yellow-600 mr-2">⚠️</div>
+                    <div class="text-sm text-yellow-700">
+                        <strong>Внимание:</strong> Это тестовая страница с рабочими параметрами оплаты. 
+                        Деньги будут списаны с карты.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Info -->
+            <div class="mt-6 text-xs text-gray-500 space-y-1">
+                <div>🔧 Версия: Рабочие параметры</div>
+                <div>🏦 Terminal: 1749023114337</div>
+                <div>📅 Страница: test-payment.html</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="message-container" class="fixed top-4 right-4 z-50"></div>
+
+    <!-- Payment Modal Container -->
+    <div id="payment-modal-container"></div>
+
+    <!-- Scripts -->
+    <script src="payment-modal.js"></script>
+    <script src="tbank-payment.js"></script>
+    
+    <script>
+        // Добавляем тестовый продукт в список продуктов
+        if (typeof products !== 'undefined') {
+            products.push({
+                id: 'test-1rub',
+                name: 'Тестовый товар',
+                price: 1
+            });
+        }
+        
+        // Логирование для отладки
+        console.log('🧪 Тестовая страница загружена');
+        console.log('💳 Используются рабочие параметры T-Bank');
+        
+        // Добавляем обработчик для кнопки
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.querySelector('.payment-btn');
+            if (button) {
+                console.log('✅ Кнопка тестовой оплаты найдена');
+            }
+        });
+    </script>
+</body>
+</html> 

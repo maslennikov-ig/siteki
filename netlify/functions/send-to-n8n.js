@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
         console.log('📋 Данные заказа для n8n:', orderData);
         
         // Отправляем данные в n8n webhook
-        const n8nResponse = await fetch('https://flow8n.ru/webhook-test/order-created', {
+        const n8nResponse = await fetch('https://flow8n.ru/webhook/order-created', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
