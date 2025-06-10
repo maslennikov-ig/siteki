@@ -19,7 +19,48 @@
         
         // Очищаем данные о текущем продукте из sessionStorage
         sessionStorage.removeItem('currentProduct');
+        
+        // Проверяем, загружена ли страница в iframe/модальном окне
+        if (window.parent && window.parent !== window) {
+            console.log('Страница загружена в iframe/модальном окне, перенаправляем родительское окно');
+            
+            // Пытаемся закрыть модальное окно и перенаправить родительскую страницу
+            try {
+                // Если есть функция закрытия модального окна в родительском окне
+                if (window.parent.closePaymentModal && typeof window.parent.closePaymentModal === 'function') {
+                    window.parent.closePaymentModal();
+                }
+                
+                // Перенаправляем родительское окно на главную страницу
+                window.parent.location.href = window.location.origin + '/index.html';
+            } catch (error) {
+                console.log('Не удалось управлять родительским окном из-за CORS, попытка простого перенаправления');
+                // Если CORS блокирует доступ к родительскому окну, просто перенаправляем текущее окно
+                window.top.location.href = window.location.origin + '/index.html';
+            }
+        }
+        
+        // Если страница открыта в отдельном окне/вкладке, показываем кнопку для возврата
+        setupReturnButton();
     });
+    
+    function setupReturnButton() {
+        const returnButton = document.getElementById('return-button');
+        if (returnButton) {
+            returnButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Проверяем, можем ли закрыть окно (если оно было открыто через window.open)
+                if (window.opener) {
+                    console.log('Закрываем платежное окно и возвращаемся к родительскому');
+                    window.close();
+                } else {
+                    // Обычное перенаправление
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+    }
     </script>
 </head>
 <body class="bg-slate-50 flex flex-col min-h-screen justify-center items-center">
@@ -27,7 +68,7 @@
         <h1 class="text-2xl font-bold mb-4 text-center text-green-600">Спасибо за оплату!</h1>
         <p class="mb-4 text-center">Ваша оплата успешно прошла. Мы отправили подробные инструкции и ссылки на скачивание на ваш email.</p>
         <p class="mb-6 text-center">Если письмо не пришло в течение 10 минут — проверьте папку "Спам" или свяжитесь с нашей поддержкой: <a href="mailto:info@academfin.ru" class="text-orange-500 underline">info@academfin.ru</a></p>
-        <a href="index.html" class="cta-button cta-button-full block text-center">Вернуться на главную</a>
+        <a href="index.html" id="return-button" class="cta-button cta-button-full block text-center">Вернуться на главную</a>
     </div>
 </body>
 </html>

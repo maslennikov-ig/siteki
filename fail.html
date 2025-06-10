@@ -26,7 +26,48 @@
         
         // Очищаем данные о текущем продукте из sessionStorage
         sessionStorage.removeItem('currentProduct');
+        
+        // Проверяем, загружена ли страница в iframe/модальном окне
+        if (window.parent && window.parent !== window) {
+            console.log('Страница ошибки загружена в iframe/модальном окне, перенаправляем родительское окно');
+            
+            // Пытаемся закрыть модальное окно и перенаправить родительскую страницу
+            try {
+                // Если есть функция закрытия модального окна в родительском окне
+                if (window.parent.closePaymentModal && typeof window.parent.closePaymentModal === 'function') {
+                    window.parent.closePaymentModal();
+                }
+                
+                // Перенаправляем родительское окно на главную страницу
+                window.parent.location.href = window.location.origin + '/index.html';
+            } catch (error) {
+                console.log('Не удалось управлять родительским окном из-за CORS, попытка простого перенаправления');
+                // Если CORS блокирует доступ к родительскому окну, просто перенаправляем текущее окно
+                window.top.location.href = window.location.origin + '/index.html';
+            }
+        }
+        
+        // Если страница открыта в отдельном окне/вкладке, показываем кнопку для возврата
+        setupReturnButton();
     });
+    
+    function setupReturnButton() {
+        const returnButton = document.getElementById('return-button');
+        if (returnButton) {
+            returnButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Проверяем, можем ли закрыть окно (если оно было открыто через window.open)
+                if (window.opener) {
+                    console.log('Закрываем платежное окно и возвращаемся к родительскому');
+                    window.close();
+                } else {
+                    // Обычное перенаправление
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+    }
     </script>
 </head>
 <body class="bg-slate-50 flex flex-col min-h-screen justify-center items-center">
@@ -34,7 +75,7 @@
         <h1 class="text-2xl font-bold mb-4 text-center text-red-600">Оплата не прошла</h1>
         <p class="mb-4 text-center">К сожалению, платёж не был завершён. Попробуйте ещё раз или свяжитесь с нашей поддержкой: <a href="mailto:info@academfin.ru" class="text-orange-500 underline">info@academfin.ru</a></p>
         <p id="error-message" class="mb-4 text-center text-red-500 hidden"></p>
-        <a href="index.html" class="cta-button cta-button-full block text-center">Вернуться на главную</a>
+        <a href="index.html" id="return-button" class="cta-button cta-button-full block text-center">Вернуться на главную</a>
     </div>
 </body>
 </html>

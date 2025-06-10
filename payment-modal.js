@@ -195,6 +195,9 @@ function closePaymentModal() {
     resetForm();
 }
 
+// Делаем функцию доступной глобально для iframe страниц
+window.closePaymentModal = closePaymentModal;
+
 // ==================== УПРАВЛЕНИЕ СЕКЦИЯМИ ====================
 function showCustomerDataSection() {
     console.log('👤 Показываем секцию ввода данных покупателя');
