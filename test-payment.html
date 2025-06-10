@@ -116,27 +116,43 @@
 
     <!-- Scripts -->
     <script src="payment-modal.js"></script>
-    <script src="tbank-payment.js"></script>
     
     <script>
-        // Добавляем тестовый продукт в список продуктов
-        if (typeof products !== 'undefined') {
-            products.push({
+        // Определяем тестовый продукт ПЕРЕД загрузкой tbank-payment.js
+        window.testProducts = [
+            {
                 id: 'test-1rub',
                 name: 'Тестовый товар',
                 price: 1
-            });
-        }
+            }
+        ];
         
         // Логирование для отладки
         console.log('🧪 Тестовая страница загружена');
         console.log('💳 Используются рабочие параметры T-Bank');
-        
-        // Добавляем обработчик для кнопки
+    </script>
+    
+    <script src="tbank-payment.js"></script>
+    
+    <script>
+        // Дополнительная инициализация после загрузки
         document.addEventListener('DOMContentLoaded', function() {
+            // Добавляем тестовый продукт в основной массив
+            if (typeof products !== 'undefined' && window.testProducts) {
+                products.push(...window.testProducts);
+                console.log('✅ Тестовый продукт добавлен:', window.testProducts[0]);
+            }
+            
+            // Проверяем кнопку
             const button = document.querySelector('.payment-btn');
             if (button) {
                 console.log('✅ Кнопка тестовой оплаты найдена');
+                
+                // Принудительно переинициализируем кнопки оплаты
+                if (typeof initPaymentButtons === 'function') {
+                    initPaymentButtons();
+                    console.log('✅ Кнопки оплаты переинициализированы');
+                }
             }
         });
     </script>
