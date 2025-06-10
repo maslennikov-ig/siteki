@@ -1,16 +1,9 @@
 /**
  * Доверительное модальное окно оплаты
- * Версия: 5.0.0 - Переход на платежную форму T-Bank (лучшие практики)
+ * Версия: 4.2.1 - Исправление CORS + Netlify прокси для n8n
  * Дата: Январь 2025
  * 
- * Обновления v5.0.0:
- * - Убран iframe подход, теперь используется перенаправление на платежную форму T-Bank
- * - Все способы оплаты (карты, T-Pay, СБП, SberPay, MirPay) доступны автоматически
- * - Сохранен webhook для n8n через Netlify прокси
- * - Данные клиента автоматически передаются в платежную форму
- * - Лучшие практики UX: уведомление + плавное перенаправление
- * 
- * Предыдущие v4.2.1:
+ * Обновления v4.2.1:
  * - Исправлена CORS проблема через Netlify функцию-прокси
  * - Новый URL: /.netlify/functions/send-to-n8n вместо прямого обращения к n8n
  * - Стабильная работа без блокировки браузером
@@ -22,9 +15,47 @@
  * - Fail-safe подход: ошибки n8n не блокируют процесс оплаты
  * - Полная передача данных заказа (клиент, продукт, цена, ID)
  * - Подробное логирование всех этапов интеграции
+ * 
+ * Предыдущие v4.1.0:
+ * - Убраны все лишние элементы доверия (буллеты, trust элементы)
+ * - Оставлены только индикаторы безопасности: SSL шифрование, PCI DSS, Банк России
+ * - Кнопка "Назад к данным" вынесена в HTML, вне виджета
+ * - Максимально чистый дизайн: только T-Bank iframe + индикаторы безопасности
+ * - Убраны рамки и границы для более интегрированного вида
+ * - Зеленый фон для индикаторов безопасности
  */
 
-console.log('📄 payment-modal.js v5.0.0 загружен - Платежная форма T-Bank + все способы оплаты');
+console.log('📄 payment-modal.js v4.2.1 загружен - CORS исправлен + n8n через Netlify прокси + T-Bank виджет');
+
+// Слушаем сообщения от iframe для динамической подстройки высоты
+window.addEventListener('message', function(event) {
+    // Проверяем, что сообщение от T-Bank домена
+    if (event.origin && (event.origin.includes('tbank.ru') || event.origin.includes('tinkoff.ru'))) {
+        const iframe = document.getElementById('tbank-iframe');
+        
+        if (iframe && event.data && typeof event.data === 'object') {
+            // Если T-Bank отправляет информацию о высоте
+            if (event.data.height && typeof event.data.height === 'number') {
+                const minHeight = 320;
+                const maxHeight = Math.min(window.innerHeight * 0.8, 600);
+                const adjustedHeight = Math.min(Math.max(event.data.height, minHeight), maxHeight);
+                
+                iframe.style.height = adjustedHeight + 'px';
+                iframe.style.maxHeight = maxHeight + 'px';
+                console.log(`📐 Высота iframe обновлена через postMessage: ${adjustedHeight}px (макс: ${maxHeight}px)`);
+                
+                // Включаем скролл если контент превышает максимальную высоту
+                if (event.data.height > maxHeight) {
+                    iframe.style.overflowY = 'auto';
+                    iframe.scrolling = 'yes';
+                } else {
+                    iframe.style.overflowY = 'hidden';
+                    iframe.scrolling = 'no';
+                }
+            }
+        }
+    }
+}, false);
 
 // ==================== ПЕРЕМЕННЫЕ ====================
 let selectedProduct = null;
@@ -75,6 +106,12 @@ function bindEventHandlers() {
     const paymentForm = document.getElementById('payment-form');
     if (paymentForm) {
         paymentForm.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // Кнопка возврата к данным покупателя
+    const backButton = document.getElementById('back-to-customer-data');
+    if (backButton) {
+        backButton.addEventListener('click', showCustomerDataSection);
     }
 }
 
@@ -161,131 +198,173 @@ function closePaymentModal() {
 // Делаем функцию доступной глобально для iframe страниц
 window.closePaymentModal = closePaymentModal;
 
-// ==================== НАВИГАЦИЯ МЕЖДУ СЕКЦИЯМИ ====================
+// ==================== УПРАВЛЕНИЕ СЕКЦИЯМИ ====================
 function showCustomerDataSection() {
     console.log('👤 Показываем секцию ввода данных покупателя');
     
-    // Скрываем секцию оплаты
+    const customerSection = document.getElementById('customer-data-section');
     const paymentSection = document.getElementById('tbank-payment-section');
+    const productSummary = document.getElementById('product-summary');
+    
+    if (customerSection) {
+        customerSection.classList.remove('hidden');
+    }
+    
     if (paymentSection) {
         paymentSection.classList.add('hidden');
     }
     
-    // Показываем секцию данных покупателя
-    const customerSection = document.getElementById('customer-data-section');
-    if (customerSection) {
-        customerSection.classList.remove('hidden');
+    // Показываем Product Summary на первом экране
+    if (productSummary) {
+        productSummary.classList.remove('hidden');
     }
 }
 
 function showPaymentSection() {
-    console.log('💳 Показываем секцию оплаты T-Bank');
+    console.log('💳 Показываем секцию оплаты');
     
-    // Скрываем секцию данных покупателя
     const customerSection = document.getElementById('customer-data-section');
+    const paymentSection = document.getElementById('tbank-payment-section');
+    const productSummary = document.getElementById('product-summary');
+    
     if (customerSection) {
         customerSection.classList.add('hidden');
     }
     
-    // Показываем секцию оплаты
-    const paymentSection = document.getElementById('tbank-payment-section');
     if (paymentSection) {
         paymentSection.classList.remove('hidden');
     }
     
-    // Инициализируем создание платежа
-    createTBankPayment();
+    // Скрываем Product Summary на втором экране
+    if (productSummary) {
+        productSummary.classList.add('hidden');
+    }
+    
+    // Инициализируем T-Bank виджет
+    initializeTBankWidget();
 }
 
 // ==================== ОБРАБОТКА ФОРМЫ ====================
 function handleFormSubmit(e) {
     e.preventDefault();
-    console.log('📝 Обрабатываем отправку формы...');
+    console.log('📝 Обработка отправки формы...');
     
     // Собираем данные формы
     const formData = collectFormData();
     
     // Валидируем данные
-    if (validateFormData(formData)) {
-        // Сохраняем данные покупателя
-        customerData = formData;
-        console.log('✅ Данные покупателя сохранены:', customerData);
-        
-        // Переходим к секции оплаты
-        showPaymentSection();
+    if (!validateFormData(formData)) {
+        return;
     }
+    
+    // Сохраняем данные покупателя
+    customerData = formData;
+    
+    console.log('✅ Данные покупателя сохранены:', customerData);
+    
+    // Переходим к секции оплаты
+    showPaymentSection();
 }
 
 function collectFormData() {
+    const name = document.getElementById('customer-name').value.trim();
+    const phone = document.getElementById('customer-phone').value.trim();
+    const email = document.getElementById('customer-email').value.trim();
+    
     return {
-        name: document.getElementById('customer-name').value.trim(),
-        phone: document.getElementById('customer-phone').value.trim(),
-        email: document.getElementById('customer-email').value.trim()
+        name,
+        phone,
+        email
     };
 }
 
 function validateFormData(data) {
-    console.log('🔍 Валидируем данные формы:', data);
-    
+    // Проверяем обязательные поля
     if (!data.name) {
         showError('Пожалуйста, введите ваше имя');
+        document.getElementById('customer-name').focus();
         return false;
     }
     
-    if (!data.phone || data.phone.length < 11) {
-        showError('Пожалуйста, введите корректный номер телефона');
+    if (!data.phone) {
+        showError('Пожалуйста, введите номер телефона');
+        document.getElementById('customer-phone').focus();
         return false;
     }
     
-    if (!data.email || !data.email.includes('@')) {
+    if (!data.email) {
+        showError('Пожалуйста, введите email');
+        document.getElementById('customer-email').focus();
+        return false;
+    }
+    
+    // Проверяем формат email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
         showError('Пожалуйста, введите корректный email');
+        document.getElementById('customer-email').focus();
         return false;
     }
     
     return true;
 }
 
-// ==================== UI HELPERS ====================
 function showError(message) {
-    console.error('❌ Ошибка:', message);
-    alert(message); // Простое решение, можно заменить на более красивое уведомление
+    // Можно добавить более красивое отображение ошибок
+    alert(message);
 }
 
+// ==================== ОБНОВЛЕНИЕ ИНФОРМАЦИИ О ПРОДУКТЕ ====================
 function updateProductInfo() {
     if (!selectedProduct) return;
     
-    console.log('📦 Обновляем информацию о продукте в модальном окне');
+    const nameElement = document.getElementById('selected-product-name');
+    const descriptionElement = document.getElementById('selected-product-description');
+    const priceElement = document.getElementById('selected-product-price');
     
-    // Обновляем название продукта
-    const productNameElement = document.getElementById('modal-product-name');
-    if (productNameElement) {
-        productNameElement.textContent = selectedProduct.name;
+    if (nameElement) {
+        nameElement.textContent = selectedProduct.name;
     }
     
-    // Обновляем цену продукта
-    const productPriceElement = document.getElementById('modal-product-price');
-    if (productPriceElement) {
-        productPriceElement.textContent = selectedProduct.price;
+    if (descriptionElement) {
+        descriptionElement.textContent = selectedProduct.description;
+    }
+    
+    if (priceElement) {
+        priceElement.textContent = selectedProduct.price;
     }
 }
 
-// ==================== СОЗДАНИЕ ПЛАТЕЖА T-BANK ====================
+// ==================== T-BANK ИНТЕГРАЦИЯ ====================
 function initializeTBankWidget() {
-    console.log('💳 Инициализируем виджет T-Bank...');
-    // Эта функция больше не нужна, но оставляем для совместимости
+    console.log('🏦 Инициализируем T-Bank виджет...');
+    
+    const container = document.getElementById('tbank-payment-container');
+    if (!container || !selectedProduct) return;
+    
+    // Очищаем контейнер
+    container.innerHTML = '';
+    
+    // Создаем реальную интеграцию с T-Bank вместо виджета
     createTBankPayment();
 }
 
 async function createTBankPayment() {
-    console.log('💰 Создаем платеж T-Bank и готовим перенаправление:', selectedProduct, customerData);
+    console.log('💰 Создаем реальный платеж T-Bank:', selectedProduct, customerData);
     
     if (!selectedProduct || !customerData) {
         showError('Данные о продукте или покупателе не найдены');
         return;
     }
-
-    // Показываем уведомление о создании платежа
-    showPaymentRedirectNotification();
+    
+    // Показываем индикатор загрузки
+    const container = document.getElementById('tbank-payment-container');
+    container.innerHTML = `
+        <div class="p-8 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p class="text-gray-600">Создаем платеж...</p>
+        </div>
+    `;
     
     // Извлекаем цену из строки (убираем "₽" и пробелы)
     const priceString = selectedProduct.price.replace(/[^\d]/g, '');
@@ -351,10 +430,10 @@ async function createTBankPayment() {
         console.log('📨 Ответ от T-Bank:', result);
         
         if (result.Success && result.PaymentURL) {
-            console.log('✅ Платеж создан успешно, перенаправляем на:', result.PaymentURL);
+            console.log('✅ Платеж создан успешно:', result.PaymentURL);
             
-            // Перенаправляем на платежную форму T-Bank
-            redirectToTBankPaymentForm(result.PaymentURL);
+            // Показываем iframe с платежной формой T-Bank
+            showTBankIframe(result.PaymentURL);
             
         } else {
             throw new Error(result.Message || result.Details || result.error || 'Неизвестная ошибка при создании платежа');
@@ -366,44 +445,34 @@ async function createTBankPayment() {
     }
 }
 
-function showPaymentRedirectNotification() {
-    console.log('🔄 Показываем уведомление о создании платежа и подготовке к перенаправлению');
+function showTBankIframe(paymentURL) {
+    console.log('💳 Показываем iframe T-Bank:', paymentURL);
     
     const container = document.getElementById('tbank-payment-container');
+    // Чистый T-Bank виджет с элементами доверия внизу
     container.innerHTML = `
-        <div class="text-center p-8">
-            <!-- Анимация загрузки -->
-            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-500 mx-auto mb-6"></div>
+        <!-- Iframe загрузки -->
+        <div id="tbank-loading" class="p-6 text-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto mb-3"></div>
+            <p class="text-gray-600 text-sm">Загружаем платежную форму T-Bank...</p>
+        </div>
+        
+        <!-- Контейнер для iframe с индикаторами безопасности -->
+        <div id="tbank-widget-container" class="hidden">
+            <!-- Iframe -->
+            <iframe 
+                id="tbank-iframe"
+                src="${paymentURL}"
+                class="w-full min-h-80 border-0 rounded-lg block"
+                style="height: 500px; max-height: 80vh;"
+                frameborder="0"
+                scrolling="auto"
+                onload="adjustIframeHeight(this); hideTBankLoading()"
+                onerror="showTBankError('Ошибка загрузки платежной формы')"
+            ></iframe>
             
-            <!-- Заголовок -->
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">
-                Создаем ваш платеж
-            </h3>
-            
-            <!-- Описание -->
-            <div class="space-y-3 mb-6">
-                <p class="text-gray-600">
-                    Подготавливаем платежную форму T-Bank с вашими данными...
-                </p>
-                <p class="text-sm text-gray-500">
-                    Через несколько секунд вы будете перенаправлены на безопасную страницу оплаты
-                </p>
-            </div>
-            
-            <!-- Способы оплаты -->
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <h4 class="text-sm font-medium text-blue-800 mb-3">Доступные способы оплаты:</h4>
-                <div class="flex flex-wrap justify-center gap-3 text-xs text-blue-700">
-                    <span class="bg-white px-2 py-1 rounded">💳 Банковские карты</span>
-                    <span class="bg-white px-2 py-1 rounded">📱 T-Pay</span>
-                    <span class="bg-white px-2 py-1 rounded">⚡ СБП</span>
-                    <span class="bg-white px-2 py-1 rounded">🟢 SberPay</span>
-                    <span class="bg-white px-2 py-1 rounded">🔵 MirPay</span>
-                </div>
-            </div>
-            
-            <!-- Индикаторы безопасности -->
-            <div class="flex items-center justify-center gap-4 bg-green-50 border border-green-200 rounded-lg p-3">
+            <!-- Индикаторы безопасности под виджетом -->
+            <div class="flex items-center justify-center gap-4 mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
                 <div class="flex items-center gap-2 text-green-700">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
@@ -427,48 +496,81 @@ function showPaymentRedirectNotification() {
     `;
 }
 
-function redirectToTBankPaymentForm(paymentURL) {
-    console.log('🚀 Перенаправляем на платежную форму T-Bank:', paymentURL);
+function adjustIframeHeight(iframe) {
+    console.log('📏 Подстраиваем высоту iframe под содержимое');
     
-    // Показываем финальное уведомление
-    const container = document.getElementById('tbank-payment-container');
-    container.innerHTML = `
-        <div class="text-center p-8">
-            <!-- Иконка успеха -->
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                </svg>
-            </div>
-            
-            <!-- Сообщение -->
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">
-                Платеж готов!
-            </h3>
-            <p class="text-gray-600 mb-6">
-                Переходим на безопасную страницу оплаты T-Bank...
-            </p>
-            
-            <!-- Кнопка ручного перехода -->
-            <button 
-                onclick="window.location.href='${paymentURL}'" 
-                class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
-            >
-                Если не произошло автоматическое перенаправление - нажмите здесь
-            </button>
-        </div>
-    `;
-    
-    // Закрываем модальное окно через 2 секунды
-    setTimeout(() => {
-        closePaymentModal();
+    try {
+        // Пытаемся получить высоту содержимого iframe
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
         
-        // Еще через секунду делаем перенаправление
+        if (iframeDocument) {
+            // Ждем полной загрузки содержимого
+            setTimeout(() => {
+                const contentHeight = Math.max(
+                    iframeDocument.body.scrollHeight,
+                    iframeDocument.body.offsetHeight,
+                    iframeDocument.documentElement.clientHeight,
+                    iframeDocument.documentElement.scrollHeight,
+                    iframeDocument.documentElement.offsetHeight
+                );
+                
+                // Устанавливаем минимальную и максимальную высоту
+                const minHeight = 320; // min-h-80 = 320px
+                const maxHeight = Math.min(window.innerHeight * 0.8, 600); // 80vh или 600px максимум
+                
+                // Подстраиваем высоту в допустимых пределах
+                const adjustedHeight = Math.min(Math.max(contentHeight, minHeight), maxHeight);
+                
+                iframe.style.height = adjustedHeight + 'px';
+                iframe.style.maxHeight = maxHeight + 'px';
+                
+                console.log(`📐 Высота iframe установлена: ${adjustedHeight}px (контент: ${contentHeight}px, макс: ${maxHeight}px)`);
+                
+                // Если контент больше максимальной высоты, включаем скролл
+                if (contentHeight > maxHeight) {
+                    iframe.style.overflowY = 'auto';
+                    iframe.scrolling = 'yes';
+                } else {
+                    iframe.style.overflowY = 'hidden';
+                    iframe.scrolling = 'no';
+                }
+            }, 500); // Даем время на полную загрузку контента
+        }
+    } catch (error) {
+        console.log('⚠️ Не удалось подстроить высоту iframe (cross-origin ограничения), используем стандартную высоту');
+        // В случае cross-origin ограничений используем увеличенную адаптивную высоту
+        const fallbackHeight = window.innerWidth < 640 ? '450px' : '500px';
+        const maxHeight = Math.min(window.innerHeight * 0.8, 600) + 'px';
+        
+        iframe.style.height = fallbackHeight;
+        iframe.style.maxHeight = maxHeight;
+        iframe.style.overflowY = 'auto';
+        iframe.scrolling = 'yes';
+        
+        console.log(`📐 Fallback высота установлена: ${fallbackHeight} (макс: ${maxHeight})`);
+    }
+}
+
+function hideTBankLoading() {
+    console.log('✅ T-Bank iframe загружен');
+    const loading = document.getElementById('tbank-loading');
+    const widgetContainer = document.getElementById('tbank-widget-container');
+    const iframe = document.getElementById('tbank-iframe');
+    
+    if (loading) {
+        loading.classList.add('hidden');
+    }
+    
+    if (widgetContainer) {
+        widgetContainer.classList.remove('hidden');
+    }
+    
+    if (iframe) {
+        // Дополнительная попытка подстройки высоты после показа iframe
         setTimeout(() => {
-            console.log('🔄 Выполняем перенаправление на T-Bank...');
-            window.location.href = paymentURL;
-        }, 1000);
-    }, 2000);
+            adjustIframeHeight(iframe);
+        }, 100);
+    }
 }
 
 function showTBankError(message) {
@@ -476,26 +578,17 @@ function showTBankError(message) {
     
     const container = document.getElementById('tbank-payment-container');
     container.innerHTML = `
-        <div class="text-center p-8">
-            <!-- Иконка ошибки -->
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        <div class="p-8 text-center">
+            <div class="text-red-500 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                 </svg>
             </div>
-            
-            <!-- Сообщение об ошибке -->
-            <h3 class="text-xl font-semibold text-red-600 mb-4">
-                Ошибка создания платежа
-            </h3>
-            <p class="text-gray-600 mb-6">
-                ${message}
-            </p>
-            
-            <!-- Кнопка повтора -->
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Ошибка оплаты</h3>
+            <p class="text-gray-600 mb-4">${message}</p>
             <button 
-                onclick="showCustomerDataSection()" 
-                class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
+                onclick="showCustomerDataSection()"
+                class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
                 Попробовать снова
             </button>
@@ -503,20 +596,17 @@ function showTBankError(message) {
     `;
 }
 
-// ==================== LEGACY FUNCTIONS (для совместимости) ====================
 function createTBankWidget() {
-    // Эта функция больше не используется, но оставляем для совместимости
-    console.log('⚠️ createTBankWidget() устарела, используется createTBankPayment()');
-    createTBankPayment();
+    // Эта функция больше не используется, заменена на createTBankPayment
+    return document.createElement('div');
 }
 
 function processPayment() {
-    // Эта функция больше не используется, но оставляем для совместимости
-    console.log('⚠️ processPayment() устарела, используется createTBankPayment()');
-    createTBankPayment();
+    // Эта функция больше не используется, заменена на createTBankPayment
+    console.log('💳 processPayment() вызвана, но теперь используется createTBankPayment()');
 }
 
-// ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+// ==================== МАСКИРОВАНИЕ ТЕЛЕФОНА ====================
 function initPhoneMask() {
     const phoneInput = document.getElementById('customer-phone');
     if (!phoneInput) return;
@@ -524,43 +614,47 @@ function initPhoneMask() {
     phoneInput.addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
         
-        if (value.startsWith('8')) {
-            value = '7' + value.slice(1);
+        if (value.length > 0) {
+            if (value[0] === '8') {
+                value = '7' + value.slice(1);
+            }
+            if (value[0] !== '7') {
+                value = '7' + value;
+            }
         }
         
-        if (value.startsWith('7')) {
-            value = value.slice(0, 11);
-            const formatted = value.replace(/(\d)(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ($2) $3-$4-$5');
-            e.target.value = formatted;
-        } else if (value.length > 0) {
-            value = '7' + value;
-            value = value.slice(0, 11);
-            const formatted = value.replace(/(\d)(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ($2) $3-$4-$5');
-            e.target.value = formatted;
+        let formattedValue = '';
+        if (value.length > 0) {
+            formattedValue = '+7';
+            if (value.length > 1) {
+                formattedValue += ' (' + value.slice(1, 4);
+                if (value.length > 4) {
+                    formattedValue += ') ' + value.slice(4, 7);
+                    if (value.length > 7) {
+                        formattedValue += '-' + value.slice(7, 9);
+                        if (value.length > 9) {
+                            formattedValue += '-' + value.slice(9, 11);
+                        }
+                    }
+                }
+            }
         }
-    });
-    
-    phoneInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' && e.target.value === '+7 (') {
-            e.target.value = '';
-        }
+        
+        e.target.value = formattedValue;
     });
 }
 
+// ==================== СБРОС ФОРМЫ ====================
 function resetForm() {
-    console.log('🔄 Очищаем форму');
-    
     const form = document.getElementById('payment-form');
     if (form) {
         form.reset();
     }
-    
-    // Очищаем контейнер T-Bank
-    const container = document.getElementById('tbank-payment-container');
-    if (container) {
-        container.innerHTML = '';
-    }
-    
-    // Показываем секцию данных покупателя
-    showCustomerDataSection();
-} 
+}
+
+// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ ВЫЗОВА ИЗ HTML ====================
+window.openPaymentModal = openPaymentModal;
+window.closePaymentModal = closePaymentModal;
+window.processPayment = processPayment;
+window.hideTBankLoading = hideTBankLoading;
+window.showTBankError = showTBankError; 
