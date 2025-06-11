@@ -48,100 +48,13 @@ jobs:
         path: dist/
         retention-days: 1
 
-  # Деплой Cloud Functions
-  deploy-functions:
-    name: ⚡ Deploy Functions
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    
-    steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
 
-    - name: 🔧 Setup Yandex Cloud CLI
-      run: |
-        curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-        echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
-
-    - name: 🔑 Authenticate Yandex Cloud
-      run: |
-        echo '${{ secrets.YC_SERVICE_ACCOUNT_KEY }}' > key.json
-        yc config profile create github-actions
-        yc config set service-account-key key.json
-        yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
-        yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
-
-    - name: 📦 Package create-payment function
-      run: |
-        cd yandex-cloud/functions/create-payment
-        zip -r create-payment.zip .
-        mv create-payment.zip ../
-
-    - name: 📦 Package send-to-n8n function
-      run: |
-        cd yandex-cloud/functions/send-to-n8n
-        zip -r send-to-n8n.zip .
-        mv send-to-n8n.zip ../
-
-    - name: ⚡ Deploy create-payment function
-      run: |
-        # Проверяем существует ли функция
-        if yc serverless function get create-payment >/dev/null 2>&1; then
-          echo "Updating existing function..."
-          yc serverless function version create \
-            --function-name create-payment \
-            --runtime nodejs18 \
-            --entrypoint index.handler \
-            --memory 128m \
-            --execution-timeout 10s \
-            --source-path yandex-cloud/functions/create-payment.zip
-        else
-          echo "Creating new function..."
-          yc serverless function create --name create-payment
-          yc serverless function version create \
-            --function-name create-payment \
-            --runtime nodejs18 \
-            --entrypoint index.handler \
-            --memory 128m \
-            --execution-timeout 10s \
-            --source-path yandex-cloud/functions/create-payment.zip
-        fi
-
-    - name: ⚡ Deploy send-to-n8n function
-      run: |
-        # Проверяем существует ли функция
-        if yc serverless function get send-to-n8n >/dev/null 2>&1; then
-          echo "Updating existing function..."
-          yc serverless function version create \
-            --function-name send-to-n8n \
-            --runtime nodejs18 \
-            --entrypoint index.handler \
-            --memory 128m \
-            --execution-timeout 10s \
-            --source-path yandex-cloud/functions/send-to-n8n.zip
-        else
-          echo "Creating new function..."
-          yc serverless function create --name send-to-n8n
-          yc serverless function version create \
-            --function-name send-to-n8n \
-            --runtime nodejs18 \
-            --entrypoint index.handler \
-            --memory 128m \
-            --execution-timeout 10s \
-            --source-path yandex-cloud/functions/send-to-n8n.zip
-        fi
-
-    - name: 🌐 Make functions public
-      run: |
-        yc serverless function allow-unauthenticated-invoke create-payment
-        yc serverless function allow-unauthenticated-invoke send-to-n8n
 
   # Деплой статических файлов
   deploy-static:
     name: 📦 Deploy Static Files
     runs-on: ubuntu-latest
-    needs: [build, deploy-functions]
+    needs: [build, terraform]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     
     steps:
@@ -189,6 +102,17 @@ jobs:
       with:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
 
+    - name: 📦 Create function archives
+      run: |
+        cd ../functions/create-payment
+        zip -r ../create-payment.zip .
+        cd ../send-to-n8n
+        zip -r ../send-to-n8n.zip .
+        cd ../../terraform
+        mkdir -p functions
+        mv ../functions/create-payment.zip functions/
+        mv ../functions/send-to-n8n.zip functions/
+
     - name: 🔑 Setup Terraform credentials
       run: |
         echo '${{ secrets.YC_SERVICE_ACCOUNT_KEY }}' > key.json
@@ -222,20 +146,20 @@ jobs:
   notify:
     name: 📢 Notify Deployment
     runs-on: ubuntu-latest
-    needs: [deploy-functions, deploy-static]
+    needs: [terraform, deploy-static]
     if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     
     steps:
     - name: ✅ Success notification
-      if: needs.deploy-functions.result == 'success' && needs.deploy-static.result == 'success'
+      if: needs.terraform.result == 'success' && needs.deploy-static.result == 'success'
       run: |
         echo "🎉 Deployment successful!"
-        echo "✅ Functions deployed"
+        echo "✅ Functions deployed via Terraform"
         echo "✅ Static files uploaded"
         echo "🌐 Site is live at: https://${{ secrets.YC_BUCKET_NAME }}"
 
     - name: ❌ Failure notification
-      if: needs.deploy-functions.result == 'failure' || needs.deploy-static.result == 'failure'
+      if: needs.terraform.result == 'failure' || needs.deploy-static.result == 'failure'
       run: |
         echo "❌ Deployment failed!"
         echo "Check the logs above for details."
