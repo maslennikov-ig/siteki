@@ -170,29 +170,52 @@ jobs:
         $HOME/yandex-cloud/bin/yc config list
         echo "✅ YC CLI готов к работе!"
 
-    - name: 📥 Import existing resources (ignore errors)
+    - name: 📥 Import existing resources and handle state
       run: |
-        echo "🔄 Попытка импорта существующих ресурсов..."
+        echo "🔄 Проверка и импорт существующих ресурсов..."
         
-        # Импорт bucket (игнорируем ошибку если уже импортирован)
-        terraform import -var-file=terraform.tfvars yandex_storage_bucket.siteki_bucket "academycredit.ru" 2>/dev/null || echo "⚠️ Bucket импорт пропущен"
+        # Функция для безопасного импорта ресурса
+        safe_import() {
+          local resource=$1
+          local id=$2
+          echo "🔍 Проверка $resource..."
+          
+          # Проверяем, есть ли ресурс в state
+          if terraform state show "$resource" >/dev/null 2>&1; then
+            echo "✅ $resource уже в state"
+            return 0
+          fi
+          
+          # Пытаемся импортировать
+          if terraform import -var-file=terraform.tfvars "$resource" "$id" 2>/dev/null; then
+            echo "✅ $resource успешно импортирован"
+          else
+            echo "⚠️ Не удалось импортировать $resource, будет создан новый"
+          fi
+        }
         
-        # Получаем ID функций если они существуют  
+        # Получаем ID существующих ресурсов
         CREATE_PAYMENT_ID=$($HOME/yandex-cloud/bin/yc serverless function get create-payment --format=json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
         SEND_TO_N8N_ID=$($HOME/yandex-cloud/bin/yc serverless function get send-to-n8n --format=json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
+        API_GATEWAY_ID=$($HOME/yandex-cloud/bin/yc serverless api-gateway get siteki-api --format=json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
         
-        # Импорт функций если они найдены
-        if [[ -n "$CREATE_PAYMENT_ID" && "$CREATE_PAYMENT_ID" != "null" ]]; then
-          echo "📦 Импорт функции create-payment: $CREATE_PAYMENT_ID"
-          terraform import -var-file=terraform.tfvars yandex_function.create_payment "$CREATE_PAYMENT_ID" 2>/dev/null || echo "⚠️ Функция create-payment импорт пропущен"
+        # Импорт bucket (использует новый import блок в Terraform)
+        safe_import "yandex_storage_bucket.siteki_bucket" "academycredit.ru"
+        
+        # Импорт функций если они существуют
+        if [[ -n "$CREATE_PAYMENT_ID" && "$CREATE_PAYMENT_ID" != "null" && "$CREATE_PAYMENT_ID" != "" ]]; then
+          safe_import "yandex_function.create_payment" "$CREATE_PAYMENT_ID"
         fi
         
-        if [[ -n "$SEND_TO_N8N_ID" && "$SEND_TO_N8N_ID" != "null" ]]; then
-          echo "📦 Импорт функции send-to-n8n: $SEND_TO_N8N_ID"
-          terraform import -var-file=terraform.tfvars yandex_function.send_to_n8n "$SEND_TO_N8N_ID" 2>/dev/null || echo "⚠️ Функция send-to-n8n импорт пропущен"
+        if [[ -n "$SEND_TO_N8N_ID" && "$SEND_TO_N8N_ID" != "null" && "$SEND_TO_N8N_ID" != "" ]]; then
+          safe_import "yandex_function.send_to_n8n" "$SEND_TO_N8N_ID"
         fi
         
-        echo "✅ Импорт завершён (ошибки игнорированы)"
+        if [[ -n "$API_GATEWAY_ID" && "$API_GATEWAY_ID" != "null" && "$API_GATEWAY_ID" != "" ]]; then
+          safe_import "yandex_api_gateway.siteki_gateway" "$API_GATEWAY_ID"
+        fi
+        
+        echo "✅ Проверка импорта завершена"
 
     - name: 📋 Terraform Plan
       run: |

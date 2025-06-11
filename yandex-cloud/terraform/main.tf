@@ -25,7 +25,12 @@ variable "domain_name" {
   default     = "academycredit.ru"
 }
 
-# S3 bucket для статического хостинга (используем существующий если есть)
+# Используем существующий сервисный аккаунт github-actions-sa
+data "yandex_iam_service_account" "existing_sa" {
+  name = "github-actions-sa"
+}
+
+# S3 bucket для статического хостинга
 resource "yandex_storage_bucket" "siteki_bucket" {
   bucket     = var.domain_name
   access_key = yandex_iam_service_account_static_access_key.sa_static_key.access_key
@@ -51,18 +56,13 @@ resource "yandex_storage_bucket" "siteki_bucket" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes = [
-      # Игнорируем изменения если bucket уже существует
-      bucket,
-      access_key,
-      secret_key
-    ]
   }
 }
 
-# Используем существующий сервисный аккаунт github-actions-sa
-data "yandex_iam_service_account" "existing_sa" {
-  name = "github-actions-sa"
+# Импорт существующего bucket
+import {
+  to = yandex_storage_bucket.siteki_bucket
+  id = "academycredit.ru"
 }
 
 # Создаём статический ключ для существующего сервисного аккаунта
@@ -71,7 +71,7 @@ resource "yandex_iam_service_account_static_access_key" "sa_static_key" {
   description        = "Статический ключ для Object Storage"
 }
 
-# Роль для работы с Object Storage (если ещё не назначена)
+# Роль для работы с Object Storage
 resource "yandex_resourcemanager_folder_iam_member" "sa_storage_editor" {
   folder_id = var.folder_id
   role      = "storage.editor"
@@ -80,11 +80,11 @@ resource "yandex_resourcemanager_folder_iam_member" "sa_storage_editor" {
 
 # Cloud Functions
 
-# Функция создания платежа (создаем только если не существует)
+# Функция создания платежа
 resource "yandex_function" "create_payment" {
   name               = "create-payment"
   description        = "Функция создания платежей T-Bank"
-  user_hash          = "create-payment-v2"  # Увеличиваем версию
+  user_hash          = "create-payment-v3"  # Увеличиваем версию для обновления
   runtime            = "nodejs18"
   entrypoint         = "index.handler"
   memory             = 128
@@ -101,18 +101,17 @@ resource "yandex_function" "create_payment" {
 
   lifecycle {
     ignore_changes = [
-      # Игнорируем некритичные изменения при обновлении
-      created_at,
+      # Убираем created_at из ignore_changes как предупреждает Terraform
       version
     ]
   }
 }
 
-# Функция отправки в n8n (создаем только если не существует)
+# Функция отправки в n8n
 resource "yandex_function" "send_to_n8n" {
   name               = "send-to-n8n"
   description        = "Функция отправки данных в n8n"
-  user_hash          = "send-to-n8n-v2"  # Увеличиваем версию
+  user_hash          = "send-to-n8n-v3"  # Увеличиваем версию для обновления
   runtime            = "nodejs18"
   entrypoint         = "index.handler"
   memory             = 128
@@ -129,8 +128,7 @@ resource "yandex_function" "send_to_n8n" {
 
   lifecycle {
     ignore_changes = [
-      # Игнорируем некритичные изменения при обновлении
-      created_at,
+      # Убираем created_at из ignore_changes как предупреждает Terraform
       version
     ]
   }
