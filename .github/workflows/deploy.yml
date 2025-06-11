@@ -64,27 +64,38 @@ jobs:
         name: static-files
         path: dist/
 
-    - name: 🔧 Setup AWS CLI for S3
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.YC_STORAGE_ACCESS_KEY }}
-        aws-secret-access-key: ${{ secrets.YC_STORAGE_SECRET_KEY }}
-        aws-region: ru-central1
-      env:
-        AWS_ENDPOINT_URL_S3: https://storage.yandexcloud.net
+    - name: 🔧 Setup Yandex Cloud CLI
+      run: |
+        # Install Yandex Cloud CLI
+        curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+        echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
+        
+        # Configure YC CLI
+        echo '${{ secrets.YC_SA_JSON_CREDENTIALS }}' > /tmp/sa-key.json
+        $HOME/yandex-cloud/bin/yc config set service-account-key /tmp/sa-key.json
+        $HOME/yandex-cloud/bin/yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
+        $HOME/yandex-cloud/bin/yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
 
     - name: 📤 Upload to Object Storage
-      env:
-        AWS_ENDPOINT_URL_S3: https://storage.yandexcloud.net
       run: |
-        aws s3 sync dist/ s3://${{ secrets.YC_STORAGE_BUCKET }}/ \
-          --endpoint-url=https://storage.yandexcloud.net \
-          --delete \
-          --cache-control "max-age=86400" \
-          --metadata-directive REPLACE
+        # Создаем и выкладываем файлы через yc CLI
+        for file in dist/*; do
+          if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            echo "📁 Загружаем: $filename"
+            $HOME/yandex-cloud/bin/yc storage s3api put-object \
+              --bucket ${{ secrets.YC_STORAGE_BUCKET }} \
+              --key "$filename" \
+              --body "$file" \
+              --cache-control "max-age=86400"
+          fi
+        done
+        echo "✅ Все файлы загружены!"
 
     - name: 🧹 Cleanup artifacts
-      run: rm -rf dist/
+      run: |
+        rm -rf dist/
+        rm -f /tmp/sa-key.json
 
   # Обновление Terraform (опционально)
   terraform:
@@ -149,6 +160,30 @@ jobs:
         echo "🔍 Проверка конфигурации YC CLI..."
         $HOME/yandex-cloud/bin/yc config list
         echo "✅ YC CLI готов к работе!"
+
+    - name: 📥 Import existing resources (ignore errors)
+      run: |
+        echo "🔄 Попытка импорта существующих ресурсов..."
+        
+        # Импорт bucket (игнорируем ошибку если уже импортирован)
+        terraform import yandex_storage_bucket.siteki_bucket "academycredit.ru" 2>/dev/null || echo "⚠️ Bucket импорт пропущен"
+        
+        # Получаем ID функций если они существуют  
+        CREATE_PAYMENT_ID=$($HOME/yandex-cloud/bin/yc serverless function get create-payment --format=json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
+        SEND_TO_N8N_ID=$($HOME/yandex-cloud/bin/yc serverless function get send-to-n8n --format=json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
+        
+        # Импорт функций если они найдены
+        if [[ -n "$CREATE_PAYMENT_ID" && "$CREATE_PAYMENT_ID" != "null" ]]; then
+          echo "📦 Импорт функции create-payment: $CREATE_PAYMENT_ID"
+          terraform import yandex_function.create_payment "$CREATE_PAYMENT_ID" 2>/dev/null || echo "⚠️ Функция create-payment импорт пропущен"
+        fi
+        
+        if [[ -n "$SEND_TO_N8N_ID" && "$SEND_TO_N8N_ID" != "null" ]]; then
+          echo "📦 Импорт функции send-to-n8n: $SEND_TO_N8N_ID"
+          terraform import yandex_function.send_to_n8n "$SEND_TO_N8N_ID" 2>/dev/null || echo "⚠️ Функция send-to-n8n импорт пропущен"
+        fi
+        
+        echo "✅ Импорт завершён (ошибки игнорированы)"
 
     - name: 📋 Terraform Plan
       run: |
