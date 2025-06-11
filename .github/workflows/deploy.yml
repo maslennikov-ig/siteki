@@ -201,17 +201,19 @@ jobs:
           sed -i '/# Импорт существующей функции send-to-n8n/,/^}$/d' main.tf
         fi
         
-        # Добавляем import блок для API Gateway если существует
+        # API Gateway не поддерживает импорт в Yandex Cloud провайдере
         if [[ -n "$API_GATEWAY_ID" && "$API_GATEWAY_ID" != "null" && "$API_GATEWAY_ID" != "" ]]; then
-          echo "📝 Добавление import блока для API Gateway..."
-          cat >> main.tf << EOF
-        
-        # Импорт существующего API Gateway
-        import {
-          to = yandex_api_gateway.siteki_gateway
-          id = "$API_GATEWAY_ID"
-        }
-        EOF
+          echo "⚠️ API Gateway уже существует (ID: $API_GATEWAY_ID)"
+          echo "📝 Yandex API Gateway не поддерживает импорт, удаляем существующий..."
+          
+          # Удаляем существующий API Gateway для корректного создания нового
+          if $HOME/yandex-cloud/bin/yc serverless api-gateway delete "$API_GATEWAY_ID" --async 2>/dev/null; then
+            echo "✅ Существующий API Gateway удалён"
+            # Ждём завершения удаления
+            sleep 5
+          else
+            echo "⚠️ Не удалось удалить API Gateway, продолжаем..."
+          fi
         fi
         
         echo "✅ Обновление import блоков завершено"

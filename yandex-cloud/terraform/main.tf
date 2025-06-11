@@ -158,6 +158,11 @@ resource "yandex_api_gateway" "siteki_gateway" {
     yandex_function.create_payment,
     yandex_function.send_to_n8n
   ]
+
+  lifecycle {
+    # API Gateway не поддерживает импорт, поэтому используем create_before_destroy для безопасного обновления
+    create_before_destroy = true
+  }
 }
 
 # Outputs
