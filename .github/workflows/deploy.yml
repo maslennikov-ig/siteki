@@ -102,6 +102,12 @@ jobs:
       with:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
 
+    - name: 📦 Install dependencies
+      run: |
+        # Install jq for JSON parsing
+        sudo apt-get update
+        sudo apt-get install -y jq
+
     - name: 📦 Create function archives
       run: |
         cd ../functions/create-payment
@@ -120,8 +126,51 @@ jobs:
         export YC_CLOUD_ID="${{ secrets.YC_CLOUD_ID }}"
         export YC_FOLDER_ID="${{ secrets.YC_FOLDER_ID }}"
 
-    - name: 🏗️ Terraform Init
+    - name: 🔄 Terraform Init
       run: terraform init
+
+    - name: 🔄 Import existing resources
+      run: |
+        echo "🔄 Импорт существующих ресурсов..."
+        
+        # Функции
+        FUNCTION_CREATE_PAYMENT_ID=$(yc serverless function get create-payment --format json 2>/dev/null | jq -r '.id' || echo "")
+        FUNCTION_SEND_TO_N8N_ID=$(yc serverless function get send-to-n8n --format json 2>/dev/null | jq -r '.id' || echo "")
+        
+        # Storage bucket 
+        BUCKET_NAME="academycredit.ru"
+        
+        # API Gateway
+        API_GATEWAY_ID=$(yc serverless api-gateway get siteki-api --format json 2>/dev/null | jq -r '.id' || echo "")
+        
+        echo "🔍 Найденные ресурсы:"
+        echo "  - Function create-payment: ${FUNCTION_CREATE_PAYMENT_ID:-'НЕ НАЙДЕНА'}"
+        echo "  - Function send-to-n8n: ${FUNCTION_SEND_TO_N8N_ID:-'НЕ НАЙДЕНА'}"
+        echo "  - Storage bucket: ${BUCKET_NAME}"
+        echo "  - API Gateway: ${API_GATEWAY_ID:-'НЕ НАЙДЕН'}"
+        
+        # Импорт функций (игнорируем ошибки если ресурс уже импортирован)
+        if [[ "$FUNCTION_CREATE_PAYMENT_ID" != "null" && -n "$FUNCTION_CREATE_PAYMENT_ID" ]]; then
+            echo "📦 Импорт функции create-payment..."
+            terraform import yandex_function.create_payment "$FUNCTION_CREATE_PAYMENT_ID" || echo "⚠️ Уже импортирована"
+        fi
+        
+        if [[ "$FUNCTION_SEND_TO_N8N_ID" != "null" && -n "$FUNCTION_SEND_TO_N8N_ID" ]]; then
+            echo "📦 Импорт функции send-to-n8n..."
+            terraform import yandex_function.send_to_n8n "$FUNCTION_SEND_TO_N8N_ID" || echo "⚠️ Уже импортирована"
+        fi
+        
+        # Импорт bucket (игнорируем ошибки)
+        echo "📦 Импорт Storage bucket..."
+        terraform import yandex_storage_bucket.siteki_bucket "$BUCKET_NAME" || echo "⚠️ Bucket не найден или уже импортирован"
+        
+        # Импорт API Gateway
+        if [[ "$API_GATEWAY_ID" != "null" && -n "$API_GATEWAY_ID" ]]; then
+            echo "📦 Импорт API Gateway..."
+            terraform import yandex_api_gateway.siteki_gateway "$API_GATEWAY_ID" || echo "⚠️ Уже импортирован"
+        fi
+        
+        echo "✅ Импорт завершён!"
 
     - name: 📋 Terraform Plan
       run: |
