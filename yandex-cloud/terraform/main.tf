@@ -100,11 +100,15 @@ resource "yandex_function" "create_payment" {
   }
 
   lifecycle {
-    ignore_changes = [
-      # Убираем created_at из ignore_changes как предупреждает Terraform
-      version
-    ]
+    prevent_destroy = true
+    # Убрали version из ignore_changes согласно предупреждению Terraform
   }
+}
+
+# Импорт существующей функции create-payment
+import {
+  to = yandex_function.create_payment
+  id = "d4e7qmhtr3ms2kv5v6jg"  # ID функции, получается через: yc serverless function get create-payment --format=json | jq -r '.id'
 }
 
 # Функция отправки в n8n
@@ -127,11 +131,15 @@ resource "yandex_function" "send_to_n8n" {
   }
 
   lifecycle {
-    ignore_changes = [
-      # Убираем created_at из ignore_changes как предупреждает Terraform
-      version
-    ]
+    prevent_destroy = true
+    # Убрали version из ignore_changes согласно предупреждению Terraform
   }
+}
+
+# Импорт существующей функции send-to-n8n
+import {
+  to = yandex_function.send_to_n8n
+  id = "d4emo3l7d88cej49f3d9"  # ID функции, получается через: yc serverless function get send-to-n8n --format=json | jq -r '.id'
 }
 
 # API Gateway
