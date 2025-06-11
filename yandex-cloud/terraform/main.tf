@@ -49,43 +49,42 @@ resource "yandex_storage_bucket" "siteki_bucket" {
   }
 }
 
-# Сервисный аккаунт для Object Storage
-resource "yandex_iam_service_account" "sa_siteki" {
-  name        = "siteki-terraform-sa"
-  description = "Сервисный аккаунт для проекта Siteki (создан через Terraform)"
+# Используем существующий сервисный аккаунт github-actions-sa
+data "yandex_iam_service_account" "existing_sa" {
+  name = "github-actions-sa"
 }
 
-# Роль для работы с Object Storage
-resource "yandex_resourcemanager_folder_iam_member" "sa_editor" {
-  folder_id = var.folder_id
-  role      = "storage.editor"
-  member    = "serviceAccount:${yandex_iam_service_account.sa_siteki.id}"
-}
-
-# Статический ключ доступа
+# Создаём статический ключ для существующего сервисного аккаунта
 resource "yandex_iam_service_account_static_access_key" "sa_static_key" {
-  service_account_id = yandex_iam_service_account.sa_siteki.id
+  service_account_id = data.yandex_iam_service_account.existing_sa.id
   description        = "Статический ключ для Object Storage"
 }
 
+# Роль для работы с Object Storage (если ещё не назначена)
+resource "yandex_resourcemanager_folder_iam_member" "sa_storage_editor" {
+  folder_id = var.folder_id
+  role      = "storage.editor"
+  member    = "serviceAccount:${data.yandex_iam_service_account.existing_sa.id}"
+}
+
 # Cloud Functions
-# Функция создания платежей
+# Функция создания платежа
 resource "yandex_function" "create_payment" {
   name               = "create-payment"
   description        = "Функция создания платежей T-Bank"
   user_hash          = "create-payment-v1"
   runtime            = "nodejs18"
   entrypoint         = "index.handler"
-  memory             = "128"
+  memory             = 128
   execution_timeout  = "10"
-  service_account_id = yandex_iam_service_account.sa_siteki.id
-
-  content {
-    zip_filename = "functions/create-payment.zip"
-  }
+  service_account_id = data.yandex_iam_service_account.existing_sa.id
 
   environment = {
     NODE_ENV = "production"
+  }
+
+  content {
+    zip_filename = "functions/create-payment.zip"
   }
 }
 
@@ -96,16 +95,16 @@ resource "yandex_function" "send_to_n8n" {
   user_hash          = "send-to-n8n-v1"
   runtime            = "nodejs18"
   entrypoint         = "index.handler"
-  memory             = "128"
+  memory             = 128
   execution_timeout  = "10"
-  service_account_id = yandex_iam_service_account.sa_siteki.id
-
-  content {
-    zip_filename = "functions/send-to-n8n.zip"
-  }
+  service_account_id = data.yandex_iam_service_account.existing_sa.id
 
   environment = {
     NODE_ENV = "production"
+  }
+
+  content {
+    zip_filename = "functions/send-to-n8n.zip"
   }
 }
 
