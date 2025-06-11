@@ -73,7 +73,7 @@ jobs:
 
     - name: 📤 Upload to Object Storage
       run: |
-        aws s3 sync dist/ s3://${{ secrets.YC_BUCKET_NAME }}/ \
+        aws s3 sync dist/ s3://${{ secrets.YC_STORAGE_BUCKET }}/ \
           --endpoint-url=https://storage.yandexcloud.net \
           --delete \
           --cache-control "max-age=86400" \
@@ -112,16 +112,13 @@ jobs:
         curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
         echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
         
-    - name: 🔧 Configure Yandex Cloud CLI  
-      uses: yc-actions/yc-iam-token@v1
-      id: yc-iam-token
-      with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_KEY_JSON }}
-        
-    - name: 🔧 Setup YC CLI with IAM token
+    - name: 🔧 Configure Yandex Cloud CLI
       run: |
-        # Configure yc CLI with IAM token
-        $HOME/yandex-cloud/bin/yc config set token ${{ steps.yc-iam-token.outputs.token }}
+        # Create service account key file
+        echo '${{ secrets.YC_SA_JSON_CREDENTIALS }}' > /tmp/sa-key.json
+        
+        # Configure yc CLI
+        $HOME/yandex-cloud/bin/yc config set service-account-key /tmp/sa-key.json
         $HOME/yandex-cloud/bin/yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
         $HOME/yandex-cloud/bin/yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
         
@@ -203,7 +200,7 @@ jobs:
 
     - name: 📋 Terraform Plan
       run: |
-        export YC_TOKEN="${{ steps.yc-iam-token.outputs.token }}"
+        export YC_SERVICE_ACCOUNT_KEY_FILE="/tmp/sa-key.json"
         export YC_CLOUD_ID="${{ secrets.YC_CLOUD_ID }}"
         export YC_FOLDER_ID="${{ secrets.YC_FOLDER_ID }}"
         terraform plan \
@@ -213,7 +210,7 @@ jobs:
     - name: 🚀 Terraform Apply
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       run: |
-        export YC_TOKEN="${{ steps.yc-iam-token.outputs.token }}"
+        export YC_SERVICE_ACCOUNT_KEY_FILE="/tmp/sa-key.json"
         export YC_CLOUD_ID="${{ secrets.YC_CLOUD_ID }}"
         export YC_FOLDER_ID="${{ secrets.YC_FOLDER_ID }}"
         terraform apply -auto-approve \
@@ -234,7 +231,7 @@ jobs:
         echo "🎉 Deployment successful!"
         echo "✅ Functions deployed via Terraform"
         echo "✅ Static files uploaded"
-        echo "🌐 Site is live at: https://${{ secrets.YC_BUCKET_NAME }}"
+        echo "🌐 Site is live at: https://${{ secrets.YC_STORAGE_BUCKET }}"
 
     - name: ❌ Failure notification
       if: needs.terraform.result == 'failure' || needs.deploy-static.result == 'failure'
