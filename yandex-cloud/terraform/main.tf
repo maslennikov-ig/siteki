@@ -51,8 +51,8 @@ resource "yandex_storage_bucket" "siteki_bucket" {
 
 # Сервисный аккаунт для Object Storage
 resource "yandex_iam_service_account" "sa_siteki" {
-  name        = "siteki-sa"
-  description = "Сервисный аккаунт для проекта Siteki"
+  name        = "siteki-terraform-sa"
+  description = "Сервисный аккаунт для проекта Siteki (создан через Terraform)"
 }
 
 # Роль для работы с Object Storage
