@@ -1,6 +1,6 @@
 {
-  "name": "siteki",
-  "version": "7.1.0",
+  "name": "academycredit",
+  "version": "9.0.0",
   "description": "Академия Финансов - лендинг с интеграцией платежной системы Т-банка",
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
     "кредитная история",
     "т-банк",
     "платежи",
-    "netlify"
+    "yandex-cloud"
   ],
   "author": "Академия Финансов",
   "license": "MIT",

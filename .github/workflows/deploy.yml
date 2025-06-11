@@ -1,0 +1,242 @@
+name: 🚀 Deploy to Yandex Cloud
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  TERRAFORM_VERSION: '1.6.0'
+
+jobs:
+  # Проверка кода и сборка
+  build:
+    name: 🔨 Build & Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📥 Install dependencies
+      run: npm ci
+
+    - name: 🎨 Build CSS with Tailwind
+      run: npx tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify
+
+    - name: 📦 Prepare static files
+      run: |
+        mkdir -p dist
+        cp *.html dist/
+        cp *.jpg *.png *.svg dist/ 2>/dev/null || true
+        cp *.js dist/
+        cp openapi.json dist/ 2>/dev/null || true
+
+    - name: 📤 Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: static-files
+        path: dist/
+        retention-days: 1
+
+  # Деплой Cloud Functions
+  deploy-functions:
+    name: ⚡ Deploy Functions
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup Yandex Cloud CLI
+      run: |
+        curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+        echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
+
+    - name: 🔑 Authenticate Yandex Cloud
+      run: |
+        echo '${{ secrets.YC_SERVICE_ACCOUNT_KEY }}' > key.json
+        yc config profile create github-actions
+        yc config set service-account-key key.json
+        yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
+        yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
+
+    - name: 📦 Package create-payment function
+      run: |
+        cd yandex-cloud/functions/create-payment
+        zip -r create-payment.zip .
+        mv create-payment.zip ../
+
+    - name: 📦 Package send-to-n8n function
+      run: |
+        cd yandex-cloud/functions/send-to-n8n
+        zip -r send-to-n8n.zip .
+        mv send-to-n8n.zip ../
+
+    - name: ⚡ Deploy create-payment function
+      run: |
+        # Проверяем существует ли функция
+        if yc serverless function get create-payment >/dev/null 2>&1; then
+          echo "Updating existing function..."
+          yc serverless function version create \
+            --function-name create-payment \
+            --runtime nodejs18 \
+            --entrypoint index.handler \
+            --memory 128m \
+            --execution-timeout 10s \
+            --source-path yandex-cloud/functions/create-payment.zip
+        else
+          echo "Creating new function..."
+          yc serverless function create --name create-payment
+          yc serverless function version create \
+            --function-name create-payment \
+            --runtime nodejs18 \
+            --entrypoint index.handler \
+            --memory 128m \
+            --execution-timeout 10s \
+            --source-path yandex-cloud/functions/create-payment.zip
+        fi
+
+    - name: ⚡ Deploy send-to-n8n function
+      run: |
+        # Проверяем существует ли функция
+        if yc serverless function get send-to-n8n >/dev/null 2>&1; then
+          echo "Updating existing function..."
+          yc serverless function version create \
+            --function-name send-to-n8n \
+            --runtime nodejs18 \
+            --entrypoint index.handler \
+            --memory 128m \
+            --execution-timeout 10s \
+            --source-path yandex-cloud/functions/send-to-n8n.zip
+        else
+          echo "Creating new function..."
+          yc serverless function create --name send-to-n8n
+          yc serverless function version create \
+            --function-name send-to-n8n \
+            --runtime nodejs18 \
+            --entrypoint index.handler \
+            --memory 128m \
+            --execution-timeout 10s \
+            --source-path yandex-cloud/functions/send-to-n8n.zip
+        fi
+
+    - name: 🌐 Make functions public
+      run: |
+        yc serverless function allow-unauthenticated-invoke create-payment
+        yc serverless function allow-unauthenticated-invoke send-to-n8n
+
+  # Деплой статических файлов
+  deploy-static:
+    name: 📦 Deploy Static Files
+    runs-on: ubuntu-latest
+    needs: [build, deploy-functions]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: 📥 Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: static-files
+        path: dist/
+
+    - name: 🔧 Setup AWS CLI for S3
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.YC_STORAGE_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.YC_STORAGE_SECRET_KEY }}
+        aws-region: ru-central1
+
+    - name: 📤 Upload to Object Storage
+      run: |
+        aws s3 sync dist/ s3://${{ secrets.YC_BUCKET_NAME }}/ \
+          --endpoint-url=https://storage.yandexcloud.net \
+          --delete \
+          --cache-control "max-age=86400" \
+          --metadata-directive REPLACE
+
+    - name: 🧹 Cleanup artifacts
+      run: rm -rf dist/
+
+  # Обновление Terraform (опционально)
+  terraform:
+    name: 🏗️ Terraform Plan/Apply
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    defaults:
+      run:
+        working-directory: yandex-cloud/terraform
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+    - name: 🔑 Setup Terraform credentials
+      run: |
+        echo '${{ secrets.YC_SERVICE_ACCOUNT_KEY }}' > key.json
+        export YC_SERVICE_ACCOUNT_KEY_FILE="$(pwd)/key.json"
+        export YC_CLOUD_ID="${{ secrets.YC_CLOUD_ID }}"
+        export YC_FOLDER_ID="${{ secrets.YC_FOLDER_ID }}"
+
+    - name: 🏗️ Terraform Init
+      run: terraform init
+
+    - name: 📋 Terraform Plan
+      run: |
+        export YC_SERVICE_ACCOUNT_KEY_FILE="$(pwd)/key.json"
+        export YC_CLOUD_ID="${{ secrets.YC_CLOUD_ID }}"
+        export YC_FOLDER_ID="${{ secrets.YC_FOLDER_ID }}"
+        terraform plan \
+          -var="folder_id=${{ secrets.YC_FOLDER_ID }}" \
+          -var="domain_name=${{ secrets.YC_BUCKET_NAME }}"
+
+    - name: 🚀 Terraform Apply
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      run: |
+        export YC_SERVICE_ACCOUNT_KEY_FILE="$(pwd)/key.json"
+        export YC_CLOUD_ID="${{ secrets.YC_CLOUD_ID }}"
+        export YC_FOLDER_ID="${{ secrets.YC_FOLDER_ID }}"
+        terraform apply -auto-approve \
+          -var="folder_id=${{ secrets.YC_FOLDER_ID }}" \
+          -var="domain_name=${{ secrets.YC_BUCKET_NAME }}"
+
+  # Уведомления о деплое
+  notify:
+    name: 📢 Notify Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-functions, deploy-static]
+    if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - name: ✅ Success notification
+      if: needs.deploy-functions.result == 'success' && needs.deploy-static.result == 'success'
+      run: |
+        echo "🎉 Deployment successful!"
+        echo "✅ Functions deployed"
+        echo "✅ Static files uploaded"
+        echo "🌐 Site is live at: https://${{ secrets.YC_BUCKET_NAME }}"
+
+    - name: ❌ Failure notification
+      if: needs.deploy-functions.result == 'failure' || needs.deploy-static.result == 'failure'
+      run: |
+        echo "❌ Deployment failed!"
+        echo "Check the logs above for details."
+        exit 1 

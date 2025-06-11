@@ -1,0 +1,10 @@
+{
+  "name": "send-to-n8n",
+  "version": "1.0.0",
+  "description": "Функция отправки данных в n8n для Yandex Cloud",
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 

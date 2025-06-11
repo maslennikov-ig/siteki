@@ -1,9 +1,3 @@
-/**
- * Netlify Function для создания платежей Т-банка
- * Обрабатывает подпись Token на backend
- * ESM версия для современных Netlify Functions
- */
-
 import crypto from 'crypto';
 
 // Конфигурация терминала
@@ -45,9 +39,9 @@ function generateToken(params) {
 }
 
 /**
- * Netlify Function handler (ESM export)
+ * Yandex Cloud Function handler
  */
-export default async (request, context) => {
+export const handler = async (event, context) => {
     // CORS headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -56,33 +50,44 @@ export default async (request, context) => {
         'Content-Type': 'application/json'
     };
     
+    const httpMethod = event.httpMethod || event.requestContext?.http?.method;
+    
     // Handle preflight requests
-    if (request.method === 'OPTIONS') {
-        return new Response('', {
-            status: 200,
-            headers
-        });
+    if (httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers,
+            body: ''
+        };
     }
     
-    if (request.method !== 'POST') {
-        return new Response(JSON.stringify({ error: 'Метод GET не поддерживается' }), {
-            status: 405,
-            headers
-        });
+    if (httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({ error: 'Метод GET не поддерживается' })
+        };
     }
     
     try {
-        const body = await request.json();
+        let body;
+        if (typeof event.body === 'string') {
+            body = JSON.parse(event.body);
+        } else {
+            body = event.body;
+        }
+        
         console.log('📋 Received payment request:', body);
         
         // Валидация обязательных полей
         if (!body.Amount || !body.OrderId || !body.Description) {
-            return new Response(JSON.stringify({ 
-                error: 'Missing required fields: Amount, OrderId, Description' 
-            }), {
-                status: 400,
-                headers
-            });
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ 
+                    error: 'Missing required fields: Amount, OrderId, Description' 
+                })
+            };
         }
         
         // Формируем параметры для API Т-банка
@@ -93,15 +98,15 @@ export default async (request, context) => {
             Description: body.Description,
             Language: 'ru',
             PayType: 'O', // Одностадийная оплата
-            SuccessURL: body.SuccessURL || 'https://siteki.netlify.app/thankyou.html',
-            FailURL: body.FailURL || 'https://siteki.netlify.app/fail.html',
+            SuccessURL: body.SuccessURL || 'https://academycredit.ru/thankyou.html',
+            FailURL: body.FailURL || 'https://academycredit.ru/fail.html',
             DATA: {
                 connection_type: 'Widget'
             },
             Receipt: {
                 Email: body.Email || 'test@example.com', // Email ВНУТРИ Receipt объекта
                 Phone: body.Phone || '+79999999999', // Phone ВНУТРИ Receipt объекта
-                EmailCompany: 'info@siteki.netlify.app',
+                EmailCompany: 'info@academycredit.ru',
                 Taxation: 'usn_income',
                 Items: [
                     {
@@ -136,19 +141,21 @@ export default async (request, context) => {
         const result = await response.json();
         console.log('📨 T-Bank API response:', result);
         
-        return new Response(JSON.stringify(result), {
-            status: 200,
-            headers
-        });
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify(result)
+        };
         
     } catch (error) {
         console.error('❌ Backend error:', error);
-        return new Response(JSON.stringify({ 
-            error: 'Internal server error',
-            details: error.message 
-        }), {
-            status: 500,
-            headers
-        });
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ 
+                error: 'Internal server error',
+                details: error.message 
+            })
+        };
     }
 }; 

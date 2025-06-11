@@ -1,6 +1,11 @@
-exports.handler = async (event, context) => {
+/**
+ * Yandex Cloud Function для отправки данных в n8n
+ */
+export const handler = async (event, context) => {
     // Поддерживаем только POST запросы
-    if (event.httpMethod !== 'POST') {
+    const httpMethod = event.httpMethod || event.requestContext?.http?.method;
+    
+    if (httpMethod !== 'POST') {
         return {
             statusCode: 405,
             headers: {
@@ -13,7 +18,7 @@ exports.handler = async (event, context) => {
     }
 
     // Обработка preflight запросов
-    if (event.httpMethod === 'OPTIONS') {
+    if (httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
             headers: {
@@ -26,10 +31,15 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        console.log('📤 Netlify функция: отправляем данные в n8n...');
+        console.log('📤 Yandex Cloud функция: отправляем данные в n8n...');
         
         // Парсим данные из запроса
-        const orderData = JSON.parse(event.body);
+        let orderData;
+        if (typeof event.body === 'string') {
+            orderData = JSON.parse(event.body);
+        } else {
+            orderData = event.body;
+        }
         
         console.log('📋 Данные заказа для n8n:', orderData);
         
@@ -60,7 +70,7 @@ exports.handler = async (event, context) => {
         };
 
     } catch (error) {
-        console.error('❌ Ошибка в Netlify функции send-to-n8n:', error);
+        console.error('❌ Ошибка в Yandex Cloud функции send-to-n8n:', error);
         
         // Возвращаем ошибку с CORS заголовками
         return {

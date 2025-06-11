@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: Siteki API Gateway
+  version: 1.0.0
+
+servers:
+  - url: https://{api_gateway_domain}
+
+paths:
+  # Статические файлы из Object Storage
+  /{path+}:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: ${bucket_name}
+        object: "{path}"
+        error_object: "fail.html"
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+
+  # Корневая страница
+  /:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: ${bucket_name}
+        object: "index.html"
+
+  # API функции
+  /api/create-payment:
+    post:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: ${create_payment_id}
+      responses:
+        '200':
+          description: Успешное создание платежа
+        '400':
+          description: Ошибка валидации
+        '500':
+          description: Внутренняя ошибка сервера
+    options:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: ${create_payment_id}
+      responses:
+        '200':
+          description: CORS preflight
+
+  /api/send-to-n8n:
+    post:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: ${send_to_n8n_id}
+      responses:
+        '200':
+          description: Успешная отправка в n8n
+        '500':
+          description: Ошибка отправки
+    options:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: ${send_to_n8n_id}
+      responses:
+        '200':
+          description: CORS preflight 
