@@ -140,63 +140,11 @@ jobs:
     - name: 🔄 Terraform Init
       run: terraform init
 
-    - name: 🔄 Import existing resources
+    - name: 🔍 Verify YC CLI Configuration
       run: |
-        echo "🔄 Импорт существующих ресурсов..."
-        
-        # Use full path to yc CLI
-        YC_CLI="$HOME/yandex-cloud/bin/yc"
-        
-        # Verify yc CLI is working
-        echo "🔍 Проверка yc CLI..."
-        $YC_CLI config list
-        
-        # Функции
-        echo "📋 Поиск функций..."
-        FUNCTION_CREATE_PAYMENT_ID=$($YC_CLI serverless function get create-payment --format json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
-        FUNCTION_SEND_TO_N8N_ID=$($YC_CLI serverless function get send-to-n8n --format json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
-        
-        # Storage bucket 
-        BUCKET_NAME="academycredit.ru"
-        
-        # API Gateway
-        echo "📋 Поиск API Gateway..."
-        API_GATEWAY_ID=$($YC_CLI serverless api-gateway get siteki-api --format json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
-        
-        echo "🔍 Найденные ресурсы:"
-        echo "  - Function create-payment: ${FUNCTION_CREATE_PAYMENT_ID:-'НЕ НАЙДЕНА'}"
-        echo "  - Function send-to-n8n: ${FUNCTION_SEND_TO_N8N_ID:-'НЕ НАЙДЕНА'}"
-        echo "  - Storage bucket: ${BUCKET_NAME}"
-        echo "  - API Gateway: ${API_GATEWAY_ID:-'НЕ НАЙДЕН'}"
-        
-        # Импорт функций (игнорируем ошибки если ресурс уже импортирован)
-        if [[ "$FUNCTION_CREATE_PAYMENT_ID" != "null" && -n "$FUNCTION_CREATE_PAYMENT_ID" && "$FUNCTION_CREATE_PAYMENT_ID" != "" ]]; then
-            echo "📦 Импорт функции create-payment ($FUNCTION_CREATE_PAYMENT_ID)..."
-            terraform import yandex_function.create_payment "$FUNCTION_CREATE_PAYMENT_ID" || echo "⚠️ Уже импортирована или ошибка импорта"
-        else
-            echo "⚠️ Функция create-payment не найдена, будет создана"
-        fi
-        
-        if [[ "$FUNCTION_SEND_TO_N8N_ID" != "null" && -n "$FUNCTION_SEND_TO_N8N_ID" && "$FUNCTION_SEND_TO_N8N_ID" != "" ]]; then
-            echo "📦 Импорт функции send-to-n8n ($FUNCTION_SEND_TO_N8N_ID)..."
-            terraform import yandex_function.send_to_n8n "$FUNCTION_SEND_TO_N8N_ID" || echo "⚠️ Уже импортирована или ошибка импорта"
-        else
-            echo "⚠️ Функция send-to-n8n не найдена, будет создана"
-        fi
-        
-        # Импорт bucket (игнорируем ошибки)
-        echo "📦 Импорт Storage bucket ($BUCKET_NAME)..."
-        terraform import yandex_storage_bucket.siteki_bucket "$BUCKET_NAME" || echo "⚠️ Bucket не найден или уже импортирован"
-        
-        # Импорт API Gateway
-        if [[ "$API_GATEWAY_ID" != "null" && -n "$API_GATEWAY_ID" && "$API_GATEWAY_ID" != "" ]]; then
-            echo "📦 Импорт API Gateway ($API_GATEWAY_ID)..."
-            terraform import yandex_api_gateway.siteki_gateway "$API_GATEWAY_ID" || echo "⚠️ Уже импортирован или ошибка импорта"
-        else
-            echo "⚠️ API Gateway не найден, будет создан"
-        fi
-        
-        echo "✅ Импорт завершён!"
+        echo "🔍 Проверка конфигурации YC CLI..."
+        $HOME/yandex-cloud/bin/yc config list
+        echo "✅ YC CLI готов к работе!"
 
     - name: 📋 Terraform Plan
       run: |
