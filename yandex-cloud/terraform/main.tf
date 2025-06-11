@@ -7,6 +7,22 @@ terraform {
   }
 }
 
+# Import существующих ресурсов
+import {
+  to = yandex_storage_bucket.siteki_bucket
+  id = "academycredit.ru"
+}
+
+import {
+  to = yandex_function.create_payment
+  id = "d4ed9uoq0254fv2pr4v5"
+}
+
+import {
+  to = yandex_function.send_to_n8n
+  id = "d4ess6k276tohpjfjeae"
+}
+
 provider "yandex" {
   # Токен и cloud_id будут переданы через переменные окружения
   folder_id = var.folder_id
@@ -26,9 +42,7 @@ variable "domain_name" {
 
 # S3 bucket для статического хостинга
 resource "yandex_storage_bucket" "siteki_bucket" {
-  bucket     = var.domain_name
-  access_key = yandex_iam_service_account_static_access_key.sa_static_key.access_key
-  secret_key = yandex_iam_service_account_static_access_key.sa_static_key.secret_key
+  bucket = var.domain_name
 
   website {
     index_document = "index.html"
