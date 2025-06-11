@@ -155,6 +155,15 @@ jobs:
     - name: 🔄 Terraform Init
       run: terraform init
 
+    - name: 📝 Create Terraform variables file
+      run: |
+        echo "🔧 Создание файла переменных..."
+        cat > terraform.tfvars << EOF
+        folder_id = "${{ secrets.YC_FOLDER_ID }}"
+        domain_name = "academycredit.ru"
+        EOF
+        echo "✅ Файл terraform.tfvars создан"
+
     - name: 🔍 Verify YC CLI Configuration
       run: |
         echo "🔍 Проверка конфигурации YC CLI..."
@@ -166,7 +175,7 @@ jobs:
         echo "🔄 Попытка импорта существующих ресурсов..."
         
         # Импорт bucket (игнорируем ошибку если уже импортирован)
-        terraform import yandex_storage_bucket.siteki_bucket "academycredit.ru" 2>/dev/null || echo "⚠️ Bucket импорт пропущен"
+        terraform import -var-file=terraform.tfvars yandex_storage_bucket.siteki_bucket "academycredit.ru" 2>/dev/null || echo "⚠️ Bucket импорт пропущен"
         
         # Получаем ID функций если они существуют  
         CREATE_PAYMENT_ID=$($HOME/yandex-cloud/bin/yc serverless function get create-payment --format=json 2>/dev/null | jq -r '.id' 2>/dev/null || echo "")
@@ -175,12 +184,12 @@ jobs:
         # Импорт функций если они найдены
         if [[ -n "$CREATE_PAYMENT_ID" && "$CREATE_PAYMENT_ID" != "null" ]]; then
           echo "📦 Импорт функции create-payment: $CREATE_PAYMENT_ID"
-          terraform import yandex_function.create_payment "$CREATE_PAYMENT_ID" 2>/dev/null || echo "⚠️ Функция create-payment импорт пропущен"
+          terraform import -var-file=terraform.tfvars yandex_function.create_payment "$CREATE_PAYMENT_ID" 2>/dev/null || echo "⚠️ Функция create-payment импорт пропущен"
         fi
         
         if [[ -n "$SEND_TO_N8N_ID" && "$SEND_TO_N8N_ID" != "null" ]]; then
           echo "📦 Импорт функции send-to-n8n: $SEND_TO_N8N_ID"
-          terraform import yandex_function.send_to_n8n "$SEND_TO_N8N_ID" 2>/dev/null || echo "⚠️ Функция send-to-n8n импорт пропущен"
+          terraform import -var-file=terraform.tfvars yandex_function.send_to_n8n "$SEND_TO_N8N_ID" 2>/dev/null || echo "⚠️ Функция send-to-n8n импорт пропущен"
         fi
         
         echo "✅ Импорт завершён (ошибки игнорированы)"
@@ -190,9 +199,7 @@ jobs:
         export YC_SERVICE_ACCOUNT_KEY_FILE="/tmp/sa-key.json"
         export YC_CLOUD_ID="${{ secrets.YC_CLOUD_ID }}"
         export YC_FOLDER_ID="${{ secrets.YC_FOLDER_ID }}"
-        terraform plan \
-          -var="folder_id=${{ secrets.YC_FOLDER_ID }}" \
-          -var="domain_name=academycredit.ru"
+        terraform plan -var-file=terraform.tfvars
 
     - name: 🚀 Terraform Apply
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -200,9 +207,7 @@ jobs:
         export YC_SERVICE_ACCOUNT_KEY_FILE="/tmp/sa-key.json"
         export YC_CLOUD_ID="${{ secrets.YC_CLOUD_ID }}"
         export YC_FOLDER_ID="${{ secrets.YC_FOLDER_ID }}"
-        terraform apply -auto-approve \
-          -var="folder_id=${{ secrets.YC_FOLDER_ID }}" \
-          -var="domain_name=academycredit.ru"
+        terraform apply -auto-approve -var-file=terraform.tfvars
 
   # Уведомления о деплое
   notify:

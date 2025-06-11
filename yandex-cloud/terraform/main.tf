@@ -22,6 +22,7 @@ variable "folder_id" {
 variable "domain_name" {
   description = "Доменное имя для сайта"
   type        = string
+  default     = "academycredit.ru"
 }
 
 # S3 bucket для статического хостинга (используем существующий если есть)

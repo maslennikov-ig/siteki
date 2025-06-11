@@ -1,0 +1,5 @@
+# Пример файла переменных для Terraform
+# Скопируйте этот файл в terraform.tfvars и укажите свои значения
+
+folder_id = "b1g656kle6s1tudv6i3m"
+domain_name = "academycredit.ru" 
