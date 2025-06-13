@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npx tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
+  "outputDirectory": ".",
+  "installCommand": "npm install",
+  "devCommand": "npx tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch",
+  "framework": null
+}
