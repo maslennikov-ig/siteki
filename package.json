@@ -1,27 +1,30 @@
 {
   "name": "academycredit",
-  "version": "9.0.0",
+  "version": "10.0.0",
   "description": "Академия Финансов - лендинг с интеграцией платежной системы Т-банка",
   "type": "module",
   "scripts": {
-    "dev": "netlify dev",
-    "build": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch",
-    "build-prod": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify"
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
+    "build-dev": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch"
   },
   "keywords": [
     "финансы",
     "кредитная история",
     "т-банк",
     "платежи",
-    "yandex-cloud"
+    "render"
   ],
   "author": "Академия Финансов",
   "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "autoprefixer": "^10.4.16",
-    "netlify-cli": "^17.0.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7"

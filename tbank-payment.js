@@ -1,7 +1,7 @@
 /**
  * tbank-payment.js
  * Интеграция платежной системы Т-банка с backend
- * Версия 2.2.0 (через Netlify Functions)
+ * Версия 3.0.0 (через Render Serverless Functions)
  * 
  * Backend обрабатывает генерацию Token и подпись
  */
@@ -55,8 +55,8 @@ async function createPaymentWithBackend(product) {
     console.log('📋 Данные для backend:', paymentData);
     
     try {
-        // Отправляем запрос к нашему backend
-        const response = await fetch('/.netlify/functions/create-payment', {
+        // Отправляем запрос к нашему backend на Render
+        const response = await fetch('/api/create-payment', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ async function paymentStartCallback(paymentType) {
  * Инициализация платежной системы при загрузке страницы
  */
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM загружен, инициализируем платежную систему Т-банка v2.2.0 (с backend)');
+    console.log('DOM загружен, инициализируем платежную систему Т-банка v3.0.0 (с Render backend)');
     
     // Проверяем, работает ли сайт по HTTPS
     if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {

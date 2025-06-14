@@ -39,55 +39,34 @@ function generateToken(params) {
 }
 
 /**
- * Yandex Cloud Function handler
+ * Render Serverless Function handler
  */
-export const handler = async (event, context) => {
+export default async function handler(req, res) {
     // CORS headers
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Content-Type': 'application/json'
-    };
-    
-    const httpMethod = event.httpMethod || event.requestContext?.http?.method;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Content-Type', 'application/json');
     
     // Handle preflight requests
-    if (httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers,
-            body: ''
-        };
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
     
-    if (httpMethod !== 'POST') {
-        return {
-            statusCode: 405,
-            headers,
-            body: JSON.stringify({ error: 'Метод GET не поддерживается' })
-        };
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Метод GET не поддерживается' });
     }
     
     try {
-        let body;
-        if (typeof event.body === 'string') {
-            body = JSON.parse(event.body);
-        } else {
-            body = event.body;
-        }
+        const body = req.body;
         
         console.log('📋 Received payment request:', body);
         
         // Валидация обязательных полей
         if (!body.Amount || !body.OrderId || !body.Description) {
-            return {
-                statusCode: 400,
-                headers,
-                body: JSON.stringify({ 
-                    error: 'Missing required fields: Amount, OrderId, Description' 
-                })
-            };
+            return res.status(400).json({ 
+                error: 'Missing required fields: Amount, OrderId, Description' 
+            });
         }
         
         // Формируем параметры для API Т-банка
@@ -141,21 +120,13 @@ export const handler = async (event, context) => {
         const result = await response.json();
         console.log('📨 T-Bank API response:', result);
         
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify(result)
-        };
+        return res.status(200).json(result);
         
     } catch (error) {
         console.error('❌ Backend error:', error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ 
-                error: 'Internal server error',
-                details: error.message 
-            })
-        };
+        return res.status(500).json({ 
+            error: 'Internal server error',
+            details: error.message 
+        });
     }
-}; 
+} 
